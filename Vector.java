@@ -72,24 +72,26 @@ public class Vector implements Cloneable {
 
 	// returns a vector with magnitude 1
 	public Vector normalize() {
-		double hyp = 999999999;
-		double magnitude = mag();
-		if (magnitude != 0) {
-			hyp = 1 / magnitude;
-		}
-
+		double square = Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2);
+		double hyp = invSquare(square);
 		return new Vector(x * hyp, y * hyp, z * hyp);
 	}
 
 	// returns a vector with magnitude n
 	public Vector normalize(double n) {
-		double hyp = 999999999;
-		double magnitude = mag();
-		if (magnitude != 0) {
-			hyp = n / magnitude;
-		}
-
+		double square = Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2);
+		double hyp = invSquare(square) * n;
 		return new Vector(x * hyp, y * hyp, z * hyp);
+	}
+
+	public double invSquare(double square){
+		double half = 0.5d * square;
+		long i = Double.doubleToLongBits(square);
+		i = 0x5fe6ec85e7de30daL - (i >> 1);
+		square = Double.longBitsToDouble(i);
+		square *= (1.5d - half * square * square);
+
+		return square;
 	}
 
 	@Override
@@ -116,9 +118,8 @@ public class Vector implements Cloneable {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof Vector) {
-			Vector p = (Vector) obj;
-			return getX() == p.getX() && getY() == p.getY() && getZ() == p.getZ();
+		if (obj instanceof Vector p) {
+            return getX() == p.getX() && getY() == p.getY() && getZ() == p.getZ();
 		}
 		return false;
 	}
@@ -146,26 +147,23 @@ public class Vector implements Cloneable {
 	}
 
 	// Rotates a Vector based on Euler Angles
-	public Vector rotateVectorByEuclid(Vector angles)
+	public Vector rotateByEuclid(Vector angles)
 	{
 		Quaternion q = new Quaternion(angles.getX(), angles.getY(), angles.getZ());
 		q.normalize();
-	    // Extract the vector part of the quaternion
-	    Vector u = new Vector(q.b, q.c, q.d);	
 
-	    // Extract the scalar part of the quaternion
-	    double s = q.a;
+		// Calculate Rotation
+		return Quaternion.rotateVector(q, this);
+	}
 
-	    // Do the math
-	    return(u.mul(2.0f * u.dotProd(this)).add(
-	          this.mul(s*s - u.dotProd(u))).add( 
-	          u.crossProd(this).mul(2.0f * s)));
+	public Vector rotateByQuat(Quaternion q){
+		return Quaternion.rotateVector(q, this);
 	}
 
 	// Finds the difference between two angles
-	public double diffAngles(Vector v1) {
-		double ratio = dotProd(v1);
-		ratio /= (mag() * v1.mag());
+	public double diffAngles(Vector vector) {
+		double ratio = dotProd(vector);
+		ratio /= (mag() * vector.mag());
 		return Math.acos(ratio);
 	}
 

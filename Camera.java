@@ -6,11 +6,10 @@
 package main;
 
 import java.awt.*;
-import java.util.Random;
 
 public class Camera extends gameObject {
 
-    private Handler handler;
+    private final Handler handler;
     public double focal_length;
     public double size;
     public Window window;
@@ -26,7 +25,7 @@ public class Camera extends gameObject {
         this.window = window;
     }
     
-    public double getFocal() {
+    public double getFocalLength() {
     	return focal_length;
     }
 
@@ -56,7 +55,13 @@ public class Camera extends gameObject {
         coords = coords.add(vel.mul(1));
 
         // Changes the focal length based on the focal length velocity
-        focal_length += focal_vel;
+        if (focal_vel < 0 && focal_length < 1) {
+            focal_length += focal_length * focal_vel / 4;
+        }
+        else{
+            focal_length += focal_vel;
+        }
+
         focal_vel /= 4;
     }
 
@@ -66,11 +71,10 @@ public class Camera extends gameObject {
 
     // Renders the screen
     public void render(Graphics g) {
-    	Point3D focalPoint = coords.add(getNorm().normalize(getFocal()));
     	Point centre = window.centre();
     	int screenX = window.getWidth() / 2;
     	int screenY = window.getHeight() / 2;
-    	
+        System.out.println("NEW RENDER");
         // Loops through all objects
         for(int i = 0; i < handler.object.size(); i ++) {
             gameObject tempObject = handler.object.get(i);
@@ -87,13 +91,21 @@ public class Camera extends gameObject {
             	for (Point3D p: mesh) {
 
                     // Calculates where on screen the point should map to
-            		Point3D camP = p.screenOrthoCoordinates(this, focalPoint, getNorm(), cos, tan);
-            		g.fillRect((int) (camP.getY() * 40 + screenX), (int) (camP.getZ() * 40 + screenY), 2, 2);
+            		Point3D camPoint = p.screenOrthoCoordinates(this, cos, tan);
+                    if (camPoint !=  null){
+                        g.fillRect((int) (camPoint.getY() * 40 + screenX), (int) (camPoint.getZ() * 40 + screenY), 2, 2);
+                    }
             	}
-
             }
         }
         g.setColor(Color.black);
+
+        Point3D ppoint = this.coords.toVect().add(this.getNorm()).toPoint();
+        Point3D camPoint = ppoint.screenOrthoCoordinates(this, cos, tan);
+        if (camPoint !=  null){
+            g.setColor(Color.yellow);
+            g.fillRect((int) (camPoint.getY() * 40 + screenX), (int) (camPoint.getZ() * 40 + screenY), 4, 4);
+        }
 
         // Prints the focal-length on screen and number of cosines and tangents applied
         g.drawString("Focal Length: " + focal_length, 600, 600);

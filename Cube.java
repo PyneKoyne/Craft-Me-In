@@ -6,21 +6,40 @@
 package main;
 
 import java.awt.*;
+import java.util.Arrays;
 
 public class Cube extends gameObject{
-    private Handler handler;
-    private Color color;
+    private final Handler handler;
+    private final Color color;
     
     
-    public Cube(Point3D p, ID id, Handler handler, Color color){
+    public Cube(Point3D p, float scale, ID id, Handler handler, Color color){
         super(p, new Vector(1, 0, 0), id);
         this.handler = handler;
 
-        Point3D[] verts = {new Point3D(p.x, p.y, p.z), new Point3D(p.x + 2, p.y, p.z), new Point3D(p.x + 2, p.y + 2, p.z), new Point3D(p.x, p.y + 2, p.z)};
-        Point[] edges = {new Point(0, 1), new Point(1, 2), new Point(2, 3), new Point(3, 0)};
-        Face[] faces = {new Face(new int[]{0, 1, 2, 3})};
+        Point3D[] verts = {
+                p,
+                p.add(new Vector(scale, 0, 0)),
+                p.add(new Vector(0, scale, 0)),
+                p.add(new Vector(scale, scale, 0)),
 
-        this.mesh = new Mesh(verts, edges, faces);
+                p.add(new Vector(0, 0, scale)),
+                p.add(new Vector(scale, 0, scale)),
+                p.add(new Vector(0, scale, scale)),
+                p.add(new Vector(scale, scale, scale))
+        };
+        System.out.println(Arrays.toString(verts));
+        int[][] faceVerts = new int[][]
+                {
+                        {0, 1, 3, 2},
+                        {0, 4, 6, 2},
+                        {0, 1, 5, 4},
+                        {2, 6, 7, 3},
+                        {4, 5, 7, 6},
+                        {5, 7, 3, 1}
+                };
+
+        this.mesh = new Mesh(verts, faceVerts);
         this.color = color;
         mesh.createMesh();
         

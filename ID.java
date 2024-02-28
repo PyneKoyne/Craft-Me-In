@@ -8,7 +8,7 @@ package main;
 // IDs
 public enum ID {
 
-    Camera(),
-    Cube;
+    Camera,
+    Cube
 
 }

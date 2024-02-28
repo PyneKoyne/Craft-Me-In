@@ -63,40 +63,44 @@ public class Engine extends Canvas implements Runnable{
         window = new Window(WIDTH, HEIGHT, "Real Engine", this);
 
         //Places the Camera
-        handler.addObject(new Camera(new Point3D(0, 0, 0), 10, ID.Camera, handler, window));
+        handler.addObject(new Camera(new Point3D(0, 0, 0), 0.2, ID.Camera, handler, window));
 
         // Places cubes which are actually planes
-        handler.addObject(new Cube(new Point3D(10, 10, 10), ID.Cube, handler, Color.black));
+        handler.addObject(new Cube(new Point3D(10, 10, 10), 10, ID.Cube, handler, Color.black));
     }
 
     //Game Loop
     public void run(){
 
-        //There are variables for the Game Loop
+        // Time variables to control the game loop
         long lastTime = System.nanoTime();
         double amountOfTicks = 60.0;
         double ns = 1000000000 / amountOfTicks;
         double delta = 0;
         long timer = System.currentTimeMillis();
         int frames = 0;
-        
+
+        // Game Loop
         while(running){
-            
+
+            // Adds to Delta Time
             long now = System.nanoTime();
             delta += (now - lastTime) / ns;
             lastTime = now;
+
+            // Ticks all game objects
             while(delta >=1)
             {
                 tick();
                 delta--;
             }
-            if(running)
+            if(running) {
                 render();
+            }
             frames++;
 
             // Prints every second
-            if(System.currentTimeMillis()-timer > 1000) {
-
+            if(System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
 
                 //Prints the FPS into the console

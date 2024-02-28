@@ -83,18 +83,28 @@ public class Face implements Cloneable {
 	}
 
 	// Draw all points within a face given vertices
-	// Currently only draws a plane, using the difference between the first 3 vertices as unit vectors
+	// Currently only draws Quats
 	public ArrayList<Point3D> drawFace(Point3D[] vertices) {
+		final double LENGTH = 0.2;
 		ArrayList<Point3D> Points = new ArrayList<Point3D>();
+
+		// We only care about x and y because we assume there are only two unit vectors
 		Vector unitX;
 		Vector unitY;
-		unitX = vertices[verts[0]].subtract(vertices[verts[1]]).normalize(0.45);
-		unitY = vertices[verts[0]].subtract(vertices[verts[3]]).normalize(0.45);
+		unitX = vertices[verts[0]].subtract(vertices[verts[1]]).normalize(LENGTH);
+		unitY = vertices[verts[0]].subtract(vertices[verts[verts.length - 1]]).normalize(LENGTH);
 
-		for (int i = -50; i < 50; i++) {
-			for (int j = -50; j < 50; j++) {
-				Points.add(vertices[verts[0]].add(unitX.mul(i)).add(unitY.mul(j)));
+		double maxX = Math.max(vertices[verts[1]].subtract(vertices[verts[0]]).mag(), vertices[verts[2]].subtract(vertices[verts[0]]).mag()); // when do we stop the loop
+		double maxY = Math.max(vertices[verts[2]].subtract(vertices[verts[0]]).mag(), vertices[verts[3]].subtract(vertices[verts[0]]).mag());
+
+		int numX = 0;
+		for (double i = 0; i < 10; i += LENGTH) {
+			int numY = 0;
+			for (double j = 0; j < 10; j += LENGTH) {
+				Points.add(vertices[verts[0]].add(unitX.mul(numX)).add(unitY.mul(numY)));
+				numY ++;
 			}
+			numX++;
 		}
 
 		return Points;
@@ -115,9 +125,8 @@ public class Face implements Cloneable {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof Face) {
-			Face p = (Face) obj;
-			return Arrays.equals(verts, p.getVerts());
+		if (obj instanceof Face p) {
+            return Arrays.equals(verts, p.getVerts());
 		}
 		return false;
 	}

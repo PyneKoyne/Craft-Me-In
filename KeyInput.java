@@ -15,7 +15,7 @@ public class KeyInput extends KeyAdapter {
     private boolean dP = false;
     private boolean lP = false;
     private boolean rP = false;
-    private Handler handler;
+    private final Handler handler;
 
     public KeyInput(Handler handler){
         this.handler = handler;
@@ -32,25 +32,27 @@ public class KeyInput extends KeyAdapter {
             gameObject tempObject = handler.object.get(i);
             if (tempObject.getid() == ID.Camera) {
                 Camera cam = (Camera) tempObject;
+
                 // Finds if there is any actions made
             	Vector force = Vector.zero;
+                Vector norm = tempObject.getNorm();
 
                 // Moves forward, right, backwards, and left respectively based on if the key is held down
                 if(key == KeyEvent.VK_W ){
                     uP = true;
-                    force = tempObject.getNorm().mul(0.02);
+                    force = norm.mul(0.02);
                 }
                 if(key == KeyEvent.VK_D ){
                     rP = true;
-                    force = tempObject.getNorm().rotateVectorByEuclid(new Vector(0, 0, Math.PI/2.0)).mul(0.02);
+                    force = norm.rotateByQuat(new Quaternion(Math.PI/2.0, tempObject.getUp())).mul(0.02);
                 }
                 if(key == KeyEvent.VK_S ){
                     dP = true;
-                    force = tempObject.getNorm().mul(-0.02);
+                    force = norm.mul(-0.02);
                 }
                 if(key == KeyEvent.VK_A ){
                     lP = true;
-                    force = tempObject.getNorm().rotateVectorByEuclid(new Vector(0, 0, -Math.PI/2.0)).mul(0.02);
+                    force = norm.rotateByQuat(new Quaternion(-Math.PI/2.0, tempObject.getUp())).mul(0.02);
                 }
 
                 // If the shift key is pressed, it switches between the camera being locked or not
@@ -79,7 +81,7 @@ public class KeyInput extends KeyAdapter {
                 }
 
                 if (key == KeyEvent.VK_X){
-                    handler.addObject(new Cube(cam.getLocation().add(cam.getNorm()), ID.Cube, handler, Color.yellow));
+                    handler.addObject(new Cube(cam.getLocation().add(cam.getNorm()), 1, ID.Cube, handler, Color.yellow));
                 }
 
                 tempObject.addForce(force);

@@ -15,6 +15,7 @@ public abstract class gameObject {
 	protected Vector vel;
 	protected double roll, pitch, yaw;
 	protected Vector norm;
+	protected Vector up;
 	protected ID id;
 	protected Mesh mesh;
 
@@ -87,8 +88,8 @@ public abstract class gameObject {
 	}
 
 	public void setVelX(double velX) {
-		this.vel.setX(velX);;
-	}
+		this.vel.setX(velX);
+    }
 
 	public void setVelY(double velY) {
 		this.vel.setY(velY);
@@ -118,6 +119,14 @@ public abstract class gameObject {
 		this.norm = norm;
 	}
 
+	public Vector getUp() {
+		return up;
+	}
+
+	public void setUp(Vector up){
+		this.up = up;
+	}
+
 	public void setRot(Vector rot) {
 		// Rotations over 360 degrees are modul-ised
 		this.roll = rot.getX() % (2 * Math.PI);
@@ -126,6 +135,9 @@ public abstract class gameObject {
 
 		// Sets the norm when the rotation is set as well
 		this.setNorm(Quaternion.rotateVectorByEuclid(Vector.i, rot));
+
+		// Sets the up vector when the rotation vector is set
+		this.setUp(Quaternion.rotateVectorByEuclid(Vector.k, rot));
 	}
 	
 	public void setRoll(double roll) {

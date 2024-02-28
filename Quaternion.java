@@ -6,37 +6,30 @@
 package main;
 
 public class Quaternion implements Cloneable {
-	public double a, b, c, d;
+	public double w, x, y, z;
 
 	// Constructs a normal Quaternion
 	public Quaternion(double theta, double x, double y, double z) {
-		this.a = Math.cos(theta/2);
-		this.b = x * Math.sin(theta/2);
-		this.c = y * Math.sin(theta/2);
-		this.d = z * Math.sin(theta/2);
+		this.w = Math.cos(theta/2.0);
+		this.x = x * Math.sin(theta/2.0);
+		this.y = y * Math.sin(theta/2.0);
+		this.z = z * Math.sin(theta/2.0);
+	}
+
+	// Constructs a Quaternion from an angle and a Vector
+	public Quaternion(double theta, Vector v){
+		this.w = Math.cos(theta/2.0);
+		this.x = v.x * Math.sin(theta/2.0);
+		this.y = v.y * Math.sin(theta/2.0);
+		this.z = v.z * Math.sin(theta/2.0);
 	}
 
 	// Constructs a Quaternion from Euler Angles
-	public Quaternion(double u, double v, double w) {
-		this.a = Math.cos(u/2) * Math.cos(v/2) * Math.cos(w/2) + Math.sin(u/2) * Math.sin(v/2) * Math.sin(w/2);
-		this.b = Math.sin(u/2) * Math.cos(v/2) * Math.cos(w/2) - Math.cos(u/2) * Math.sin(v/2) * Math.sin(w/2);
-		this.c = Math.cos(u/2) * Math.sin(v/2) * Math.cos(w/2) + Math.sin(u/2) * Math.cos(v/2) * Math.sin(w/2);
-		this.d = Math.cos(u/2) * Math.cos(v/2) * Math.sin(w/2) - Math.sin(u/2) * Math.sin(v/2) * Math.cos(w/2);
-	}
-
-	// Rotates a vector given a quaternion
-	public Vector rotateVectorByQuat(Vector v)
-	{
-	    // Extract the vector part of the quaternion
-	    Vector u = new Vector(b, c, d);
-
-	    // Extract the scalar part of the quaternion
-	    double s = a;
-
-	    // Do the math
-	    return(u.mul(2.0 * u.dotProd(v)).add(
-	          v.mul(s*s - u.dotProd(v))).add( 
-	          u.crossProd(v).mul(2.0f * s)));
+	public Quaternion(double roll, double pitch, double yaw) {
+		this.w = Math.cos(roll/2) * Math.cos(pitch/2) * Math.cos(yaw/2) + Math.sin(roll/2) * Math.sin(pitch/2) * Math.sin(yaw/2);
+		this.x = Math.sin(roll/2) * Math.cos(pitch/2) * Math.cos(yaw/2) - Math.cos(roll/2) * Math.sin(pitch/2) * Math.sin(yaw/2);
+		this.y = Math.cos(roll/2) * Math.sin(pitch/2) * Math.cos(yaw/2) + Math.sin(roll/2) * Math.cos(pitch/2) * Math.sin(yaw/2);
+		this.z = Math.cos(roll/2) * Math.cos(pitch/2) * Math.sin(yaw/2) - Math.sin(roll/2) * Math.sin(pitch/2) * Math.cos(yaw/2);
 	}
 
 	// Rotates a Vector given Euler Angles
@@ -44,38 +37,29 @@ public class Quaternion implements Cloneable {
 	{
 		Quaternion q = new Quaternion(angles.getX(), angles.getY(), angles.getZ());
 
-	    // Extract the vector part of the quaternion
-	    Vector u = new Vector(q.b, q.c, q.d);
-	    
-	    // Extract the scalar part of the quaternion
-	    double s = q.a;
-
-	    // Do the math
-	    return(u.mul(2.0 * u.dotProd(v)).add(
-	          v.mul(s*s - u.dotProd(u))).add( 
-	          u.crossProd(v).mul(2.0 * s)));
+		return rotateVector(q, v);
 	}
 
-	public void setLocation(double a, double b, double c, double d) {
-		this.a = a;
-		this.b = b;
-		this.c = c;
-		this.d = d;
+	public void setLocation(double w, double x, double y, double z) {
+		this.w = w;
+		this.x = x;
+		this.y = y;
+		this.z = z;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getName() + "[a=" + a + ",b=" + b + ",c=" + c + "d=" + d + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return getClass().getName() + "[w=" + w + ",x=" + x + ",y=" + y + "z=" + z + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	// Finds the magnitude of a quaternion
-	public double mag(double a, double b, double c, double d) {
-		return Math.sqrt(a * a + b * b + c * c + d * d);
+	public double mag(double w, double x, double y, double z) {
+		return Math.sqrt(w * w + x * x + y * y + z * z);
 	}
 
 	// Finds the magnitude of the quaternion
 	public double mag() {
-		return Math.sqrt(a * a + b * b + c * c + d * d);
+		return Math.sqrt(w * w + x * x + y * y + z * z);
 	}
 
 	// Prints whether the magnitude of the Quaternion is 1
@@ -85,26 +69,56 @@ public class Quaternion implements Cloneable {
 
 	// Quaternion to angle
 	public double quat2angle() {
-		return 2 * Math.acos(a);
+		return 2 * Math.acos(w);
 	}
 
 	// returns a Quaternion with magnitude 1
 	public Quaternion normalize() {
 		double hyp = mag();
 
-		return new Quaternion(a / hyp, b / hyp, c / hyp, d / hyp);
+		return new Quaternion(w / hyp, x / hyp, y / hyp, z / hyp);
 	}
 
 	// returns the inverse of the Quaternion
 	public Quaternion inv() {
-		return new Quaternion(a, -b, -c, -d);
+		return new Quaternion(w, -x, -y, -z);
 	}
 
 	// Rotates a point based on a Quaternion
-	public Point3D rotate(Quaternion rot, Point3D point) {
+	public Point3D rotatePoint(Quaternion rot, Point3D point) {
 		Quaternion quatPoint = new Quaternion(0, point.getX(), point.getY(), point.getZ());
 		Quaternion pPrime = rot.inv().mul(quatPoint).mul(rot);
-		return new Point3D(pPrime.b, pPrime.c, pPrime.d);
+		return new Point3D(pPrime.x, pPrime.y, pPrime.z);
+	}
+
+	public static Vector rotateVector(Quaternion q, Vector v) {
+		// Extract the vector part of the quaternion
+		Vector unitVector = new Vector(q.x, q.y, q.z);
+
+		// Extract the scalar part of the quaternion
+		double s = q.w;
+
+		// Do the math
+		return(
+				unitVector.mul(2.0 * unitVector.dotProd(v)).add(
+						v.mul(s*s - unitVector.dotProd(unitVector))).add(
+						unitVector.crossProd(v).mul(2.0 * s))
+		);
+	}
+
+	public Vector rotateVector(Vector v) {
+		// Extract the vector part of the quaternion
+		Vector unitVector = new Vector(this.x, this.y, this.z);
+
+		// Extract the scalar part of the quaternion
+		double s = this.w;
+
+		// Do the math
+		return(
+				unitVector.mul(2.0 * unitVector.dotProd(v)).add(
+						v.mul(s*s - unitVector.dotProd(unitVector))).add(
+						unitVector.crossProd(v).mul(2.0 * s))
+		);
 	}
 
 	@Override
@@ -119,10 +133,10 @@ public class Quaternion implements Cloneable {
 
 	@Override
 	public int hashCode() {
-		long l = java.lang.Double.doubleToLongBits(a);
-		l = l * 31 ^ java.lang.Double.doubleToLongBits(b);
-		l = l * 31 ^ java.lang.Double.doubleToLongBits(c);
-		l = l * 31 ^ java.lang.Double.doubleToLongBits(d);
+		long l = java.lang.Double.doubleToLongBits(w);
+		l = l * 31 ^ java.lang.Double.doubleToLongBits(x);
+		l = l * 31 ^ java.lang.Double.doubleToLongBits(y);
+		l = l * 31 ^ java.lang.Double.doubleToLongBits(z);
 		return (int) ((l >> 31) ^ l);
 	}
 
@@ -132,19 +146,18 @@ public class Quaternion implements Cloneable {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof Quaternion) {
-			Quaternion q = (Quaternion) obj;
-			return a == q.a && b == q.b && c == q.c && d == q.d;
+		if (obj instanceof Quaternion q) {
+            return w == q.w && x == q.x && y == q.y && z == q.z;
 		}
 		return false;
 	}
 
 	// Multiples a Quaternion with another Quaternion
 	public Quaternion mul(Quaternion q) {
-		double p0 = a * q.a - b * q.b - c * q.c - d * q.d;
-		double p1 = a * q.b + b * q.a - c * q.d + d * q.c;
-		double p2 = a * q.c + b * q.d + c * q.a - d * q.b;
-		double p3 = a * q.d - b * q.c + c * q.b + d * q.a;
+		double p0 = w * q.w - x * q.x - y * q.y - z * q.z;
+		double p1 = w * q.x + x * q.w - y * q.z + z * q.y;
+		double p2 = w * q.y + x * q.z + y * q.w - z * q.x;
+		double p3 = w * q.z - x * q.y + y * q.x + z * q.w;
 		return new Quaternion(p0, p1, p2, p3);
 	}
 }
