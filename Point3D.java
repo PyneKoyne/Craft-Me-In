@@ -148,14 +148,12 @@ public class Point3D implements Cloneable {
     }
 
     // Maps a point onto the camera
-    public Point3D screenOrthoCoordinates(Camera cam, int cos, int tan) {
+    public Vector screenOrthoCoordinates(Camera cam, int cos, int tan) {
         final double ROTATION_LIMIT = Math.PI/2.0;
         double focalLength = cam.getFocalLength();
-        double length = 99999999;
         Vector norm = cam.getNorm();
-        Point3D focalPoint = cam.coords.add(norm.mul(focalLength));
-
-        Vector vector2cam = this.subtract(focalPoint).mul(-1);
+        Point3D focalPoint = cam.getFocalPoint();
+        Vector vector2cam = focalPoint.subtract(this);
 
         double angle = vector2cam.diffAngles(norm);
         if (angle > ROTATION_LIMIT){
@@ -166,6 +164,7 @@ public class Point3D implements Cloneable {
         for (int i = 0; i < cos; i++) angle = Math.cos(angle);
         for (int i = 0; i < tan; i++) angle = Math.tan(angle);
 
+//        double length = 99999999;
 //        // length of the vector to reach the screen plane
 //        // In case the angle is 0
 //        if (angle != 0) {
@@ -173,13 +172,10 @@ public class Point3D implements Cloneable {
 //        }
 
         // Rotates the vector to the camera towards the screen
-        vector2cam = Quaternion.rotateVectorByEuclid(vector2cam, cam.getRot().mul(-1));
+        vector2cam = cam.getRot().rotateVector(vector2cam, true);
+        vector2cam.setX(0);
 
-        if (angle *focalLength < 0.1) {
-            System.out.println(angle * focalLength);
-            return (Vector.zero.toPoint());
-        }
-        return (new Vector(0, vector2cam.getY(), vector2cam.getZ()).normalize((angle) * focalLength).toPoint());
+        return vector2cam.normalize(angle * focalLength * 5000);
     }
 
     // Turns a point into a Vector from the origin

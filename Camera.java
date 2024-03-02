@@ -17,6 +17,7 @@ public class Camera extends gameObject {
     public boolean locked = true;
     public int cos = 0;
     public int tan = 0;
+    public Point3D focalPoint = Point3D.zero;
 
     public Camera(Point3D coords, double focal, ID id, Handler handler, Window window) {
         super(coords, new Vector(0, 0, 0), id);
@@ -33,6 +34,8 @@ public class Camera extends gameObject {
     public void setFocalVel(double vel) {
         focal_vel = vel;
     }
+
+    public Point3D getFocalPoint() {return focalPoint;}
 
     // Sets the number of cosines applied in the projection
     public void setCos(int cos) {
@@ -53,13 +56,14 @@ public class Camera extends gameObject {
     // Moves every tick
     public void tick() {
         coords = coords.add(vel.mul(1));
+        focalPoint = this.coords.add(norm.mul(this.focal_length));
 
         // Changes the focal length based on the focal length velocity
         if (focal_vel < 0 && focal_length < 1) {
             focal_length += focal_length * focal_vel / 4;
         }
         else{
-            focal_length += focal_vel;
+            focal_length += focal_vel/4;
         }
 
         focal_vel /= 4;
@@ -71,10 +75,9 @@ public class Camera extends gameObject {
 
     // Renders the screen
     public void render(Graphics g) {
-    	Point centre = window.centre();
+
     	int screenX = window.getWidth() / 2;
     	int screenY = window.getHeight() / 2;
-        System.out.println("NEW RENDER");
         // Loops through all objects
         for(int i = 0; i < handler.object.size(); i ++) {
             gameObject tempObject = handler.object.get(i);
@@ -91,21 +94,14 @@ public class Camera extends gameObject {
             	for (Point3D p: mesh) {
 
                     // Calculates where on screen the point should map to
-            		Point3D camPoint = p.screenOrthoCoordinates(this, cos, tan);
+            		Vector camPoint = p.screenOrthoCoordinates(this, cos, tan);
                     if (camPoint !=  null){
-                        g.fillRect((int) (camPoint.getY() * 40 + screenX), (int) (camPoint.getZ() * 40 + screenY), 2, 2);
+                        g.fillRect((int) (camPoint.getY() + screenX), (int) (camPoint.getZ() + screenY), 2, 2);
                     }
             	}
             }
         }
         g.setColor(Color.black);
-
-        Point3D ppoint = this.coords.toVect().add(this.getNorm()).toPoint();
-        Point3D camPoint = ppoint.screenOrthoCoordinates(this, cos, tan);
-        if (camPoint !=  null){
-            g.setColor(Color.yellow);
-            g.fillRect((int) (camPoint.getY() * 40 + screenX), (int) (camPoint.getZ() * 40 + screenY), 4, 4);
-        }
 
         // Prints the focal-length on screen and number of cosines and tangents applied
         g.drawString("Focal Length: " + focal_length, 600, 600);
@@ -117,11 +113,11 @@ public class Camera extends gameObject {
         if (locked) {
             // Finds the difference in mouse coordinates
             Point p = MouseInfo.getPointerInfo().getLocation();
-            setRot(getRot().add(new Vector(0, (centre.getY() - p.getY())/1000, (centre.getX() - p.getX())/1000)));
+            setRot(getAngles().add(new Vector(0, (screenY - p.getY() + window.screenLoc().y)/1000, (screenX - p.getX() + window.screenLoc().x)/1000)));
 
             try {
                 Robot robot = new Robot();
-                robot.mouseMove((int) (centre.getX()), (int) (centre.getY()));
+                robot.mouseMove((int) (screenX + window.screenLoc().x), (int) (screenY + window.screenLoc().y));
 
             } catch (AWTException e) {
                 e.printStackTrace();

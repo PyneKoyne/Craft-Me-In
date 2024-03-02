@@ -54,7 +54,7 @@ public class Engine extends Canvas implements Runnable{
             		Camera camera = (Camera) tempObject;
 
                     // Sets focal length velocity change to make it more seamless
-            		camera.setFocalVel(-1 * notches);
+            		camera.setFocalVel(-0.2 * notches);
             	}
             }
         });
@@ -66,7 +66,7 @@ public class Engine extends Canvas implements Runnable{
         handler.addObject(new Camera(new Point3D(0, 0, 0), 0.2, ID.Camera, handler, window));
 
         // Places cubes which are actually planes
-        handler.addObject(new Cube(new Point3D(10, 10, 10), 10, ID.Cube, handler, Color.black));
+        handler.addObject(new Cube(new Point3D(10, 10, -8), 10, ID.Cube, handler, Color.black));
     }
 
     //Game Loop

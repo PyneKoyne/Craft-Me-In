@@ -33,9 +33,12 @@ public class Quaternion implements Cloneable {
 	}
 
 	// Rotates a Vector given Euler Angles
-	public static Vector rotateVectorByEuclid(Vector v, Vector angles)
+	public static Vector rotateVectorByEuclid(Vector v, Vector angles, boolean inv)
 	{
 		Quaternion q = new Quaternion(angles.getX(), angles.getY(), angles.getZ());
+		if (inv){
+			q.inv();
+		}
 
 		return rotateVector(q, v);
 	}
@@ -81,7 +84,10 @@ public class Quaternion implements Cloneable {
 
 	// returns the inverse of the Quaternion
 	public Quaternion inv() {
-		return new Quaternion(w, -x, -y, -z);
+		this.x = -this.x;
+		this.y = -this.y;
+		this.z = -this.z;
+		return this;
 	}
 
 	// Rotates a point based on a Quaternion
@@ -106,9 +112,13 @@ public class Quaternion implements Cloneable {
 		);
 	}
 
-	public Vector rotateVector(Vector v) {
+	public Vector rotateVector(Vector v, boolean inv) {
 		// Extract the vector part of the quaternion
 		Vector unitVector = new Vector(this.x, this.y, this.z);
+
+		if (inv) {
+			unitVector = unitVector.mul(-1);
+		}
 
 		// Extract the scalar part of the quaternion
 		double s = this.w;

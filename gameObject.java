@@ -14,6 +14,7 @@ public abstract class gameObject {
 	protected Point3D coords;
 	protected Vector vel;
 	protected double roll, pitch, yaw;
+	protected Quaternion rot;
 	protected Vector norm;
 	protected Vector up;
 	protected ID id;
@@ -21,11 +22,7 @@ public abstract class gameObject {
 
 	// Average game object constructor
 	public gameObject(Point3D cos, Vector rot, ID id) {
-		this.roll = rot.getX();
-		this.pitch = rot.getY();
-		this.yaw = rot.getZ();
-		
-		norm = Quaternion.rotateVectorByEuclid(new Vector(1, 0, 0), rot);
+		setRot(rot);
 		coords = cos;
 		this.vel = new Vector(0, 0, 0);
 		this.id = id;
@@ -129,15 +126,17 @@ public abstract class gameObject {
 
 	public void setRot(Vector rot) {
 		// Rotations over 360 degrees are modul-ised
-		this.roll = rot.getX() % (2 * Math.PI);
-		this.pitch = rot.getY() % (2 * Math.PI);
-		this.yaw = rot.getZ() % (2 * Math.PI);
+		this.roll = rot.getX();
+		this.pitch = rot.getY();
+		this.yaw = rot.getZ();
+
+		this.rot = new Quaternion(this.roll, this.pitch, this.yaw);
 
 		// Sets the norm when the rotation is set as well
-		this.setNorm(Quaternion.rotateVectorByEuclid(Vector.i, rot));
+		this.setNorm(this.rot.rotateVector(Vector.i, false));
 
 		// Sets the up vector when the rotation vector is set
-		this.setUp(Quaternion.rotateVectorByEuclid(Vector.k, rot));
+		this.setUp(this.rot.rotateVector(Vector.k, false));
 	}
 	
 	public void setRoll(double roll) {
@@ -159,7 +158,11 @@ public abstract class gameObject {
 		setVelZ(getVelZ() + force.getZ());
 	}
 	
-	public Vector getRot() {
+	public Vector getAngles() {
 		return new Vector(this.roll, this.pitch, this.yaw);
+	}
+
+	public Quaternion getRot() {
+		return rot;
 	}
 }
