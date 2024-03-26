@@ -6,7 +6,6 @@
 package main;
 
 import java.awt.*;
-import java.util.Arrays;
 
 public class Cube extends gameObject{
     private final Handler handler;
@@ -14,7 +13,7 @@ public class Cube extends gameObject{
     
     
     public Cube(Point3D p, float scale, ID id, Handler handler, Color color){
-        super(p, new Vector(1, 0, 0), id);
+        super(p, new Vector(0, 0, 0), id);
         this.handler = handler;
 
         Point3D[] verts = {
@@ -28,7 +27,6 @@ public class Cube extends gameObject{
                 p.add(new Vector(0, scale, scale)),
                 p.add(new Vector(scale, scale, scale))
         };
-        System.out.println(Arrays.toString(verts));
         int[][] faceVerts = new int[][]
                 {
                         {0, 1, 3, 2},
@@ -42,12 +40,12 @@ public class Cube extends gameObject{
         this.mesh = new Mesh(verts, faceVerts);
         this.color = color;
         mesh.createMesh();
-        
     }
 
     // changes its coordinates every tick based on its velocity
     public void tick() {
-        coords.add(vel);
+        coords = coords.add(vel);
+        this.addForce(new Vector(0, 0, -0.000981));
     }
 
     public void render(Graphics g) {

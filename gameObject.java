@@ -17,6 +17,7 @@ public abstract class gameObject {
 	protected Quaternion rot;
 	protected Vector norm;
 	protected Vector up;
+	protected Vector left;
 	protected ID id;
 	protected Mesh mesh;
 
@@ -124,31 +125,45 @@ public abstract class gameObject {
 		this.up = up;
 	}
 
+	public Vector getLeft() {
+		return left;
+	}
+
+	public void setLeft(Vector left){
+		this.left = left;
+	}
+
 	public void setRot(Vector rot) {
 		// Rotations over 360 degrees are modul-ised
-		this.roll = rot.getX();
-		this.pitch = rot.getY();
-		this.yaw = rot.getZ();
+		this.roll = rot.getX() % (2 * Math.PI);
+		this.pitch = rot.getY() % (2 * Math.PI);
+		this.yaw = rot.getZ() % (2 * Math.PI);
 
+		updateRot();
+	}
+
+	private void updateRot() {
 		this.rot = new Quaternion(this.roll, this.pitch, this.yaw);
 
-		// Sets the norm when the rotation is set as well
+		// Sets the norm, up, and right vectors when the rotation is set as well
 		this.setNorm(this.rot.rotateVector(Vector.i, false));
-
-		// Sets the up vector when the rotation vector is set
 		this.setUp(this.rot.rotateVector(Vector.k, false));
+		this.setLeft(this.rot.rotateVector(Vector.j, false));
 	}
 	
 	public void setRoll(double roll) {
 		this.roll = roll;
+		updateRot();
 	}
 	
 	public void setPitch(double pitch) {
 		this.pitch = pitch;
+		updateRot();
 	}
 	
 	public void setYaw(double yaw) {
 		this.yaw = yaw;
+		updateRot();
 	}
 
 	// adds acceleration
@@ -165,4 +180,8 @@ public abstract class gameObject {
 	public Quaternion getRot() {
 		return rot;
 	}
+
+	protected Color getColor() {
+        return null;
+    }
 }

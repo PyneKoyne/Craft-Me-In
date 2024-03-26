@@ -7,24 +7,23 @@ package main;
 
 import java.awt.*;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 // Handler Class
 public class Handler {
     // A list of all the gameObjects
     LinkedList<gameObject> object = new LinkedList<gameObject>();
+    ExecutorService executorService = Executors.newFixedThreadPool(10);
 
     // Ticks and renders every game object
     public void tick(){
-        for(int i = 0; i < object.size(); i ++){
-            gameObject tempObject = object.get(i);
-
-            tempObject.tick();
+        for (gameObject tempObject : object) {
+            executorService.execute(tempObject::tick);
         }
     }
     public void render(Graphics g){
-        for(int i = 0; i < object.size(); i ++) {
-            gameObject tempObject = object.get(i);
-
+        for (gameObject tempObject : object) {
             tempObject.render(g);
         }
     }

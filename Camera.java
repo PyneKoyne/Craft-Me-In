@@ -5,18 +5,24 @@
 
 package main;
 
+import com.aparapi.Kernel;
+import com.aparapi.Range;
+
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Camera extends gameObject {
 
     private final Handler handler;
     public double focal_length;
-    public double size;
     public Window window;
     public double focal_vel;
+    public boolean[] movement = {false, false, false, false};
     public boolean locked = true;
-    public int cos = 0;
-    public int tan = 0;
+    public int cos = 0, tan = 0;
+    public int screenX = 0, screenY = 0;
+    public Camera thisCamera = this;
     public Point3D focalPoint = Point3D.zero;
 
     public Camera(Point3D coords, double focal, ID id, Handler handler, Window window) {
@@ -55,7 +61,14 @@ public class Camera extends gameObject {
 
     // Moves every tick
     public void tick() {
-        coords = coords.add(vel.mul(1));
+
+        if (movement[0]) addForce(norm.mul(0.1));
+        if (movement[1]) addForce(left.mul(-0.1));
+        if (movement[2]) addForce(norm.mul(-0.1));
+        if (movement[3]) addForce(left.mul(0.1));
+
+        coords = coords.add(vel);
+        vel = vel.mul(0.1);
         focalPoint = this.coords.add(norm.mul(this.focal_length));
 
         // Changes the focal length based on the focal length velocity
@@ -76,31 +89,40 @@ public class Camera extends gameObject {
     // Renders the screen
     public void render(Graphics g) {
 
-    	int screenX = window.getWidth() / 2;
-    	int screenY = window.getHeight() / 2;
+        screenX = window.getWidth() / 2;
+    	screenY = window.getHeight() / 2;
+        List<Range> ranges = new ArrayList<>();
         // Loops through all objects
         for(int i = 0; i < handler.object.size(); i ++) {
             gameObject tempObject = handler.object.get(i);
 
             // If the object is a cube, it renders it
-            if (tempObject.getid() == ID.Cube) {
-                Cube cube = (Cube) tempObject;
+            if (tempObject.getid() == ID.Cube || tempObject.getid() == ID.Plane) {
 
                 // Finds the mesh
-            	Point3D[] mesh = cube.getMesh().getPoints();
-
+            	Point3D[] mesh = tempObject.getMesh().getPoints();
+                Vector relativeFocal = tempObject.coords.subtract(this.getFocalPoint());
+                Vector[] renders = new Vector[mesh.length];
                 // Sets the colour to the colour of the object
-                g.setColor(cube.getColor());
-            	for (Point3D p: mesh) {
-
-                    // Calculates where on screen the point should map to
-            		Vector camPoint = p.screenOrthoCoordinates(this, cos, tan);
-                    if (camPoint !=  null){
-                        g.fillRect((int) (camPoint.getY() + screenX), (int) (camPoint.getZ() + screenY), 2, 2);
+                g.setColor(tempObject.getColor());
+                Kernel kernel = new Kernel() {
+                    @Override
+                    public void run() {
+                        int i = getGlobalId();
+                        renders[i] = mesh[i].screenOrthoCoordinates(thisCamera, relativeFocal, cos, tan);
                     }
-            	}
+                };
+                ranges.add(Range.create(renders.length));
+                kernel.execute(ranges.getLast());
+
+                for (Vector camPoint: renders){
+                    if (camPoint !=  null){
+                        g.fillRect((int) (-camPoint.getY() + screenX), (int) (-camPoint.getZ() + screenY), 2, 2);
+                    }
+                }
             }
         }
+
         g.setColor(Color.black);
 
         // Prints the focal-length on screen and number of cosines and tangents applied
@@ -113,16 +135,15 @@ public class Camera extends gameObject {
         if (locked) {
             // Finds the difference in mouse coordinates
             Point p = MouseInfo.getPointerInfo().getLocation();
-            setRot(getAngles().add(new Vector(0, (screenY - p.getY() + window.screenLoc().y)/1000, (screenX - p.getX() + window.screenLoc().x)/1000)));
+            setRot(getAngles().add(new Vector(0, (-screenY + p.getY() - window.screenLoc().y)/1000, (screenX - p.getX() + window.screenLoc().x)/1000)));
 
             try {
                 Robot robot = new Robot();
-                robot.mouseMove((int) (screenX + window.screenLoc().x), (int) (screenY + window.screenLoc().y));
+                robot.mouseMove(screenX + window.screenLoc().x, screenY + window.screenLoc().y);
 
             } catch (AWTException e) {
                 e.printStackTrace();
             }
         }
     }
-
 }

@@ -70,7 +70,7 @@ public class Face implements Cloneable {
 
 	@Override
 	public String toString() {
-		return getClass().getName() + "[" + verts + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return getClass().getName() + "[" + Arrays.toString(verts) + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 	}
 
 	@Override
@@ -89,18 +89,17 @@ public class Face implements Cloneable {
 		ArrayList<Point3D> Points = new ArrayList<Point3D>();
 
 		// We only care about x and y because we assume there are only two unit vectors
-		Vector unitX;
-		Vector unitY;
+		Vector unitX, unitY;
 		unitX = vertices[verts[0]].subtract(vertices[verts[1]]).normalize(LENGTH);
 		unitY = vertices[verts[0]].subtract(vertices[verts[verts.length - 1]]).normalize(LENGTH);
 
-		double maxX = Math.max(vertices[verts[1]].subtract(vertices[verts[0]]).mag(), vertices[verts[2]].subtract(vertices[verts[0]]).mag()); // when do we stop the loop
-		double maxY = Math.max(vertices[verts[2]].subtract(vertices[verts[0]]).mag(), vertices[verts[3]].subtract(vertices[verts[0]]).mag());
+		double maxX = Math.max(vertices[verts[0]].subtract(vertices[verts[1]]).mag(), vertices[verts[0]].subtract(vertices[verts[2]]).mag()); // when do we stop the loop
+		double maxY = Math.max(vertices[verts[0]].subtract(vertices[verts[2]]).mag(), vertices[verts[0]].subtract(vertices[verts[3]]).mag());
 
 		int numX = 0;
-		for (double i = 0; i < 10; i += LENGTH) {
+		for (double i = 0; i < vertices[verts[0]].subtract(vertices[verts[1]]).mag(); i += LENGTH) {
 			int numY = 0;
-			for (double j = 0; j < 10; j += LENGTH) {
+			for (double j = 0; j < vertices[verts[0]].subtract(vertices[verts[verts.length - 1]]).mag(); j += LENGTH) {
 				Points.add(vertices[verts[0]].add(unitX.mul(numX)).add(unitY.mul(numY)));
 				numY ++;
 			}

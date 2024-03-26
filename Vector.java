@@ -176,4 +176,8 @@ public class Vector implements Cloneable {
 	public Point3D toPoint() {
 		return new Point3D(getX(), getY(), getZ());
 	}
+
+	public Vector subtract(Point3D p) {
+		return new Vector(p.x - getX(), p.y - getY(), p.z - getZ());
+	}
 }
