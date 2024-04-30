@@ -6,6 +6,7 @@
 package main;
 
 import java.awt.*;
+import java.util.HashMap;
 
 public class Cube extends gameObject{
     private final Handler handler;
@@ -14,7 +15,6 @@ public class Cube extends gameObject{
     
     public Cube(Point3D p, float scale, ID id, Handler handler, Color color){
         super(p, new Vector(0, 0, 0), id);
-        this.handler = handler;
 
         Point3D[] verts = {
                 p,
@@ -40,15 +40,17 @@ public class Cube extends gameObject{
         this.mesh = new Mesh(verts, faceVerts);
         this.color = color;
         mesh.createMesh();
+
+        this.handler = handler;
     }
 
     // changes its coordinates every tick based on its velocity
     public void tick() {
         coords = coords.add(vel);
-        this.addForce(new Vector(0, 0, -0.000981));
+//        this.addForce(new Vector(0, 0, -0.000981));
     }
 
-    public void render(Graphics g) {
+    public void render(Graphics g, HashMap<String, ArrayGPU> gpu) {
 
     }
 

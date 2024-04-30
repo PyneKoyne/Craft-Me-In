@@ -9,6 +9,7 @@ package main;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.util.Arrays;
 
 public class Engine extends Canvas implements Runnable{
     //Dimensions
@@ -16,6 +17,7 @@ public class Engine extends Canvas implements Runnable{
     public static int WIDTH = 1366, HEIGHT = 768;
 
     //Variables
+
     private Thread thread;
     private boolean running = false;
     private final Handler handler;
@@ -39,6 +41,10 @@ public class Engine extends Canvas implements Runnable{
     //Main Class
     public Engine(){
         handler = new Handler();
+//        handler.gpu.put("Add", new ArrayGPU());
+        handler.gpu.put("Sub", new ArrayGPU());
+        handler.gpu.get("Sub").startProgram(ArrayGPU.subSource);
+//        handler.gpu.put("crossProd", new ArrayGPU());
         
         // Adds KeyInputs
         this.addKeyListener(new KeyInput(handler));

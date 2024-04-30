@@ -10,6 +10,8 @@ import com.aparapi.Range;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 
 public class Camera extends gameObject {
@@ -24,6 +26,15 @@ public class Camera extends gameObject {
     public int screenX = 0, screenY = 0;
     public Camera thisCamera = this;
     public Point3D focalPoint = Point3D.zero;
+
+    public static String screenSRC = "__kernel void " +
+            "sampleKernel(__global const Point3D *p," +
+            "             __global const float *b," +
+            "             __global float *c)" +
+            "{" +
+            "    int gid = get_global_id(0);" +
+            "    c[gid] = a[gid] * b[gid + 1] - a[gid + 1] * b[gid];" +
+            "}";
 
     public Camera(Point3D coords, double focal, ID id, Handler handler, Window window) {
         super(coords, new Vector(0, 0, 0), id);
@@ -87,7 +98,7 @@ public class Camera extends gameObject {
     }
 
     // Renders the screen
-    public void render(Graphics g) {
+    public void render(Graphics g, HashMap<String, ArrayGPU> gpu) {
 
         screenX = window.getWidth() / 2;
     	screenY = window.getHeight() / 2;
@@ -100,24 +111,40 @@ public class Camera extends gameObject {
             if (tempObject.getid() == ID.Cube || tempObject.getid() == ID.Plane) {
 
                 // Finds the mesh
-            	Point3D[] mesh = tempObject.getMesh().getPoints();
                 Vector relativeFocal = tempObject.coords.subtract(this.getFocalPoint());
-                Vector[] renders = new Vector[mesh.length];
-                // Sets the colour to the colour of the object
+                Vector[] mesh = Point3D.screenOrthoCoordinatesTotal(this, tempObject.getMesh().points, relativeFocal, tempObject.getHash(), gpu);
                 g.setColor(tempObject.getColor());
-                Kernel kernel = new Kernel() {
-                    @Override
-                    public void run() {
-                        int i = getGlobalId();
-                        renders[i] = mesh[i].screenOrthoCoordinates(thisCamera, relativeFocal, cos, tan);
-                    }
-                };
-                ranges.add(Range.create(renders.length));
-                kernel.execute(ranges.getLast());
+//                gameObject cube = tempObject;
+//
+//                // Finds the mesh
+//                Point3D[] mesh = cube.getMesh().getPoints();
+//
+//                // Sets the colour to the colour of the object
+//                g.setColor(cube.getColor());
+//                for (Point3D p: mesh) {
+//
+//                    // Calculates where on screen the point should map to
+//                    Vector camPoint = p.screenOrthoCoordinates(this, this.focalPoint.toVect(), 0, 0);
+//                    if (camPoint !=  null){
+//                        g.fillRect((int) (camPoint.getY() + screenX), (int) (camPoint.getZ() + screenY), 2, 2);
+//                    }
+//                }
 
-                for (Vector camPoint: renders){
-                    if (camPoint !=  null){
-                        g.fillRect((int) (-camPoint.getY() + screenX), (int) (-camPoint.getZ() + screenY), 2, 2);
+//                Vector[] renders = new Vector[mesh.length];
+//                Sets the colour to the colour of the object
+//                Kernel kernel = new Kernel() {
+//                    @Override
+//                    public void run() {
+//                        int i = getGlobalId();
+//                        renders[i] = mesh[i].screenOrthoCoordinates(thisCamera, relativeFocal, cos, tan);
+//                    }
+//                };
+//                ranges.add(Range.create(renders.length));
+//                kernel.execute(ranges.getLast());
+                for (Vector p: mesh) {
+                    // Calculates where on screen the point should map to
+                    if (p !=  null){
+                        g.fillRect((int) (p.getY() + screenX), (int) (p.getZ() + screenY), 2, 2);
                     }
                 }
             }

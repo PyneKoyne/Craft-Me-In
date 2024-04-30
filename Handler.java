@@ -6,6 +6,7 @@
 package main;
 
 import java.awt.*;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -14,22 +15,31 @@ import java.util.concurrent.Executors;
 public class Handler {
     // A list of all the gameObjects
     LinkedList<gameObject> object = new LinkedList<gameObject>();
-    ExecutorService executorService = Executors.newFixedThreadPool(10);
+    HashMap<String, ArrayGPU> gpu = new HashMap<>();
+    ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     // Ticks and renders every game object
     public void tick(){
         for (gameObject tempObject : object) {
-            executorService.execute(tempObject::tick);
+            tempObject.tick();
+//            executorService.execute(tempObject::tick);
         }
     }
     public void render(Graphics g){
-        for (gameObject tempObject : object) {
-            tempObject.render(g);
+        for(int i = 0; i < object.size(); i ++) {
+            gameObject tempObject = object.get(i);
+            tempObject.render(g, gpu);
         }
     }
     //Adds a gameObject to the list
     public void addObject(gameObject object){
         this.object.add(object);
+        for (ArrayGPU tempGPU: gpu.values()){
+            Mesh tempMesh = object.getMesh();
+            if (tempMesh != null) {
+                tempGPU.allocateMemory(tempMesh.points, tempMesh.rawMesh, 12, object.getHash());
+            }
+        }
     }
     //Removes a gameObject from the list
     public void removeObject(gameObject object){

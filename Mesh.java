@@ -12,10 +12,11 @@ import java.util.HashMap;
 public class Mesh {
 	// Variables
 	public Point3D[] vertices;
+	public int points;
 	public HashMap<Integer, ArrayList<Integer>> edges = new HashMap<Integer, ArrayList<Integer>>();
 	public Face[] faces;
-
 	public ArrayList<Point3D> mesh = new ArrayList<Point3D>();
+	public float[] rawMesh;
 
 	// Defines the mesh based on the given parameters
 	public Mesh(Point3D[] vertices, int[][] faceStructure) {
@@ -50,11 +51,12 @@ public class Mesh {
 				System.out.println(p);
 			}
 		}
+		rawMesh = Point3D.toFloat(mesh.toArray(new Point3D[0]));
+		points = rawMesh.length;
 	}
 
 	// returns the total list of points
 	public Point3D[] getPoints() {
-
 		Point3D[] arr = new Point3D[mesh.size()];
 		return mesh.toArray(arr);
 	}

@@ -5,6 +5,10 @@
 
 package main;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.HashMap;
+
 // Point3D class
 public class Point3D implements Cloneable {
     public double x;
@@ -153,7 +157,6 @@ public class Point3D implements Cloneable {
         final double ROTATION_LIMIT = Math.PI/2.0;
         Vector norm = cam.getNorm();
         Vector vector2cam = focalPoint.subtract(this);
-
         double angle = vector2cam.diffAngles(norm);
         if (angle > ROTATION_LIMIT){
             return null;
@@ -177,9 +180,52 @@ public class Point3D implements Cloneable {
         return vector2cam.normalize(angle * cam.getFocalLength() * 5000);
     }
 
+    public static Vector[] screenOrthoCoordinatesTotal(Camera cam, int points, Vector focalPoint, int hash, HashMap<String, ArrayGPU> gpu) {
+        final double ROTATION_LIMIT = Math.PI/2.0;
+        Vector norm = cam.getNorm();
+        float[] focal = focalPoint.toFloat();
+        Quaternion realign = cam.getRot();
+        Vector[] output = new Vector[points/3];
+        float[] vectors = gpu.get("Sub").runProgram(points, new float[] {
+                (float) norm.x,
+                (float) norm.y,
+                (float) norm.z,
+                (float) Math.sqrt(norm.x * norm.x + norm.y * norm.y + norm.z * norm.z),
+                focal[0],
+                focal[1],
+                focal[2],
+                (float) ((-1) * realign.x),
+                (float) ((-1) * realign.y),
+                (float) ((-1) * realign.z),
+                (float) realign.w,
+                (float) (realign.w * realign.w - (realign.x * realign.x + realign.y * realign.y + realign.z * realign.z))
+        }, points/3, hash);
+
+        for (int i = 0; i < points/3; i++) {
+            if (vectors[i * 3] < ROTATION_LIMIT) {
+                output[i] = new Vector(0, vectors[i * 3 + 1], vectors[i * 3 + 2]).normalize(vectors[i * 3] * cam.getFocalLength() * 8192);
+            }
+        }
+        return output;
+    }
+
+    public static float[] toFloat(Point3D[] points){
+        float[] output = new float[points.length * 3];
+        for(int i = 0; i < points.length; i++){
+            output[i * 3] = (float) points[i].getX();
+            output[i * 3 + 1] = (float) points[i].getY();
+            output[i * 3 + 2] = (float) points[i].getZ();
+        }
+        return output;
+    }
+
     // Turns a point into a Vector from the origin
     public Vector toVect() {
         return new Vector(getX(), getY(), getZ());
+    }
+
+    public float[] toFloat() {
+        return new float[] {(float) getX(), (float) getY(), (float) getZ()};
     }
 
 }

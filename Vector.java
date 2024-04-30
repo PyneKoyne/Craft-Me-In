@@ -5,6 +5,10 @@
 
 package main;
 
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.HashMap;
+
 public class Vector implements Cloneable {
 	public double x;
 	public double y;
@@ -15,12 +19,19 @@ public class Vector implements Cloneable {
 	public static Vector j = new Vector(0, 1, 0);
 	public static Vector k = new Vector(0, 0, 1);
 	public static Vector zero = new Vector(0, 0, 0);
+	public HashMap<String, ArrayGPU> gpu = new HashMap<>();
 
 	// Constructs a Vector
 	public Vector(double x, double y, double z) {
 		this.x = x;
 		this.y = y;
 		this.z = z;
+	}
+
+	public Vector(float[] v){
+		this.x = v[0];
+		this.y = v[1];
+		this.z = v[2];
 	}
 
 	// Getters and Setters
@@ -61,7 +72,7 @@ public class Vector implements Cloneable {
 	}
 
 	// finds the magnitude of a vector
-	public double mag(double px, double py, double pz) {
+	public static double mag(double px, double py, double pz) {
 		return Math.sqrt(px * px + py * py + pz * pz);
 	}
 
@@ -146,6 +157,16 @@ public class Vector implements Cloneable {
 		return new Vector(x, y, z);
 	}
 
+//	public Vector crossProd(Vector v, ArrayGPU program){
+//		float[] vNew = program.runProgram(3, ArrayGPU.crossProdSource,
+//				new float[]{(float) getY(), (float) getZ(), (float) getX(), (float) getY()},
+//				new float[]{(float) v.getY(), (float) v.getZ(), (float) v.getX(), (float) v.getY()});
+//		System.out.println(Arrays.toString(vNew));
+//		return new Vector(
+//				vNew
+//		);
+//	}
+
 	// Rotates a Vector based on Euler Angles
 	public Vector rotateByEuclid(Vector angles)
 	{
@@ -169,7 +190,12 @@ public class Vector implements Cloneable {
 
 	// Adds two vectors
 	public Vector add(Vector v) {
-		return new Vector(getX() + v.getX(), getY() + v.getY(), getZ() + v.getZ());
+//		return new Vector(
+//				ArrayGPU.addArray(3, ArrayGPU.addSource,
+//				new float[]{(float) getX(), (float) getY(), (float) getZ()},
+//				new float[]{(float) v.getX(), (float) v.getY(), (float) v.getZ()})
+//		);
+		return new Vector(v.getX() + getX(), v.getY() + getY(), v.getZ() + getZ());
 	}
 
 	// Turns a Vector into a Point if the Vectors tail was at the origin
@@ -177,7 +203,17 @@ public class Vector implements Cloneable {
 		return new Point3D(getX(), getY(), getZ());
 	}
 
+	public float[] toFloat() {
+		return new float[]{(float) getX(), (float) getY(), (float) getZ()};
+	}
+
 	public Vector subtract(Point3D p) {
-		return new Vector(p.x - getX(), p.y - getY(), p.z - getZ());
+//		return new Vector(
+//				ArrayGPU.addArray(3, ArrayGPU.subSource,
+//						new float[]{(float) p.getX(), (float) p.getY(), (float) p.getZ()},
+//						new float[]{(float) getX(), (float) getY(), (float) getZ()}
+//				)
+//		);
+		return new Vector(p.getX() - getX(), p.getY() - getY(), p.getZ() - getZ());
 	}
 }

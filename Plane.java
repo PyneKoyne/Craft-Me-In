@@ -6,6 +6,7 @@
 package main;
 
 import java.awt.*;
+import java.util.HashMap;
 
 public class Plane extends gameObject{
     private final Handler handler;
@@ -38,7 +39,7 @@ public class Plane extends gameObject{
         coords.add(vel);
     }
 
-    public void render(Graphics g) {
+    public void render(Graphics g, HashMap<String, ArrayGPU> gpu) {
 
     }
 

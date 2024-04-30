@@ -6,6 +6,7 @@
 package main;
 
 import java.awt.*;
+import java.util.HashMap;
 
 // Abstract class to define game objects such as Camera and CUbe
 public abstract class gameObject {
@@ -19,6 +20,7 @@ public abstract class gameObject {
 	protected Vector up;
 	protected Vector left;
 	protected ID id;
+	protected int hash = System.identityHashCode(this);
 	protected Mesh mesh;
 
 	// Average game object constructor
@@ -32,7 +34,7 @@ public abstract class gameObject {
 	// requires a tick and render method in every game object
 	public abstract void tick();
 
-	public abstract void render(Graphics g);
+	public abstract void render(Graphics g, HashMap<String ,ArrayGPU> gpu);
 
 	// Getters and Setters
 	public void setX(double x) {
@@ -77,6 +79,9 @@ public abstract class gameObject {
 
 	public ID getid() {
 		return id;
+	}
+	public int getHash(){
+		return hash;
 	}
 
 	public void setVel(Vector vel) {
