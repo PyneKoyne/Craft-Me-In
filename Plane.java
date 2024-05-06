@@ -39,7 +39,7 @@ public class Plane extends gameObject{
         coords.add(vel);
     }
 
-    public void render(Graphics g, HashMap<String, ArrayGPU> gpu) {
+    public void render(Graphics g, ArrayGPU[] gpu) {
 
     }
 

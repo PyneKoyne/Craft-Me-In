@@ -9,10 +9,11 @@ package main;
 
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-import java.util.Arrays;
+import java.io.Serial;
 
 public class Engine extends Canvas implements Runnable{
     //Dimensions
+    @Serial
     private static final long serialVersionUID = 1L;
     public static int WIDTH = 1366, HEIGHT = 768;
 
@@ -31,8 +32,9 @@ public class Engine extends Canvas implements Runnable{
     }
     public synchronized void stop(){
         try{
-            thread.join();
             running = false;
+            thread.join();
+            window.dispose();
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -42,8 +44,8 @@ public class Engine extends Canvas implements Runnable{
     public Engine(){
         handler = new Handler();
 //        handler.gpu.put("Add", new ArrayGPU());
-        handler.gpu.put("Sub", new ArrayGPU());
-        handler.gpu.get("Sub").startProgram(ArrayGPU.subSource);
+        handler.gpu[0] = new ArrayGPU();
+        handler.gpu[0].startProgram(ArrayGPU.subSource);
 //        handler.gpu.put("crossProd", new ArrayGPU());
         
         // Adds KeyInputs
@@ -73,7 +75,7 @@ public class Engine extends Canvas implements Runnable{
 
         // Places cubes which are actually planes
         handler.addObject(new Cube(new Point3D(10, 10, -8), 10, ID.Cube, handler, Color.black));
-//        handler.addObject(new Plane(new Point3D(0, 0, -8), 100, ID.Plane, handler, Color.black));
+        handler.addObject(new Plane(new Point3D(0, 0, -8), 100, ID.Plane, handler, Color.blue));
     }
 
     //Game Loop
@@ -115,9 +117,7 @@ public class Engine extends Canvas implements Runnable{
                 frames = 0;
             }
         }
-
-        // Stops the whole engine
-        stop();
+        handler.gpu[0].closeGPU();
     }
 
     private void tick(){
@@ -148,7 +148,6 @@ public class Engine extends Canvas implements Runnable{
 
     public static void main(){
         new Engine();
-
     }
 
 }

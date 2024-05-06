@@ -5,10 +5,6 @@
 
 package main;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.HashMap;
-
 // Point3D class
 public class Point3D implements Cloneable {
     public double x;
@@ -180,33 +176,17 @@ public class Point3D implements Cloneable {
         return vector2cam.normalize(angle * cam.getFocalLength() * 5000);
     }
 
-    public static Vector[] screenOrthoCoordinatesTotal(Camera cam, int points, Vector focalPoint, int hash, HashMap<String, ArrayGPU> gpu) {
-        final double ROTATION_LIMIT = Math.PI/2.0;
-        Vector norm = cam.getNorm();
-        float[] focal = focalPoint.toFloat();
-        Quaternion realign = cam.getRot();
-        Vector[] output = new Vector[points/3];
-        float[] vectors = gpu.get("Sub").runProgram(points, new float[] {
-                (float) norm.x,
-                (float) norm.y,
-                (float) norm.z,
-                (float) Math.sqrt(norm.x * norm.x + norm.y * norm.y + norm.z * norm.z),
-                focal[0],
-                focal[1],
-                focal[2],
-                (float) ((-1) * realign.x),
-                (float) ((-1) * realign.y),
-                (float) ((-1) * realign.z),
-                (float) realign.w,
-                (float) (realign.w * realign.w - (realign.x * realign.x + realign.y * realign.y + realign.z * realign.z))
-        }, points/3, hash);
+    public static void screenOrthoCoordinatesTotal(int points, float[] focal, int hash, ArrayGPU[] gpu, int[] g, int screenX, int colour) {
+        float[] vectors = gpu[0].runProgram(points, focal, points/3, hash);
 
         for (int i = 0; i < points/3; i++) {
-            if (vectors[i * 3] < ROTATION_LIMIT) {
-                output[i] = new Vector(0, vectors[i * 3 + 1], vectors[i * 3 + 2]).normalize(vectors[i * 3] * cam.getFocalLength() * 8192);
+            if ((int) vectors[i * 3 + 1] > 0 && (int) vectors[i * 3 + 2] > 0) {
+                g[(int) vectors[i * 3 + 1] + (int) (vectors[i * 3 + 2]) * screenX] = colour;
+                g[(int) vectors[i * 3 + 1] + 1 + (int) (vectors[i * 3 + 2] + 1) * screenX] = colour;
+                g[(int) vectors[i * 3 + 1] + (int) (vectors[i * 3 + 2]) * screenX] = colour;
+                g[(int) vectors[i * 3 + 1] + 1 + (int) (vectors[i * 3 + 2] + 1) * screenX] = colour;
             }
         }
-        return output;
     }
 
     public static float[] toFloat(Point3D[] points){

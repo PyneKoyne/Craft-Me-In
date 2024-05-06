@@ -50,7 +50,7 @@ public class Cube extends gameObject{
 //        this.addForce(new Vector(0, 0, -0.000981));
     }
 
-    public void render(Graphics g, HashMap<String, ArrayGPU> gpu) {
+    public void render(Graphics g, ArrayGPU[] gpu) {
 
     }
 

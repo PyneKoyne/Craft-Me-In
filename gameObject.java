@@ -34,7 +34,7 @@ public abstract class gameObject {
 	// requires a tick and render method in every game object
 	public abstract void tick();
 
-	public abstract void render(Graphics g, HashMap<String ,ArrayGPU> gpu);
+	public abstract void render(Graphics g, ArrayGPU[] gpu);
 
 	// Getters and Setters
 	public void setX(double x) {

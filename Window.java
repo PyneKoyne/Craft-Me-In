@@ -9,6 +9,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class Window extends Canvas{
     private static final long serialVersionUID = 1L;
@@ -17,7 +19,6 @@ public class Window extends Canvas{
     public Point loc;
     
     public Window(int width, int height, String title, Engine engine){
-    	GraphicsDevice vc;
     	frame = new JFrame(title);
         
         frame.setPreferredSize(new Dimension(width, height)); //1024x768, 1600/900\
@@ -26,10 +27,9 @@ public class Window extends Canvas{
         frame.setMinimumSize(new Dimension(width, height));
         
         
-        frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.requestFocus();
-        
         
         d = frame.getSize();
         frame.addComponentListener(new ComponentAdapter() {
@@ -46,6 +46,17 @@ public class Window extends Canvas{
         
         loc = frame.getLocationOnScreen();
         engine.start();
+        frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent event){
+                engine.stop();
+            }
+        });
+    }
+
+    public void dispose() {
+        frame.dispose();
+        System.exit(0);
     }
     
     public int getWidth() {

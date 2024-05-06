@@ -15,12 +15,13 @@ import java.util.concurrent.Executors;
 public class Handler {
     // A list of all the gameObjects
     LinkedList<gameObject> object = new LinkedList<gameObject>();
-    HashMap<String, ArrayGPU> gpu = new HashMap<>();
+    ArrayGPU[] gpu = new ArrayGPU[3];
     ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     // Ticks and renders every game object
     public void tick(){
-        for (gameObject tempObject : object) {
+        for(int i = 0; i < object.size(); i ++) {
+            gameObject tempObject = object.get(i);
             tempObject.tick();
 //            executorService.execute(tempObject::tick);
         }
@@ -34,11 +35,9 @@ public class Handler {
     //Adds a gameObject to the list
     public void addObject(gameObject object){
         this.object.add(object);
-        for (ArrayGPU tempGPU: gpu.values()){
-            Mesh tempMesh = object.getMesh();
-            if (tempMesh != null) {
-                tempGPU.allocateMemory(tempMesh.points, tempMesh.rawMesh, 12, object.getHash());
-            }
+        Mesh tempMesh = object.getMesh();
+        if (tempMesh != null) {
+            gpu[0].allocateMemory(tempMesh.points, tempMesh.rawMesh, 15, object.getHash());
         }
     }
     //Removes a gameObject from the list

@@ -14,13 +14,28 @@ public class ArrayGPU {
             "             __global float *c)" +
             "{" +
             "    int gid = get_global_id(0);" +
-            "    float x = (a[gid * 3 + 0] + b[4]);" +
-            "    float y = (a[gid * 3 + 1] + b[5]);" +
-            "    float z = (a[gid * 3 + 2] + b[6]);" +
+            "    float x = (a[gid * 3 + 0] + b[12]);" +
+            "    float y = (a[gid * 3 + 1] + b[13]);" +
+            "    float z = (a[gid * 3 + 2] + b[14]);" +
             "    c[gid * 3 + 0] = acos((x * b[0] + y * b[1] + z * b[2]) / (sqrt(x * x + y * y + z * z) * b[3]));" +
-            "    float con = 2.0 * (b[7] * x + b[8] * y + b[9] * z);" +
-            "    c[gid * 3 + 1] = b[8] * con + y * b[11] + (b[9] * x - b[7] * z) * b[10] * 2.0;" +
-            "    c[gid * 3 + 2] = b[9] * con + z * b[11] + (b[7] * y - b[8] * x) * b[10] * 2.0;" +
+            "    if (c[gid * 3 + 0] < 1.57079632679) {" +
+            "       float con = 2.0 * (b[4] * x + b[5] * y + b[6] * z);" +
+            "       float new_y = b[5] * con + y * b[8] + (b[6] * x - b[4] * z) * b[7] * 2.0;" +
+            "       float new_z = b[6] * con + z * b[8] + (b[4] * y - b[5] * x) * b[7] * 2.0;" +
+            "       float hyp = (c[gid * 3] * b[9] * 8192)/sqrt(new_y * new_y + new_z * new_z);" +
+            "       c[gid * 3 + 1] = b[10] - new_y * hyp;" +
+            "       if (c[gid * 3 + 1] > (b[10] * 2 - 2)) {" +
+            "           c[gid * 3 + 1] = 0;" +
+            "       }" +
+            "       c[gid * 3 + 2] = b[11] - new_z * hyp;" +
+            "       if (c[gid * 3 + 2] > (b[11] * 2 - 2)) {" +
+            "           c[gid * 3 + 2] = 0;" +
+            "       }" +
+            "    }" +
+            "    else {" +
+            "       c[gid * 3 + 1] = 0;" +
+            "       c[gid * 3 + 2] = 0;" +
+            "    }" +
             "}";
 
     public cl_context context;
@@ -28,6 +43,8 @@ public class ArrayGPU {
     public cl_command_queue commandQueue;
     public HashMap<Integer, cl_mem[]> memObjects = new HashMap<>();
     public cl_program program;
+
+    public cl_mem camMem;
 
     public ArrayGPU(){
         // The platform, device type and device number
@@ -89,7 +106,7 @@ public class ArrayGPU {
         mem[0] = CL.clCreateBuffer(this.context,
                 CL.CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                 (long) Sizeof.cl_float * n, srcA, null);
-        mem[1] = CL.clCreateBuffer(this.context,
+        this.camMem = CL.clCreateBuffer(this.context,
                 CL.CL_MEM_READ_ONLY,
                 (long) Sizeof.cl_float * b, null, null);
         mem[2] = CL.clCreateBuffer(this.context,
@@ -98,24 +115,31 @@ public class ArrayGPU {
         memObjects.put(hash, mem);
     }
 
-    public float[] runProgram(int n, float[] srcArrayB, int ids, int hash) {
-        float[] dstArray = new float[n];
+    public void setCamMem(float[] srcArrayB){
         Pointer srcB = Pointer.to(srcArrayB);
+
+        clEnqueueWriteBuffer(commandQueue, this.camMem, CL_TRUE, 0,
+                (long) 12 * Sizeof.cl_float, srcB, 0, null, null);
+    }
+
+    public float[] runProgram(int n, float[] focal, int ids, int hash) {
+        float[] dstArray = new float[n];
+        Pointer srcB = Pointer.to(focal);
         Pointer dst = Pointer.to(dstArray);
 
-        cl_mem[] mem = memObjects.get(hash);
+        cl_mem[] mem = this.memObjects.get(hash);
         if(mem == null){
             return dstArray;
         }
+        clEnqueueWriteBuffer(commandQueue, this.camMem, CL_TRUE, 12 * Sizeof.cl_float,
+                (long) 3 * Sizeof.cl_float, srcB, 0, null, null);
 
-        clEnqueueWriteBuffer(commandQueue, mem[1], CL_TRUE, 0,
-                (long) 12 * Sizeof.cl_float, srcB, 0, null, null);
 
         // Set the arguments for the kernel
         CL.clSetKernelArg(this.kernel, 0,
                 Sizeof.cl_mem, Pointer.to(mem[0]));
         CL.clSetKernelArg(this.kernel, 1,
-                Sizeof.cl_mem, Pointer.to(mem[1]));
+                Sizeof.cl_mem, Pointer.to(this.camMem));
         CL.clSetKernelArg(this.kernel, 2,
                 Sizeof.cl_mem, Pointer.to(mem[2]));
 
@@ -135,9 +159,9 @@ public class ArrayGPU {
 
     public void closeGPU(){
         // Release kernel, program, and memory objects
+        CL.clReleaseMemObject(camMem);
         for (cl_mem[] mem: memObjects.values()) {
             CL.clReleaseMemObject(mem[0]);
-            CL.clReleaseMemObject(mem[1]);
             CL.clReleaseMemObject(mem[2]);
         }
         CL.clReleaseContext(this.context);
