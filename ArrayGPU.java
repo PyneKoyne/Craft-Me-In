@@ -14,20 +14,20 @@ public class ArrayGPU {
             "             __global float *c)" +
             "{" +
             "    int gid = get_global_id(0);" +
-            "    float x = (a[gid * 3 + 0] + b[12]);" +
-            "    float y = (a[gid * 3 + 1] + b[13]);" +
-            "    float z = (a[gid * 3 + 2] + b[14]);" +
+            "    float x = (a[gid * 3 + 0] - b[12]);" +
+            "    float y = (a[gid * 3 + 1] - b[13]);" +
+            "    float z = (a[gid * 3 + 2] - b[14]);" +
             "    c[gid * 3 + 0] = acos((x * b[0] + y * b[1] + z * b[2]) / (sqrt(x * x + y * y + z * z) * b[3]));" +
             "    if (c[gid * 3 + 0] < 1.57079632679) {" +
             "       float con = 2.0 * (b[4] * x + b[5] * y + b[6] * z);" +
             "       float new_y = b[5] * con + y * b[8] + (b[6] * x - b[4] * z) * b[7] * 2.0;" +
             "       float new_z = b[6] * con + z * b[8] + (b[4] * y - b[5] * x) * b[7] * 2.0;" +
             "       float hyp = (c[gid * 3] * b[9] * 8192)/sqrt(new_y * new_y + new_z * new_z);" +
-            "       c[gid * 3 + 1] = b[10] - new_y * hyp;" +
+            "       c[gid * 3 + 1] = new_y * hyp + b[10];" +
             "       if (c[gid * 3 + 1] > (b[10] * 2 - 2)) {" +
             "           c[gid * 3 + 1] = 0;" +
             "       }" +
-            "       c[gid * 3 + 2] = b[11] - new_z * hyp;" +
+            "       c[gid * 3 + 2] = new_z * hyp + b[11];" +
             "       if (c[gid * 3 + 2] > (b[11] * 2 - 2)) {" +
             "           c[gid * 3 + 2] = 0;" +
             "       }" +
@@ -38,13 +38,12 @@ public class ArrayGPU {
             "    }" +
             "}";
 
-    public cl_context context;
-    public cl_kernel kernel;
-    public cl_command_queue commandQueue;
-    public HashMap<Integer, cl_mem[]> memObjects = new HashMap<>();
-    public cl_program program;
-
-    public cl_mem camMem;
+    private cl_context context;
+    private cl_kernel kernel;
+    private cl_command_queue commandQueue;
+    private HashMap<Integer, cl_mem[]> memObjects = new HashMap<>();
+    private cl_program program;
+    private cl_mem camMem;
 
     public ArrayGPU(){
         // The platform, device type and device number
@@ -168,18 +167,5 @@ public class ArrayGPU {
         CL.clReleaseCommandQueue(this.commandQueue);
         CL.clReleaseKernel(this.kernel);
         clReleaseProgram(this.program);
-    }
-
-    private static String getString(cl_device_id device, int paramName) {
-        // Obtain the length of the string that will be queried
-        long size[] = new long[1];
-        CL.clGetDeviceInfo(device, paramName, 0, null, size);
-
-        // Create a buffer of the appropriate size and fill it with the info
-        byte buffer[] = new byte[(int)size[0]];
-        CL.clGetDeviceInfo(device, paramName, buffer.length, Pointer.to(buffer), null);
-
-        // Create a string from the buffer (excluding the trailing \0 byte)
-        return new String(buffer, 0, buffer.length-1);
     }
 }

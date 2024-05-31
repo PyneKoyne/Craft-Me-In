@@ -13,10 +13,9 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class Window extends Canvas{
-    private static final long serialVersionUID = 1L;
     public JFrame frame;
-    public java.awt.Dimension d;
-    public Point loc;
+    private java.awt.Dimension dimension;
+    private Point loc;
     
     public Window(int width, int height, String title, Engine engine){
     	frame = new JFrame(title);
@@ -31,12 +30,12 @@ public class Window extends Canvas{
         frame.setLocationRelativeTo(null);
         frame.requestFocus();
         
-        d = frame.getSize();
+        dimension = frame.getSize();
         frame.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentResized(ComponentEvent evt) {
                 JFrame c = (JFrame) evt.getSource();
-                d = c.getSize();
+                dimension = c.getSize();
                 loc = c.getLocationOnScreen();
             }
         });
@@ -60,19 +59,14 @@ public class Window extends Canvas{
     }
     
     public int getWidth() {
-    	return (int) d.getWidth();
+    	return (int) dimension.getWidth();
     }
     
     public int getHeight() {
-    	return (int) d.getHeight();
+    	return (int) dimension.getHeight();
     }
     
     public Point screenLoc() {
-    	return 	loc;
-    }
-    
-    public Point centre() {
-    	Point loc = screenLoc();
-    	return new Point((int) (getWidth()/2 + loc.getX()), (int) (getHeight()/2 + loc.getY()));
+    	return loc;
     }
 }

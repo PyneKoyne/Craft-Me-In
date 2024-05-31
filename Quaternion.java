@@ -43,13 +43,6 @@ public class Quaternion implements Cloneable {
 		return rotateVector(q, v);
 	}
 
-	public void setLocation(double w, double x, double y, double z) {
-		this.w = w;
-		this.x = x;
-		this.y = y;
-		this.z = z;
-	}
-
 	@Override
 	public String toString() {
 		return getClass().getName() + "[w=" + w + ",x=" + x + ",y=" + y + "z=" + z + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$

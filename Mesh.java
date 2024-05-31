@@ -13,7 +13,6 @@ public class Mesh {
 	// Variables
 	public Point3D[] vertices;
 	public int points;
-	public HashMap<Integer, ArrayList<Integer>> edges = new HashMap<Integer, ArrayList<Integer>>();
 	public Face[] faces;
 	public ArrayList<Point3D> mesh = new ArrayList<Point3D>();
 	public float[] rawMesh;
@@ -46,10 +45,7 @@ public class Mesh {
 	// Creates the total mesh by drawing each face
 	public void createMesh() {
 		for (Face face : faces) {
-			for (Point3D p : face.drawFace(vertices)) {
-				mesh.add(p);
-				System.out.println(p);
-			}
+            mesh.addAll(face.drawFace(vertices));
 		}
 		rawMesh = Point3D.toFloat(mesh.toArray(new Point3D[0]));
 		points = rawMesh.length;

@@ -14,9 +14,9 @@ import java.util.concurrent.Executors;
 // Handler Class
 public class Handler {
     // A list of all the gameObjects
-    LinkedList<gameObject> object = new LinkedList<gameObject>();
-    ArrayGPU[] gpu = new ArrayGPU[3];
-    ExecutorService executorService = Executors.newFixedThreadPool(1);
+    public LinkedList<gameObject> object = new LinkedList<gameObject>();
+    public ArrayGPU[] gpu = new ArrayGPU[3];
+//    ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     // Ticks and renders every game object
     public void tick(){

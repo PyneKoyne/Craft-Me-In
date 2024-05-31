@@ -28,11 +28,6 @@ public class Point3D implements Cloneable {
         return x2 * x2 + y2 * y2 + z2 * z2;
     }
 
-    // finds the magnitude of a vector between two inputs
-    public static double mag(double x1, double y1, double z1, double x2, double y2, double z2) {
-        return Math.sqrt(distanceSq(x1, y1, z1, x2, y2, z2));
-    }
-
     // Getters and Setters
     public double getX() {
         return x;
@@ -60,26 +55,6 @@ public class Point3D implements Cloneable {
         this.z = z;
     }
 
-    public void addX(double x) {
-        this.x += x;
-    }
-
-    // Changes the location of the point
-
-    public void addY(double y) {
-        this.y += y;
-    }
-
-    public void addZ(double z) {
-        this.z += z;
-    }
-
-    public void setLocation(double x, double y, double z) {
-        this.x = x;
-        this.y = y;
-        this.z = z;
-    }
-
     @Override
     public String toString() {
         return "(" + x + ", " + y + ", " + z + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -91,10 +66,6 @@ public class Point3D implements Cloneable {
 
     public double distanceSq(Point3D p) {
         return Point3D.distanceSq(getX(), getY(), getZ(), p.getX(), p.getY(), p.getZ());
-    }
-
-    public double mag(double px, double py, double pz) {
-        return Math.sqrt(distanceSq(px, py, pz));
     }
 
     public Vector displacement(Point3D p1, Point3D p2) {
@@ -174,19 +145,6 @@ public class Point3D implements Cloneable {
         vector2cam.setX(0);
 
         return vector2cam.normalize(angle * cam.getFocalLength() * 5000);
-    }
-
-    public static void screenOrthoCoordinatesTotal(int points, float[] focal, int hash, ArrayGPU[] gpu, int[] g, int screenX, int colour) {
-        float[] vectors = gpu[0].runProgram(points, focal, points/3, hash);
-
-        for (int i = 0; i < points/3; i++) {
-            if ((int) vectors[i * 3 + 1] > 0 && (int) vectors[i * 3 + 2] > 0) {
-                g[(int) vectors[i * 3 + 1] + (int) (vectors[i * 3 + 2]) * screenX] = colour;
-                g[(int) vectors[i * 3 + 1] + 1 + (int) (vectors[i * 3 + 2] + 1) * screenX] = colour;
-                g[(int) vectors[i * 3 + 1] + (int) (vectors[i * 3 + 2]) * screenX] = colour;
-                g[(int) vectors[i * 3 + 1] + 1 + (int) (vectors[i * 3 + 2] + 1) * screenX] = colour;
-            }
-        }
     }
 
     public static float[] toFloat(Point3D[] points){

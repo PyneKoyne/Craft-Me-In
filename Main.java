@@ -13,20 +13,19 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Main extends JFrame implements ActionListener{
+    // Sets default width and height of the window
+    private final static int X = 1366;
+    private final static int Y = 768;
 
     // main function
     public static void main(String[] args){
         new Main().setVisible(true);
 
     }
-
-    // Sets default width and height of the window
-    public static int x = 1366;
-    public static int y = 768;
     private Main(){
         //Properties
         super("Real Engine");
-        setSize(x, y); //1024x768, 1600/900
+        setSize(X, Y); //1024x768, 1600/900
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
@@ -42,11 +41,11 @@ public class Main extends JFrame implements ActionListener{
         //Start Button
         JButton button = new JButton("Start");
         button.addActionListener(this);
-        button.setBounds(x/2 - 110, y/2 - 15, 220, 30);
+        button.setBounds(X /2 - 110, Y /2 - 15, 220, 30);
 
         //Panel
         JPanel pnlButton = new JPanel();
-        pnlButton.setBounds(x/5, y/5, 3*x/5, 3*y/5);
+        pnlButton.setBounds(X /5, Y /5, 3* X /5, 3* Y /5);
         LayoutManager FlowLayout = new FlowLayout(java.awt.FlowLayout.CENTER, 550, 25);
         setLayout(FlowLayout);
 
@@ -74,7 +73,5 @@ public class Main extends JFrame implements ActionListener{
             }
             this.dispose();
         }
-
     }
-
 }

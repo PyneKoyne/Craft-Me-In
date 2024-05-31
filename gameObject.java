@@ -24,9 +24,9 @@ public abstract class gameObject {
 	protected Mesh mesh;
 
 	// Average game object constructor
-	public gameObject(Point3D cos, Vector rot, ID id) {
+	public gameObject(Point3D coords, Vector rot, ID id) {
 		setRot(rot);
-		coords = cos;
+		this.coords = coords;
 		this.vel = new Vector(0, 0, 0);
 		this.id = id;
 	}
@@ -80,6 +80,7 @@ public abstract class gameObject {
 	public ID getid() {
 		return id;
 	}
+
 	public int getHash(){
 		return hash;
 	}
