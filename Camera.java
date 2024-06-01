@@ -15,8 +15,6 @@ public class Camera extends gameObject {
     public double focalLength;
     public Window window;
     public double focalVel;
-    public boolean[] movement = {false, false, false, false};
-    public boolean locked = true;
     public int cos = 0, tan = 0;
     public int screenX = 0, screenY = 0;
     public Point3D focalPoint = Point3D.zero;
@@ -62,14 +60,6 @@ public class Camera extends gameObject {
 
     // Moves every tick
     public void tick() {
-
-        if (movement[0]) addForce(norm.mul(0.1));
-        if (movement[1]) addForce(left.mul(-0.1));
-        if (movement[2]) addForce(norm.mul(-0.1));
-        if (movement[3]) addForce(left.mul(0.1));
-
-        this.coords = this.coords.add(this.vel);
-        this.vel = this.vel.mul(0.1);
         this.focalPoint = this.coords.add(norm.mul(this.focalLength));
 
         // Changes the focal length based on the focal length velocity
@@ -80,25 +70,6 @@ public class Camera extends gameObject {
         }
 
         this.focalVel /= 4;
-
-        // Moves the mouse to the centre of the screen if not shift locked
-        if (locked) {
-            // Finds the difference in mouse coordinates
-            Point p = MouseInfo.getPointerInfo().getLocation();
-            setRot(getAngles().add(new Vector(0, (screenY - p.getY() + window.screenLoc().y) / 2000, (screenX - p.getX() + window.screenLoc().x) / 2000)));
-
-            try {
-                Robot robot = new Robot();
-                robot.mouseMove(screenX + window.screenLoc().x, screenY + window.screenLoc().y);
-
-            } catch (AWTException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    public void switchLock() {
-        locked = !locked;
     }
 
     // Renders the screen
@@ -133,7 +104,7 @@ public class Camera extends gameObject {
             gameObject tempObject = handler.object.get(i);
 
             // If the object is a cube, it renders it
-            if (tempObject.getid() == ID.Cube || tempObject.getid() == ID.Plane) {
+            if (tempObject.getMesh() != null) {
                 float[] focal = tempObject.coords.subtract(this.getFocalPoint()).toFloat();
                 float[] vectors = gpu[0].runProgram(tempObject.getMesh().points, focal, tempObject.getMesh().points/3, tempObject.getHash());
 

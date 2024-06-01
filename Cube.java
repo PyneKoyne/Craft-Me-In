@@ -8,24 +8,24 @@ package main;
 import java.awt.*;
 import java.util.HashMap;
 
-public class Cube extends gameObject{
+public class Cube extends gameObject {
     private final Handler handler;
     private final Color color;
-    
-    
-    public Cube(Point3D p, float scale, ID id, Handler handler, Color color){
+
+
+    public Cube(Point3D p, float scale, ID id, Handler handler, Color color) {
         super(p, new Vector(0, 0, 0), id);
 
         Point3D[] verts = {
-                p,
-                p.add(new Vector(scale, 0, 0)),
-                p.add(new Vector(0, scale, 0)),
-                p.add(new Vector(scale, scale, 0)),
+                Point3D.zero,
+                new Point3D(scale, 0, 0),
+                new Point3D(0, scale, 0),
+                new Point3D(scale, scale, 0),
 
-                p.add(new Vector(0, 0, scale)),
-                p.add(new Vector(scale, 0, scale)),
-                p.add(new Vector(0, scale, scale)),
-                p.add(new Vector(scale, scale, scale))
+                new Point3D(0, 0, scale),
+                new Point3D(scale, 0, scale),
+                new Point3D(0, scale, scale),
+                new Point3D(scale, scale, scale)
         };
         int[][] faceVerts = new int[][]
                 {
@@ -55,7 +55,7 @@ public class Cube extends gameObject{
     }
 
     // returns the color of the shape
-    public Color getColor(){
+    public Color getColor() {
         return color;
     }
 

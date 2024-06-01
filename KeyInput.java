@@ -27,18 +27,45 @@ public class KeyInput extends KeyAdapter {
         // Loops through every game object
         for(int i = 0; i < handler.object.size(); i ++) {
             gameObject tempObject = handler.object.get(i);
-            if (tempObject.getid() == ID.Camera) {
-                Camera cam = getCamera((Camera) tempObject, key);
+            if (tempObject.getid() == ID.Player) {
+                Player player = getCamera((Player) tempObject, key);
 
                 if (key == KeyEvent.VK_X){
-                    handler.addObject(new Cube(cam.getLocation().add(cam.getNorm()), 10, ID.Cube, handler, Color.yellow));
+                    System.out.println(player.getLocation().add(player.getNorm().mul(10)));
+                    handler.addObject(new Cube(player.getLocation().add(player.getNorm().mul(10)), 10, ID.Cube, handler, Color.yellow));
+                }
+            }
+            if (tempObject.getid() == ID.Camera) {
+                Camera cam = (Camera) tempObject;
+
+                // If the e key is pressed, increases the number of cosines applied
+                if (key == KeyEvent.VK_E) {
+                    cam.setCos(cam.cos + 1);
+                }
+
+                // If the q key is pressed, decreases the number of cosines applied
+                if (key == KeyEvent.VK_Q) {
+                    cam.setCos(cam.cos - 1);
+                }
+
+                // If the c key is pressed, increases the number of tangents applied
+                if (key == KeyEvent.VK_C) {
+                    cam.setTan(cam.tan + 1);
+                }
+
+                // If the z key is pressed, decreases the number of tangents applied
+                if (key == KeyEvent.VK_Z) {
+                    cam.setTan(cam.tan - 1);
                 }
             }
         }
     }
 
-    private static Camera getCamera(Camera tempObject, int key) {
-
+    private static Player getCamera(Player tempObject, int key) {
+        // If the shift key is pressed, it switches between the camera being locked or not
+        if (key == KeyEvent.VK_SHIFT) {
+            tempObject.switchLock();
+        }
         if(key == KeyEvent.VK_W ){
             tempObject.movement[0] = true;
         }
@@ -51,31 +78,6 @@ public class KeyInput extends KeyAdapter {
         if(key == KeyEvent.VK_A ){
             tempObject.movement[3] = true;
         }
-
-        // If the shift key is pressed, it switches between the camera being locked or not
-        if (key == KeyEvent.VK_SHIFT) {
-            tempObject.switchLock();
-        }
-
-        // If the e key is pressed, increases the number of cosines applied
-        if (key == KeyEvent.VK_E) {
-            tempObject.setCos(tempObject.cos + 1);
-        }
-
-        // If the q key is pressed, decreases the number of cosines applied
-        if (key == KeyEvent.VK_Q) {
-            tempObject.setCos(tempObject.cos - 1);
-        }
-
-        // If the c key is pressed, increases the number of tangents applied
-        if (key == KeyEvent.VK_C) {
-            tempObject.setTan(tempObject.tan + 1);
-        }
-
-        // If the z key is pressed, decreases the number of tangents applied
-        if (key == KeyEvent.VK_Z) {
-            tempObject.setTan(tempObject.tan - 1);
-        }
         return tempObject;
     }
 
@@ -84,21 +86,20 @@ public class KeyInput extends KeyAdapter {
         int key = e.getKeyCode();
         for(int i = 0; i < handler.object.size(); i ++) {
             gameObject tempObject = handler.object.get(i);
-            
-            if (tempObject.getid() == ID.Camera) {
-                Camera cam = (Camera) tempObject;
+            if (tempObject.getid() == ID.Player) {
+                Player player = (Player) tempObject;
                 //Key Release Events
                 if (key == KeyEvent.VK_W) {
-                    cam.movement[0] = false;
+                    player.movement[0] = false;
                 }
                 if (key == KeyEvent.VK_D) {
-                    cam.movement[1] = false;
+                    player.movement[1] = false;
                 }
                 if (key == KeyEvent.VK_S) {
-                    cam.movement[2] = false;
+                    player.movement[2] = false;
                 }
                 if (key == KeyEvent.VK_A) {
-                    cam.movement[3] = false;
+                    player.movement[3] = false;
                 }
             }
         }
