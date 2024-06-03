@@ -6,6 +6,7 @@
 package main;
 
 import java.awt.*;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.concurrent.ExecutorService;
@@ -37,6 +38,7 @@ public class Handler {
         this.object.add(object);
         Mesh tempMesh = object.getMesh();
         if (tempMesh != null) {
+            System.out.println(Arrays.toString(tempMesh.rawMesh));
             gpu[0].allocateMemory(tempMesh.points, tempMesh.rawMesh, 15, object.getHash());
         }
     }

@@ -29,14 +29,13 @@ public class KeyInput extends KeyAdapter {
             gameObject tempObject = handler.object.get(i);
             if (tempObject.getid() == ID.Player) {
                 Player player = getCamera((Player) tempObject, key);
-
-                if (key == KeyEvent.VK_X){
-                    System.out.println(player.getLocation().add(player.getNorm().mul(10)));
-                    handler.addObject(new Cube(player.getLocation().add(player.getNorm().mul(10)), 10, ID.Cube, handler, Color.yellow));
-                }
             }
             if (tempObject.getid() == ID.Camera) {
                 Camera cam = (Camera) tempObject;
+                if (key == KeyEvent.VK_X){
+                    System.out.println(cam.getLocation().add(cam.getNorm().mul(10)));
+                    handler.addObject(new Cube(cam.getLocation().add(cam.getNorm().mul(10)), 10, ID.Cube, handler, Color.yellow));
+                }
 
                 // If the e key is pressed, increases the number of cosines applied
                 if (key == KeyEvent.VK_E) {
@@ -77,6 +76,9 @@ public class KeyInput extends KeyAdapter {
         }
         if(key == KeyEvent.VK_A ){
             tempObject.movement[3] = true;
+        }
+        if(key == KeyEvent.VK_SPACE){
+            tempObject.addForce(Vector.k);
         }
         return tempObject;
     }

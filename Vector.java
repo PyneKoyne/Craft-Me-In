@@ -5,10 +5,6 @@
 
 package main;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.HashMap;
-
 public class Vector implements Cloneable {
 	public double x;
 	public double y;
@@ -71,13 +67,12 @@ public class Vector implements Cloneable {
 
 	// returns a vector with magnitude 1
 	public Vector normalize() {
-		double square = Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2);
-		double hyp = invSquare(square);
+		double hyp = 1/mag();
 		return new Vector(x * hyp, y * hyp, z * hyp);
 	}
 
 	// returns a vector with magnitude n
-	public Vector normalize(double n) {
+	public Vector fastNormalize(double n) {
 		double square = Math.pow(x, 2) + Math.pow(y, 2) + Math.pow(z, 2);
 		double hyp = invSquare(square) * n;
 		return new Vector(x * hyp, y * hyp, z * hyp);

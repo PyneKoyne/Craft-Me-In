@@ -154,7 +154,7 @@ public abstract class gameObject {
         updateRot();
     }
 
-    private void updateRot() {
+    protected void updateRot() {
         this.rot = new Quaternion(this.roll, this.pitch, this.yaw);
 
         // Sets the norm, up, and right vectors when the rotation is set as well

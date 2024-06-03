@@ -11,13 +11,14 @@ import java.util.HashMap;
 public class Player extends gameObject{
     private final Handler handler;
     private final Camera camera;
+    private final Vector CAMERA_OFFSET = new Vector(0, 0, 4);
     private final Window window;
     public boolean[] movement = {false, false, false, false};
     public boolean locked = true;
     private final Color color;
 
     public Player(Point3D p, float scale, ID id, Handler handler, Color color, Window window){
-        super(p, new Vector(0, 0, 0), id);
+        super(p, new Vector(Math.PI, 0, 0), id);
         this.color = color;
         this.handler = handler;
         this.window = window;
@@ -31,14 +32,28 @@ public class Player extends gameObject{
         if (movement[1]) addForce(left.mul(-0.1));
         if (movement[2]) addForce(norm.mul(-0.1));
         if (movement[3]) addForce(left.mul(0.1));
-        this.coords = this.coords.add(this.vel);
-        this.vel = this.vel.mul(0.1);
 
-        camera.coords = this.coords;
-        camera.rot = this.rot;
-        camera.setNorm(this.norm);
-        camera.setUp(this.up);
-        camera.setLeft(this.left);
+        for (gameObject tempObject: handler.object){
+            if (tempObject.getMesh() != null){
+                for (Face face: tempObject.getMesh().faces){
+                    Vector distance = tempObject.coords.add(face.centre).subtract(this.coords);
+                    if (true) {
+                        if (face.norm.dotProd(vel) < 0 && face.norm.dotProd(distance) > 0 && face.norm.dotProd(distance) + (face.norm.dotProd(vel)) < 0) {
+                            this.vel = this.vel.mul(0.6);
+                            addForce(face.norm.mul(-face.norm.dotProd(vel) / (face.norm.mag())));
+                        }
+                        if (face.norm.dotProd(vel) > 0 && face.norm.dotProd(distance) < 0 && face.norm.mul(-1).dotProd(distance) + (face.norm.mul(-1).dotProd(vel)) < 0) {
+                            this.vel = this.vel.mul(0.6);
+                            addForce(face.norm.mul(face.norm.mul(-1).dotProd(vel) / (face.norm.mag())));
+                        }
+                    }
+                }
+            }
+        }
+
+        this.coords = this.coords.add(this.vel);
+        this.vel = this.vel.mul(0.99);
+        this.addForce(new Vector(0, 0, -0.02));
 
         // Moves the mouse to the centre of the screen if not shift locked
         if (locked) {
@@ -46,7 +61,7 @@ public class Player extends gameObject{
             Point p = MouseInfo.getPointerInfo().getLocation();
             int screenX = this.window.getWidth() / 2;
             int screenY = this.window.getHeight() / 2;
-            setRot(getAngles().add(new Vector(0, (screenY - p.getY() + window.screenLoc().y) / 2000, (screenX - p.getX() + window.screenLoc().x) / 2000)));
+            setRot(getAngles().add(new Vector(0, (-screenY + p.getY() - window.screenLoc().y) / 2000, (screenX - p.getX() + window.screenLoc().x) / 2000)));
 
             try {
                 Robot robot = new Robot();
@@ -56,6 +71,8 @@ public class Player extends gameObject{
                 e.printStackTrace();
             }
         }
+
+        camera.coords = this.coords.add(CAMERA_OFFSET);
     }
 
     public void render(Graphics g, ArrayGPU[] gpu) {
@@ -64,6 +81,21 @@ public class Player extends gameObject{
 
     public void switchLock() {
         locked = !locked;
+    }
+
+    public void setRot(Vector rot) {
+        // Rotations over 360 degrees are modul-ised
+        this.roll = rot.getX() % (2 * Math.PI);
+        this.yaw = rot.getZ() % (2 * Math.PI);
+
+        if (camera != null) {
+            camera.roll = this.roll;
+            camera.pitch += rot.getY() % (2 * Math.PI);
+            camera.yaw = this.yaw;
+            camera.updateRot();
+        }
+
+        updateRot();
     }
 
 

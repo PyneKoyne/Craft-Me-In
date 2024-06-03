@@ -144,7 +144,7 @@ public class Point3D implements Cloneable {
         vector2cam = cam.getRot().rotateVector(vector2cam, true);
         vector2cam.setX(0);
 
-        return vector2cam.normalize(angle * cam.getFocalLength() * 5000);
+        return vector2cam.fastNormalize(angle * cam.getFocalLength() * 5000);
     }
 
     public static float[] toFloat(Point3D[] points){

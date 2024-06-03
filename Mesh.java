@@ -5,47 +5,35 @@
 
 package main;
 
-import java.awt.Point;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Arrays;
 
 public class Mesh {
 	// Variables
-	public Point3D[] vertices;
+	public ArrayList<Point3D> vertices;
 	public int points;
-	public Face[] faces;
+	public ArrayList<Face> faces = new ArrayList<>();
 	public ArrayList<Point3D> mesh = new ArrayList<Point3D>();
 	public float[] rawMesh;
 
 	// Defines the mesh based on the given parameters
-	public Mesh(Point3D[] vertices, int[][] faceStructure) {
+	public Mesh(ArrayList<Point3D> vertices, ArrayList<int[]> faceStructure) {
 		this.vertices = vertices;
-		Face[] faces = new Face[faceStructure.length];
 
-		for (int i = 0; i < faceStructure.length; i++){
-			faces[i] = new Face(faceStructure[i]);
-		}
-		this.faces = faces;
-
-//		for (Point edge : edges) {
-//			if (this.edges.get(edge.x) != null) {
-//				this.edges.get(edge.x).add(edge.y);
-//			} else {
-//				this.edges.put(edge.x, new ArrayList<>());
-//			}
-//
-//			if (this.edges.get(edge.y) != null) {
-//				this.edges.get(edge.y).add(edge.x);
-//			} else {
-//				this.edges.put(edge.y, new ArrayList<>());
-//			}
-//		}
+        for (int[] face : faceStructure) {
+            faces.add(new Face(face));
+        }
 	}
 
 	// Creates the total mesh by drawing each face
 	public void createMesh() {
+		Point3D[] tempVertices = new Point3D[vertices.size()];
+		for (int i = 0; i < vertices.size(); i++){
+			tempVertices[i] = vertices.get(i);
+		}
+
 		for (Face face : faces) {
-            mesh.addAll(face.drawFace(vertices));
+			mesh.addAll(face.drawFace(tempVertices));
 		}
 		rawMesh = Point3D.toFloat(mesh.toArray(new Point3D[0]));
 		points = rawMesh.length;

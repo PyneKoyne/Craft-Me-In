@@ -2,7 +2,6 @@ package main;
 
 import org.jocl.*;
 
-import java.util.Arrays;
 import java.util.HashMap;
 
 import static org.jocl.CL.*;

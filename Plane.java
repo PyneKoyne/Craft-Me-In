@@ -6,6 +6,8 @@
 package main;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class Plane extends gameObject{
@@ -17,16 +19,14 @@ public class Plane extends gameObject{
         super(p, new Vector(1, 0, 0), id);
         this.handler = handler;
 
-        Point3D[] verts = {
-                p,
-                p.add(new Vector(scale, 0, 0)),
-                p.add(new Vector(0, scale, 0)),
-                p.add(new Vector(scale, scale, 0))
-        };
-        int[][] faceVerts = new int[][]
-                {
-                        {0, 1, 3, 2},
-                };
+        ArrayList<Point3D> verts = new ArrayList<>();
+        verts.add(p);
+        verts.add(p.add(new Vector(scale, 0, 0)));
+        verts.add(p.add(new Vector(0, scale, 0)));
+        verts.add(p.add(new Vector(scale, scale, 0)));
+
+        ArrayList<int[]> faceVerts = new ArrayList<>();
+        faceVerts.add(new int[]{0, 1, 3, 2});
 
         this.mesh = new Mesh(verts, faceVerts);
         this.color = color;
