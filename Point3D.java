@@ -106,7 +106,8 @@ public class Point3D implements Cloneable {
     public boolean equals(Object obj) {
         if (obj == this) {
             return true;
-        } else if (obj instanceof Point3D p) {
+        } else if (obj instanceof Point3D) {
+            Point3D p = (Point3D) obj;
             return getX() == p.getX() && getY() == p.getY() && getZ() == p.getZ();
         }
         return false;

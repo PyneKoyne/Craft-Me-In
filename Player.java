@@ -14,11 +14,11 @@ public class Player extends gameObject{
     // variables
     private final Handler handler;
     private final Camera camera; // has a camera object as a child
-    private final Vector CAMERA_OFFSET = new Vector(0, 0, 4);
+    private final Vector CAMERA_OFFSET = new Vector(0, 0, 1);
     private final Window window;
     public boolean[] movement = {false, false, false, false};
     public boolean locked = true;
-    private final Color color;
+    private Color color;
 
     // player constructor which extends game object
     public Player(Point3D p, float scale, ID id, Handler handler, Color color, Window window){
@@ -27,7 +27,8 @@ public class Player extends gameObject{
         this.handler = handler;
         this.window = window;
         // creates a new camera
-        this.camera = new Camera(p, 1, ID.Camera, handler, window);
+        this.camera = new Camera(p, 0.16, ID.Camera, handler, window);
+        this.camera.pitch = Math.PI/2;
         handler.addObject(this.camera);
     }
 
@@ -38,11 +39,12 @@ public class Player extends gameObject{
         if (movement[2]) addForce(norm.mul(-0.1));
         if (movement[3]) addForce(left.mul(0.1));
 
-        for (gameObject tempObject: handler.object){
+        for (int i = 0; i < handler.object.size(); i++){
+            gameObject tempObject = handler.object.get(i);
             if (tempObject.getMesh() != null){
                 for (Face face: tempObject.getMesh().faces){
                     Vector distance = tempObject.coords.add(face.centre).subtract(this.coords);
-                    if (true) {
+                    if (Math.sqrt(Math.pow(distance.mag(), 2) - Math.pow(face.norm.dotProd(distance), 2)) < 1) {
                         if (face.norm.dotProd(vel) < 0 && face.norm.dotProd(distance) > 0 && face.norm.dotProd(distance) + (face.norm.dotProd(vel)) < 0) {
                             this.vel = this.vel.mul(0.6);
                             addForce(face.norm.mul(-face.norm.dotProd(vel) / (face.norm.mag())));
@@ -58,7 +60,7 @@ public class Player extends gameObject{
 
         this.coords = this.coords.add(this.vel);
         this.vel = this.vel.mul(0.5 );
-//        this.addForce(new Vector(0, 0, -0.02));
+        this.addForce(new Vector(0, 0, -0.02));
 
         // Moves the mouse to the centre of the screen if not shift locked
         // rotates and moves the camera to follow the player

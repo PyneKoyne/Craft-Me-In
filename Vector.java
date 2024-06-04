@@ -116,8 +116,9 @@ public class Vector implements Cloneable {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof Vector p) {
-            return getX() == p.getX() && getY() == p.getY() && getZ() == p.getZ();
+		if (obj instanceof Vector) {
+			Vector p = (Vector) obj;
+			return getX() == p.getX() && getY() == p.getY() && getZ() == p.getZ();
 		}
 		return false;
 	}

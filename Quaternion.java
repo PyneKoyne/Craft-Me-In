@@ -154,8 +154,9 @@ public class Quaternion implements Cloneable {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof Quaternion q) {
-            return w == q.w && x == q.x && y == q.y && z == q.z;
+		if (obj instanceof Quaternion) {
+			Quaternion q = (Quaternion) obj;
+			return w == q.w && x == q.x && y == q.y && z == q.z;
 		}
 		return false;
 	}

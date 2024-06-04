@@ -3,12 +3,11 @@
 // Program Name: Engine
 // Description: This is the perlin noise generation code found online. Creates slopes and terrains.
 
-
-
 package main;
 
 import java.util.Random;
 
+// Perlin noise class
 public class PerlinNoise {
 
     // dimensions of heatmap
@@ -17,6 +16,7 @@ public class PerlinNoise {
     private double[][] noise;
     private Random random;
 
+    // Constructs a new Perlin Noise object
     public PerlinNoise(int width, int height) {
         this.width = width;
         this.height = height;
@@ -29,6 +29,7 @@ public class PerlinNoise {
         return t * t * t * (t * (t * 6 - 15) + 10);
     }
 
+    // lerp function
     private double lerp(double t, double a, double b) {
         return a + t * (b - a);
     }

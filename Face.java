@@ -52,11 +52,11 @@ public class Face implements Cloneable {
 
 		// Draws the two diagonals
 		Vector diagX, diagY;
-		diagX = vertices[verts[2]].subtract(vertices[verts[0]]).mul(.01);
-		diagY = vertices[verts[3]].subtract(vertices[verts[1]]).mul(.01);
+		diagX = vertices[verts[2]].subtract(vertices[verts[0]]).mul(.02);
+		diagY = vertices[verts[3]].subtract(vertices[verts[1]]).mul(.02);
 
 		// draws all the points between both diagonals
-		for (int i = 0; i <= 100; i += 1){
+		for (int i = 0; i <= 50; i += 1){
 			Vector line = vertices[verts[3]].add(diagY.mul(i)).subtract(vertices[verts[2]].add(diagX.mul(i)));
 			for (double j = 0; j <= line.mag(); j += LENGTH){
 				Points.add(vertices[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
@@ -64,7 +64,7 @@ public class Face implements Cloneable {
 		}
 
 		// draws all the points between the two diagonals in the other way
-		for (int i = 0; i <= 100; i += 1){
+		for (int i = 0; i <= 50; i += 1){
 			Vector line = vertices[verts[3]].add(diagY.mul(i)).subtract(vertices[verts[0]].add(diagX.mul(-i)));
 			for (double j = 0; j < line.mag() + LENGTH/2; j += LENGTH){
 				Points.add(vertices[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
@@ -101,8 +101,9 @@ public class Face implements Cloneable {
 		if (obj == this) {
 			return true;
 		}
-		if (obj instanceof Face p) {
-            return Arrays.equals(verts, p.getVerts());
+		if (obj instanceof Face) {
+			Face p = (Face) obj;
+			return Arrays.equals(verts, p.getVerts());
 		}
 		return false;
 	}

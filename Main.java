@@ -26,7 +26,7 @@ public class Main extends JFrame implements ActionListener{
     // private constructor which launches the main menu
     private Main(){
         //Properties
-        super("Real Engine");
+        super("Craft Me In");
         setSize(X, Y); //1024x768, 1600/900
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);

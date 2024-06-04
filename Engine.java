@@ -8,11 +8,9 @@ package main;
 // Imports
 import java.awt.*;
 import java.awt.image.BufferStrategy;
-import java.io.Serial;
 
 // Class to start the main engine which starts the game
 public class Engine extends Canvas implements Runnable{
-    @Serial
     private static final long serialVersionUID = 1L;
     public static int WIDTH = 1366, HEIGHT = 768; //Dimensions
 
@@ -64,14 +62,19 @@ public class Engine extends Canvas implements Runnable{
         });
         
         //Starts the Window
-        window = new Window(WIDTH, HEIGHT, "Real Engine", this);
+        window = new Window(WIDTH, HEIGHT, "Craft Me In", this);
 
         //Places the Camera
         handler.addObject(new Player(new Point3D(0, 0, 0), 0.2F, ID.Player, handler, Color.black, window));
 
         // Places cubes which are actually planes
 //        handler.addObject(new Cube(new Point3D(10, 10, -8), 10, ID.Cube, handler, Color.black));
-        handler.addObject(new Plane(new Point3D(-20, -20, -20), 100, ID.Plane, handler, Color.black));
+        handler.addObject(new Chunk(new Point3D(0, -20, -20), ID.Plane, handler, Color.black, 0));
+        handler.addObject(new Chunk(new Point3D(-32, -20, -20), ID.Plane, handler, Color.black, 1));
+        handler.addObject(new Chunk(new Point3D(-64, -20, -20), ID.Plane, handler, Color.black, 2));
+        handler.addObject(new Chunk(new Point3D(-96, -20, -20), ID.Plane, handler, Color.black, 3));
+
+//        handler.addObject(new Plane(new Point3D(-20, -20, -20), 100, ID.Plane, handler, Color.black));
     }
 
     //Game Loop
