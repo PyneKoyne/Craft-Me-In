@@ -1,6 +1,6 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
 // Description: This class handles all keyboard inputs
 
 package main;
@@ -13,6 +13,7 @@ import java.awt.event.KeyEvent;
 public class KeyInput extends KeyAdapter {
     private final Handler handler;
 
+    // constructor which sets the handler variable
     public KeyInput(Handler handler){
         this.handler = handler;
     }
@@ -28,7 +29,7 @@ public class KeyInput extends KeyAdapter {
         for(int i = 0; i < handler.object.size(); i ++) {
             gameObject tempObject = handler.object.get(i);
             if (tempObject.getid() == ID.Player) {
-                Player player = getCamera((Player) tempObject, key);
+                Player player = getPlayer((Player) tempObject, key);
             }
             if (tempObject.getid() == ID.Camera) {
                 Camera cam = (Camera) tempObject;
@@ -60,27 +61,27 @@ public class KeyInput extends KeyAdapter {
         }
     }
 
-    private static Player getCamera(Player tempObject, int key) {
+    private static Player getPlayer(Player player, int key) {
         // If the shift key is pressed, it switches between the camera being locked or not
         if (key == KeyEvent.VK_SHIFT) {
-            tempObject.switchLock();
+            player.switchLock();
         }
         if(key == KeyEvent.VK_W ){
-            tempObject.movement[0] = true;
+            player.movement[0] = true;
         }
         if(key == KeyEvent.VK_D ){
-            tempObject.movement[1] = true;
+            player.movement[1] = true;
         }
         if(key == KeyEvent.VK_S ){
-            tempObject.movement[2] = true;
+            player.movement[2] = true;
         }
         if(key == KeyEvent.VK_A ){
-            tempObject.movement[3] = true;
+            player.movement[3] = true;
         }
         if(key == KeyEvent.VK_SPACE){
-            tempObject.addForce(Vector.k);
+            player.addForce(Vector.k);
         }
-        return tempObject;
+        return player;
     }
 
     // If it detects a key is released, and it was a key that was pressed down and moving the camera, it stops moving the camera
@@ -90,6 +91,7 @@ public class KeyInput extends KeyAdapter {
             gameObject tempObject = handler.object.get(i);
             if (tempObject.getid() == ID.Player) {
                 Player player = (Player) tempObject;
+
                 //Key Release Events
                 if (key == KeyEvent.VK_W) {
                     player.movement[0] = false;

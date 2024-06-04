@@ -1,12 +1,12 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
 // Description: This class creates the GameObject Data Structure, which creates a structure for all game objects
 
 package main;
 
+// imports
 import java.awt.*;
-import java.util.HashMap;
 
 // Abstract class to define game objects such as Camera and CUbe
 public abstract class gameObject {

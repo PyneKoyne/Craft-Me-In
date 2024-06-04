@@ -1,13 +1,19 @@
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
+// Description: ArrayGPU creates an object which can interface with the GPU to perform an array of tasks simultaneously
+
 package main;
 
+// imports
 import org.jocl.*;
-
 import java.util.HashMap;
-
 import static org.jocl.CL.*;
 
+// ArrayGPU class to create a new ArrayGPU object. Heavily inspired by JOCL template code
 public class ArrayGPU {
-    public static String subSource = "__kernel void " +
+    // openCL code to find where a point projects onto the scren
+    public static String projectionSource = "__kernel void " +
             "sampleKernel(__global const float *a," +
             "             __global const float *b," +
             "             __global float *c)" +
@@ -37,6 +43,7 @@ public class ArrayGPU {
             "    }" +
             "}";
 
+    // variables for the gpu
     private cl_context context;
     private cl_kernel kernel;
     private cl_command_queue commandQueue;
@@ -44,6 +51,7 @@ public class ArrayGPU {
     private cl_program program;
     private cl_mem camMem;
 
+    // constructor which sets all the default information for the GPU
     public ArrayGPU(){
         // The platform, device type and device number
         // that will be used
@@ -85,6 +93,7 @@ public class ArrayGPU {
                 CL.clCreateCommandQueue(this.context, device, 0, null);
     }
 
+    // Creates a program based on the source code
     public void startProgram(String programSource){
         this.program = CL.clCreateProgramWithSource(context,
                 1, new String[]{programSource}, null, null);
@@ -97,6 +106,7 @@ public class ArrayGPU {
         clReleaseProgram(program);
     }
 
+    // allocates memory objects to save time if they are used between seperate runs
     public void allocateMemory(int n, float[] srcArrayA, int b, int hash){
         // Allocate the memory objects for the input and output data
         Pointer srcA = Pointer.to(srcArrayA);
@@ -113,6 +123,7 @@ public class ArrayGPU {
         memObjects.put(hash, mem);
     }
 
+    // sets the memory data of the camera details
     public void setCamMem(float[] srcArrayB){
         Pointer srcB = Pointer.to(srcArrayB);
 
@@ -120,6 +131,7 @@ public class ArrayGPU {
                 (long) 12 * Sizeof.cl_float, srcB, 0, null, null);
     }
 
+    // Executes the program based on the input received and the other stored memory objects
     public float[] runProgram(int n, float[] focal, int ids, int hash) {
         float[] dstArray = new float[n];
         Pointer srcB = Pointer.to(focal);
@@ -131,7 +143,6 @@ public class ArrayGPU {
         }
         clEnqueueWriteBuffer(commandQueue, this.camMem, CL_TRUE, 12 * Sizeof.cl_float,
                 (long) 3 * Sizeof.cl_float, srcB, 0, null, null);
-
 
         // Set the arguments for the kernel
         CL.clSetKernelArg(this.kernel, 0,
@@ -155,6 +166,7 @@ public class ArrayGPU {
         return dstArray;
     }
 
+    // closes the GPU and releases all memory objects
     public void closeGPU(){
         // Release kernel, program, and memory objects
         CL.clReleaseMemObject(camMem);

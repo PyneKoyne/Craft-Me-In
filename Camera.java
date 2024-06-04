@@ -1,16 +1,19 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
-// Description: This is the camera  class, creating a game object of which points can be displayed on screen according to its location and rotation
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
+// Description: This is the camera class, creating a game object of which points can be displayed on screen according to its location and rotation
 
 package main;
 
+// Imports
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBufferInt;
 import java.util.Arrays;
 
+// Class to manage the camera of the game
 public class Camera extends gameObject {
+    // Global Variables
     private final Handler handler;
     public double focalLength;
     public Window window;
@@ -21,14 +24,16 @@ public class Camera extends gameObject {
     private BufferedImage bufferedImg; //     // image creation
     private final GraphicsConfiguration CONFIG = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
 
+    // Constructor of the class, extends gameObject
     public Camera(Point3D coords, double focal, ID id, Handler handler, Window window) {
         super(coords, new Vector(0, 0, 0), id);
         this.focalLength = focal;
         this.handler = handler;
         this.window = window;
-        bufferedImg = CONFIG.createCompatibleImage(window.getWidth(), window.getHeight());
+        bufferedImg = CONFIG.createCompatibleImage(window.getWidth(), window.getHeight()); // sets the image
     }
 
+    // Retrieves the focal length of the camera
     public double getFocalLength() {
         return focalLength;
     }
@@ -38,6 +43,7 @@ public class Camera extends gameObject {
         focalVel = vel;
     }
 
+    // Retrieves the focal point of the camera
     public Point3D getFocalPoint() {
         return focalPoint;
     }
@@ -58,9 +64,9 @@ public class Camera extends gameObject {
         this.tan = tan;
     }
 
-    // Moves every tick
+    // Runs every tick
     public void tick() {
-        this.focalPoint = this.coords.add(norm.mul(this.focalLength));
+        this.focalPoint = this.coords.add(norm.mul(this.focalLength)); // sets the focal point as the coordinates of the camera plus the normal multiplied by the length
 
         // Changes the focal length based on the focal length velocity
         if (this.focalVel < 0 && this.focalLength < 1) {
@@ -77,10 +83,12 @@ public class Camera extends gameObject {
         this.screenX = this.window.getWidth() / 2;
         this.screenY = this.window.getHeight() / 2;
 
+        // if the screen size has changed, creates a new canvas
         if (bufferedImg.getHeight() != window.getHeight() || bufferedImg.getWidth() != window.getWidth()){
             bufferedImg = CONFIG.createCompatibleImage(window.getWidth(), window.getHeight());
         }
 
+        // resets the image
         int[] pixelData = ((DataBufferInt) bufferedImg.getRaster().getDataBuffer()).getData();
         Arrays.fill(pixelData, 0xd3d3d3);
 
@@ -97,7 +105,7 @@ public class Camera extends gameObject {
                 (float) this.focalLength,
                 (float) screenX,
                 (float) screenY
-        });
+        }); // sets variables required for computing the screen location of the point in the GPU
 
         // Loops through all objects
         for (int i = 0; i < handler.object.size(); i++) {
@@ -129,6 +137,7 @@ public class Camera extends gameObject {
         gParent.drawString("# of Tan Applied: " + tan, 600, 675);
     }
 
+    // fills a one by two rectangle on the image
     private void fillRect(int[] pixelData, gameObject tempObject, int[] loc) {
         pixelData[loc[0] + loc[1] * screenX * 2] = tempObject.getColor().getRGB();
         pixelData[loc[0] + 1 + (loc[1] + 1) * screenX * 2] = tempObject.getColor().getRGB();

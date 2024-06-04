@@ -1,6 +1,6 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
 // Description: This class creates IDs for game objects
 
 package main;

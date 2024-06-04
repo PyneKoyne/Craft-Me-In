@@ -1,10 +1,11 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
 // Description: This class creates the Vector Data Structure, which allows for vector algebra and point manipulation
 
 package main;
 
+// Vector Class
 public class Vector implements Cloneable {
 	public double x;
 	public double y;
@@ -23,6 +24,7 @@ public class Vector implements Cloneable {
 		this.z = z;
 	}
 
+	// Constructs a vector from a float array
 	public Vector(float[] v){
 		this.x = v[0];
 		this.y = v[1];
@@ -78,6 +80,7 @@ public class Vector implements Cloneable {
 		return new Vector(x * hyp, y * hyp, z * hyp);
 	}
 
+	// Inverse Square algorithm taken from Quake 3
 	public double invSquare(double square){
 		double half = 0.5d * square;
 		long i = Double.doubleToLongBits(square);
@@ -88,6 +91,7 @@ public class Vector implements Cloneable {
 		return square;
 	}
 
+	// allows for cloning a vector
 	@Override
 	public Object clone() {
 		try {
@@ -159,11 +163,6 @@ public class Vector implements Cloneable {
 
 	// Adds two vectors
 	public Vector add(Vector v) {
-//		return new Vector(
-//				ArrayGPU.addArray(3, ArrayGPU.addSource,
-//				new float[]{(float) getX(), (float) getY(), (float) getZ()},
-//				new float[]{(float) v.getX(), (float) v.getY(), (float) v.getZ()})
-//		);
 		return new Vector(v.getX() + getX(), v.getY() + getY(), v.getZ() + getZ());
 	}
 
@@ -172,10 +171,12 @@ public class Vector implements Cloneable {
 		return new Point3D(getX(), getY(), getZ());
 	}
 
+	// converts a Vector into a float array
 	public float[] toFloat() {
 		return new float[]{(float) getX(), (float) getY(), (float) getZ()};
 	}
 
+	// subtracts a Vector from a Point3D to return a Vector
 	public Vector subtract(Point3D p) {
 		return new Vector(p.getX() - getX(), p.getY() - getY(), p.getZ() - getZ());
 	}

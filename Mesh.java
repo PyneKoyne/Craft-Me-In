@@ -1,19 +1,18 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
 // Description: This class creates the mesh data structure, which manages the 3d graphics portion of game objects
 
 package main;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 
+// Mesh object class which is used to display game objects
 public class Mesh {
 	// Variables
-	public ArrayList<Point3D> vertices;
+	public ArrayList<Point3D> vertices, mesh = new ArrayList<Point3D>();
 	public int points;
 	public ArrayList<Face> faces = new ArrayList<>();
-	public ArrayList<Point3D> mesh = new ArrayList<Point3D>();
 	public float[] rawMesh;
 
 	// Defines the mesh based on the given parameters
@@ -27,13 +26,15 @@ public class Mesh {
 
 	// Creates the total mesh by drawing each face
 	public void createMesh() {
-		Point3D[] tempVertices = new Point3D[vertices.size()];
+		// converts the flexible vertices ArrayList into a normal array
+		Point3D[] meshVertices = new Point3D[vertices.size()];
 		for (int i = 0; i < vertices.size(); i++){
-			tempVertices[i] = vertices.get(i);
+			meshVertices[i] = vertices.get(i);
 		}
 
+		// goes through each face and finds the points
 		for (Face face : faces) {
-			mesh.addAll(face.drawFace(tempVertices));
+			mesh.addAll(face.drawFace(meshVertices));
 		}
 		rawMesh = Point3D.toFloat(mesh.toArray(new Point3D[0]));
 		points = rawMesh.length;

@@ -1,21 +1,20 @@
 // Author: Kenny Z
 // Date: June 14th
-// Program Name: Engine
+// Program Name: Craft Me In
 // Description: This is the main class of the engine, running the game loop and calling all game object methods, as well as listeners
 
 package main;
 
-//Modules
-
+// Imports
 import java.awt.*;
 import java.awt.image.BufferStrategy;
 import java.io.Serial;
 
+// Class to start the main engine which starts the game
 public class Engine extends Canvas implements Runnable{
-    //Dimensions
     @Serial
     private static final long serialVersionUID = 1L;
-    public static int WIDTH = 1366, HEIGHT = 768;
+    public static int WIDTH = 1366, HEIGHT = 768; //Dimensions
 
     //Variables
     private Thread thread;
@@ -41,12 +40,10 @@ public class Engine extends Canvas implements Runnable{
 
     //Main Class
     public Engine(){
-        handler = new Handler();
-//        handler.gpu.put("Add", new ArrayGPU());
-        handler.gpu[0] = new ArrayGPU();
-        handler.gpu[0].startProgram(ArrayGPU.subSource);
-//        handler.gpu.put("crossProd", new ArrayGPU());
-        
+        handler = new Handler(); // Creates a handler class to manage all our game objects
+        handler.gpu[0] = new ArrayGPU(); // sets the GPU integration of the handler
+        handler.gpu[0].startProgram(ArrayGPU.projectionSource); // starts the
+
         // Adds KeyInputs
         this.addKeyListener(new KeyInput(handler));
         
@@ -115,17 +112,19 @@ public class Engine extends Canvas implements Runnable{
                 System.out.println("FPS: " + frames);
                 frames = 0;
             }
-        }
-        handler.gpu[0].closeGPU();
+        } // end of game loop
+        handler.gpu[0].closeGPU(); // closes GPU integration
     }
 
+    // Method which runs every 60th of a second
     private void tick(){
 		// Finds the width and height of the screen every tick
     	WIDTH = window.getWidth();
         HEIGHT = window.getHeight();
         handler.tick();
     }
-    
+
+    // Method which runs every single frame to draw all game objects
     private void render(){
         // To render the Screen every frame
         BufferStrategy bs = this.getBufferStrategy();
@@ -145,8 +144,8 @@ public class Engine extends Canvas implements Runnable{
         bs.show();
     }
 
+    // creates new Engine
     public static void main(){
         new Engine();
     }
-
 }

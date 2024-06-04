@@ -1,27 +1,32 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
-// Description: This is the cube class, creating a game object which is really just a plane currently
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
+// Description: This is the Player class, creating a game object which acts as the player
 
 package main;
 
+// imports
 import java.awt.*;
 import java.util.HashMap;
 
+// Player object class
 public class Player extends gameObject{
+    // variables
     private final Handler handler;
-    private final Camera camera;
+    private final Camera camera; // has a camera object as a child
     private final Vector CAMERA_OFFSET = new Vector(0, 0, 4);
     private final Window window;
     public boolean[] movement = {false, false, false, false};
     public boolean locked = true;
     private final Color color;
 
+    // player constructor which extends game object
     public Player(Point3D p, float scale, ID id, Handler handler, Color color, Window window){
         super(p, new Vector(Math.PI, 0, 0), id);
         this.color = color;
         this.handler = handler;
         this.window = window;
+        // creates a new camera
         this.camera = new Camera(p, 1, ID.Camera, handler, window);
         handler.addObject(this.camera);
     }
@@ -56,6 +61,7 @@ public class Player extends gameObject{
         this.addForce(new Vector(0, 0, -0.02));
 
         // Moves the mouse to the centre of the screen if not shift locked
+        // rotates and moves the camera to follow the player
         if (locked) {
             // Finds the difference in mouse coordinates
             Point p = MouseInfo.getPointerInfo().getLocation();
@@ -71,18 +77,20 @@ public class Player extends gameObject{
                 e.printStackTrace();
             }
         }
-
         camera.coords = this.coords.add(CAMERA_OFFSET);
     }
 
+    // helper code to run on every render
     public void render(Graphics g, ArrayGPU[] gpu) {
 
     }
 
+    // switches if the mouse is locked in the center or not
     public void switchLock() {
         locked = !locked;
     }
 
+    // an override of the gameObject method to also rotate the camera's pitch but not the players
     public void setRot(Vector rot) {
         // Rotations over 360 degrees are modul-ised
         this.roll = rot.getX() % (2 * Math.PI);

@@ -1,24 +1,24 @@
-// Author: Kenny Z
+// Author: Kenny Z & Anish Nagariya
 // Date: June 14th
-// Program Name: Engine
-// Description: This is the cube class, creating a game object which is really just a plane currently
+// Program Name: Craft Me In
+// Description: Creates a 3d plane on screen
 
 package main;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
 
+// creates a new plane object
 public class Plane extends gameObject{
     private final Handler handler;
     private final Color color;
 
-
+    // constructor of the plane class which extends game object
     public Plane(Point3D p, float scale, ID id, Handler handler, Color color){
         super(p, new Vector(1, 0, 0), id);
         this.handler = handler;
 
+        // adds the vertices and faces of the object to render
         ArrayList<Point3D> verts = new ArrayList<>();
         verts.add(p);
         verts.add(p.add(new Vector(scale, 0, 0)));
@@ -28,17 +28,19 @@ public class Plane extends gameObject{
         ArrayList<int[]> faceVerts = new ArrayList<>();
         faceVerts.add(new int[]{0, 1, 3, 2});
 
+        // creates the mesh to draw
         this.mesh = new Mesh(verts, faceVerts);
         this.color = color;
         mesh.createMesh();
 
     }
 
-    // changes its coordinates every tick based on its velocity
+    // any code which runs every tick
     public void tick() {
         coords.add(vel);
     }
 
+    // any additional helper code to help render the object
     public void render(Graphics g, ArrayGPU[] gpu) {
 
     }

@@ -1,12 +1,13 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
-// Description: This class creates the Quaternion Data Structure, which is really just for rotations
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
+// Description: This class creates the Quaternion Data Structure for 3D rotations
 
 package main;
 
+// Quaternion class
 public class Quaternion implements Cloneable {
-	public double w, x, y, z;
+	public double w, x, y, z; // variables
 
 	// Constructs a normal Quaternion
 	public Quaternion(double theta, double x, double y, double z) {
@@ -43,6 +44,7 @@ public class Quaternion implements Cloneable {
 		return rotateVector(q, v);
 	}
 
+	// to string method override for debugging
 	@Override
 	public String toString() {
 		return getClass().getName() + "[w=" + w + ",x=" + x + ",y=" + y + "z=" + z + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
@@ -90,6 +92,7 @@ public class Quaternion implements Cloneable {
 		return new Point3D(pPrime.x, pPrime.y, pPrime.z);
 	}
 
+	// rotates a variable given a quaternion and a vector
 	public static Vector rotateVector(Quaternion q, Vector v) {
 		// Extract the vector part of the quaternion
 		Vector unitVector = new Vector(q.x, q.y, q.z);
@@ -105,6 +108,7 @@ public class Quaternion implements Cloneable {
 		);
 	}
 
+	// rotates a Vector using the parent Quaternion
 	public Vector rotateVector(Vector v, boolean inv) {
 		// Extract the vector part of the quaternion
 		Vector unitVector = new Vector(this.x, this.y, this.z);
@@ -124,6 +128,7 @@ public class Quaternion implements Cloneable {
 		);
 	}
 
+	// alows for cloning of a Quaternion object
 	@Override
 	public Object clone() {
 		try {
@@ -133,7 +138,7 @@ public class Quaternion implements Cloneable {
 		}
 	}
 
-
+	// Hash code for a Quaternion
 	@Override
 	public int hashCode() {
 		long l = java.lang.Double.doubleToLongBits(w);

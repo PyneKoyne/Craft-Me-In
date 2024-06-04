@@ -1,6 +1,6 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
 // Description: This class creates the Point3D Data Structure, which keep tracks of all points within the 3d space
 
 package main;
@@ -11,7 +11,7 @@ public class Point3D implements Cloneable {
     public double y;
     public double z;
 
-    public static Point3D zero = new Point3D(0, 0, 0);
+    public static Point3D zero = new Point3D(0, 0, 0); // a static zeroed Point3D for reference
 
     // Constructs a Point3D
     public Point3D(double x, double y, double z) {
@@ -45,8 +45,6 @@ public class Point3D implements Cloneable {
         this.y = y;
     }
 
-    // Adds to a specific direction
-
     public double getZ() {
         return z;
     }
@@ -55,19 +53,25 @@ public class Point3D implements Cloneable {
         this.z = z;
     }
 
+    // To String Method
     @Override
     public String toString() {
-        return "(" + x + ", " + y + ", " + z + ")"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+        return "(" + x + ", " + y + ", " + z + ")";
     }
 
+    // finds the distance squared between the point and another coordinate tuple
     public double distanceSq(double px, double py, double pz) {
         return Point3D.distanceSq(getX(), getY(), getZ(), px, py, pz);
     }
+
+    // finds the distance squared between the point and another point3D
 
     public double distanceSq(Point3D p) {
         return Point3D.distanceSq(getX(), getY(), getZ(), p.getX(), p.getY(), p.getZ());
     }
 
+
+    // finds the displacement between the point and another coordinate tuple
     public Vector displacement(Point3D p1, Point3D p2) {
         return new Vector(p2.x - p1.x, p2.y - p1.y, p2.z - p1.z);
     }
@@ -77,6 +81,7 @@ public class Point3D implements Cloneable {
         return Math.sqrt(distanceSq(p));
     }
 
+    // allows a Point3D to be cloned
     @Override
     public Object clone() {
         try {
@@ -87,7 +92,6 @@ public class Point3D implements Cloneable {
     }
 
     // Hash code for a hash map
-
     @Override
     public int hashCode() {
         long l = java.lang.Double.doubleToLongBits(getZ());
@@ -117,9 +121,10 @@ public class Point3D implements Cloneable {
     public Point3D add(Vector v) {
         return new Point3D(getX() + v.x, getY() + v.y, getZ() + v.z);
     }
+    // Adds a point to a point creating another point
     public Point3D add(Point3D p) { return new Point3D(getX() + p.x, getY() + p.y, getZ() + p.z); }
 
-    // Maps a point onto the camera
+    // Maps a point onto the camera OLD
     public Vector screenOrthoCoordinates(Camera cam, Vector focalPoint, int cos, int tan) {
         final double ROTATION_LIMIT = Math.PI/2.0;
         Vector norm = cam.getNorm();
@@ -147,6 +152,7 @@ public class Point3D implements Cloneable {
         return vector2cam.fastNormalize(angle * cam.getFocalLength() * 5000);
     }
 
+    // Turns a list of Point3Ds into a 1-dimensional float array
     public static float[] toFloat(Point3D[] points){
         float[] output = new float[points.length * 3];
         for(int i = 0; i < points.length; i++){
@@ -157,11 +163,12 @@ public class Point3D implements Cloneable {
         return output;
     }
 
-    // Turns a point into a Vector from the origin
+    // Turns a point into a Vector with its tail at the origin
     public Vector toVect() {
         return new Vector(getX(), getY(), getZ());
     }
 
+    // turns a Point3D into a float array
     public float[] toFloat() {
         return new float[] {(float) getX(), (float) getY(), (float) getZ()};
     }

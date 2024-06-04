@@ -1,10 +1,9 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
 // Description: This is the runner class, creating a window beforehand to put information
 
 package main;
-
 
 // Imports
 import javax.swing.*;
@@ -12,6 +11,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+// Main class which creates the Main Menu screen
 public class Main extends JFrame implements ActionListener{
     // Sets default width and height of the window
     private final static int X = 1366;
@@ -22,6 +22,8 @@ public class Main extends JFrame implements ActionListener{
         new Main().setVisible(true);
 
     }
+
+    // private constructor which launches the main menu
     private Main(){
         //Properties
         super("Real Engine");
@@ -61,6 +63,7 @@ public class Main extends JFrame implements ActionListener{
         add(pnlButton);
     }
 
+    // Checks if the user clicks the button to start the game
     @Override
     public void actionPerformed(ActionEvent e) {
 

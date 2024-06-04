@@ -1,6 +1,6 @@
-// Author: Kenny Z
+// Author: Kenny Z & Anish Nagariya
 // Date: June 14th
-// Program Name: Engine
+// Program Name: Craft Me In
 // Description: This class handles the JFrame of which the program is displayed on
 
 package main;
@@ -12,12 +12,16 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+// Window class which creates a JFrame the game is displayed on
 public class Window extends Canvas{
+    // Variables
     public JFrame frame;
     private java.awt.Dimension dimension;
     private Point loc;
-    
+
+    // Constructs a new window
     public Window(int width, int height, String title, Engine engine){
+        // creates a new window
     	frame = new JFrame(title);
         
         frame.setPreferredSize(new Dimension(width, height)); //1024x768, 1600/900\
@@ -42,7 +46,8 @@ public class Window extends Canvas{
         
         frame.add(engine);
         frame.setVisible(true);
-        
+
+        // starts the game
         loc = frame.getLocationOnScreen();
         engine.start();
         frame.addWindowListener(new WindowAdapter() {
@@ -53,11 +58,13 @@ public class Window extends Canvas{
         });
     }
 
+    // closes the game
     public void dispose() {
         frame.dispose();
         System.exit(0);
     }
-    
+
+    // Getters
     public int getWidth() {
     	return (int) dimension.getWidth();
     }

@@ -1,16 +1,12 @@
-// Author: Kenny Z
-// Date: June 14th
-// Program Name: Engine
+// Author: Kenny Z & Anish Nagariya
+// Date: June 3rd
+// Program Name: Craft Me In
 // Description: This class creates a data structure which handles all game objects
 
 package main;
 
 import java.awt.*;
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 // Handler Class
 public class Handler {
@@ -36,9 +32,9 @@ public class Handler {
     //Adds a gameObject to the list
     public void addObject(gameObject object){
         this.object.add(object);
+        // adds the mesh of the game object into the gpu memory
         Mesh tempMesh = object.getMesh();
         if (tempMesh != null) {
-            System.out.println(Arrays.toString(tempMesh.rawMesh));
             gpu[0].allocateMemory(tempMesh.points, tempMesh.rawMesh, 15, object.getHash());
         }
     }
