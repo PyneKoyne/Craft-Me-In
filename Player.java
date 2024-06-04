@@ -52,8 +52,8 @@ public class Player extends gameObject{
         }
 
         this.coords = this.coords.add(this.vel);
-        this.vel = this.vel.mul(0.99);
-        this.addForce(new Vector(0, 0, -0.02));
+        this.vel = this.vel.mul(0.5 );
+//        this.addForce(new Vector(0, 0, -0.02));
 
         // Moves the mouse to the centre of the screen if not shift locked
         if (locked) {

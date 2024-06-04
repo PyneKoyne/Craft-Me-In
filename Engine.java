@@ -15,7 +15,7 @@ public class Engine extends Canvas implements Runnable{
     //Dimensions
     @Serial
     private static final long serialVersionUID = 1L;
-    public static int WIDTH = 1366, HEIGHT = 768;
+    public static int WIDTH = 1000, HEIGHT = 600;
 
     //Variables
     private Thread thread;
@@ -74,7 +74,7 @@ public class Engine extends Canvas implements Runnable{
 
         // Places cubes which are actually planes
 //        handler.addObject(new Cube(new Point3D(10, 10, -8), 10, ID.Cube, handler, Color.black));
-        handler.addObject(new Plane(new Point3D(-20, -20, -20), 100, ID.Plane, handler, Color.black));
+        handler.addObject(new Chunk(new Point3D(-20, -20, -20), 100, ID.Plane, handler, Color.black));
     }
 
     //Game Loop
