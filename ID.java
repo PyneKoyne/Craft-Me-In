@@ -11,6 +11,7 @@ public enum ID {
     Camera,
     Player,
     Cube,
-    Plane
+    Plane,
+    Chunk
 
 }

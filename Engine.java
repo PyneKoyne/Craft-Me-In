@@ -8,6 +8,7 @@ package main;
 // Imports
 import java.awt.*;
 import java.awt.image.BufferStrategy;
+import java.util.HashMap;
 
 // Class to start the main engine which starts the game
 public class Engine extends Canvas implements Runnable{
@@ -19,6 +20,8 @@ public class Engine extends Canvas implements Runnable{
     private boolean running = false;
     private final Handler handler;
     private final Window window;
+    private HashMap<Point, Chunk> chunkHashMap;
+    private Player player;
 
     //To start and stop the loop
     public synchronized void start(){
@@ -42,6 +45,8 @@ public class Engine extends Canvas implements Runnable{
         handler.gpu[0] = new ArrayGPU(); // sets the GPU integration of the handler
         handler.gpu[0].startProgram(ArrayGPU.projectionSource); // starts the
 
+        this.chunkHashMap = new HashMap<>();
+
         // Adds KeyInputs
         this.addKeyListener(new KeyInput(handler));
         
@@ -62,18 +67,14 @@ public class Engine extends Canvas implements Runnable{
         });
         
         //Starts the Window
-        window = new Window(WIDTH, HEIGHT, "Craft Me In", this);
+        this.window = new Window(WIDTH, HEIGHT, "Craft Me In", this);
 
         //Places the Camera
-        handler.addObject(new Player(new Point3D(0, 0, 0), 0.2F, ID.Player, handler, Color.black, window));
+        player = new Player(new Point3D(0, 0, 0), 0.2F, ID.Player, handler, Color.black, window);
+        handler.addObject(player);
 
         // Places cubes which are actually planes
 //        handler.addObject(new Cube(new Point3D(10, 10, -8), 10, ID.Cube, handler, Color.black));
-        handler.addObject(new Chunk(new Point3D(0, -20, -20), ID.Plane, handler, Color.black, 0));
-        handler.addObject(new Chunk(new Point3D(-32, -20, -20), ID.Plane, handler, Color.black, 1));
-        handler.addObject(new Chunk(new Point3D(-64, -20, -20), ID.Plane, handler, Color.black, 2));
-        handler.addObject(new Chunk(new Point3D(-96, -20, -20), ID.Plane, handler, Color.black, 3));
-
 //        handler.addObject(new Plane(new Point3D(-20, -20, -20), 100, ID.Plane, handler, Color.black));
     }
 
@@ -124,6 +125,23 @@ public class Engine extends Canvas implements Runnable{
 		// Finds the width and height of the screen every tick
     	WIDTH = window.getWidth();
         HEIGHT = window.getHeight();
+
+        if (player != null) {
+            for (int i = 0; i < Chunk.render_distance; i++){
+                for (double theta = 0; theta < 2 * Math.PI; theta += Math.atan((double)1/i)){
+                    Point tempKey = new Point(
+                            (int) (Math.round((player.coords.x + (i * Chunk.SIZE) * Math.cos(theta))/Chunk.SIZE) * Chunk.SIZE),
+                            (int) (Math.round((player.coords.y + (i * Chunk.SIZE) * Math.sin(theta))/Chunk.SIZE) * Chunk.SIZE)
+                    );
+                    if (chunkHashMap.containsKey(tempKey)) {
+                        chunkHashMap.get(tempKey).setActive();
+                    }
+                    else {
+                        chunkHashMap.put(tempKey, new Chunk(new Point3D(tempKey.x, tempKey.y, 0), ID.Chunk, handler, Color.black, 0, player));
+                    }
+                }
+            }
+        }
         handler.tick();
     }
 

@@ -52,21 +52,21 @@ public class Face implements Cloneable {
 
 		// Draws the two diagonals
 		Vector diagX, diagY;
-		diagX = vertices[verts[2]].subtract(vertices[verts[0]]).mul(.02);
-		diagY = vertices[verts[3]].subtract(vertices[verts[1]]).mul(.02);
+		diagX = vertices[verts[2]].subtract(vertices[verts[0]]).mul(.1);
+		diagY = vertices[verts[3]].subtract(vertices[verts[1]]).mul(.1);
 
 		// draws all the points between both diagonals
-		for (int i = 0; i <= 50; i += 1){
+		for (int i = 0; i <= 10; i += 1){
 			Vector line = vertices[verts[3]].add(diagY.mul(i)).subtract(vertices[verts[2]].add(diagX.mul(i)));
-			for (double j = 0; j <= line.mag(); j += LENGTH){
+			for (double j = 0; j <= line.mag() ; j += LENGTH){
 				Points.add(vertices[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
 			}
 		}
 
 		// draws all the points between the two diagonals in the other way
-		for (int i = 0; i <= 50; i += 1){
+		for (int i = 0; i <= 10; i += 1){
 			Vector line = vertices[verts[3]].add(diagY.mul(i)).subtract(vertices[verts[0]].add(diagX.mul(-i)));
-			for (double j = 0; j < line.mag() + LENGTH/2; j += LENGTH){
+			for (double j = 0; j < line.mag() + LENGTH/4; j += LENGTH){
 				Points.add(vertices[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
 			}
 		}
