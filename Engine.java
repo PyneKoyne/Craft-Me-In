@@ -13,7 +13,7 @@ import java.util.HashMap;
 // Class to start the main engine which starts the game
 public class Engine extends Canvas implements Runnable{
     private static final long serialVersionUID = 1L;
-    public static int WIDTH = 1366, HEIGHT = 768; //Dimensions
+    public static int WIDTH = 1280, HEIGHT = 768; //Dimensions
 
     //Variables
     private Thread thread;
@@ -70,7 +70,7 @@ public class Engine extends Canvas implements Runnable{
         this.window = new Window(WIDTH, HEIGHT, "Craft Me In", this);
 
         //Places the Camera
-        player = new Player(new Point3D(0, 0, 0), 0.2F, ID.Player, handler, Color.black, window);
+        player = new Player(new Point3D(0, 0, 5), 0.2F, ID.Player, handler, Color.black, window);
         handler.addObject(player);
 
         // Places cubes which are actually planes

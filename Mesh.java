@@ -19,9 +19,9 @@ public class Mesh {
 	public Mesh(ArrayList<Point3D> vertices, ArrayList<int[]> faceStructure) {
 		this.vertices = vertices;
 
-        for (int[] face : faceStructure) {
-            faces.add(new Face(face));
-        }
+		for (int[] face : faceStructure) {
+			faces.add(new Face(face));
+		}
 	}
 
 	// Creates the total mesh by drawing each face
@@ -33,8 +33,15 @@ public class Mesh {
 		}
 
 		// goes through each face and finds the points
+		for (Face face: faces){
+			face.setFace(meshVertices);
+		}
 		for (Face face : faces) {
-			mesh.addAll(face.drawFace(meshVertices));
+			int cnt = 0;
+			for (Face face2: faces){
+				if (face.equals(face2)) cnt++;
+			}
+			if (cnt < 2) mesh.addAll(face.drawFace()); // adds the points from the face to the mesh
 		}
 		rawMesh = Point3D.toFloat(mesh.toArray(new Point3D[0]));
 		points = rawMesh.length;

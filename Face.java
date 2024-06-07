@@ -13,9 +13,10 @@ public class Face implements Cloneable {
 
 	// Vertices
 	private int[] verts;
+	private Point3D[] vertPointers;
 	public Vector norm;
 	public Point3D centre;
-	private static final double LENGTH = 0.1; // constant Length
+	private static final double LENGTH = 0.05;// constant Length
 
 
 	// Constructor
@@ -44,32 +45,8 @@ public class Face implements Cloneable {
 		}
 	}
 
-	// Draw all points within a face given vertices
-	// Currently only draws Quadrilaterals
-	public ArrayList<Point3D> drawFace(Point3D[] vertices) {
-		ArrayList<Point3D> Points = new ArrayList<Point3D>();
+	public void setFace(Point3D[] vertices) {
 		Vector x, y;
-
-		// Draws the two diagonals
-		Vector diagX, diagY;
-		diagX = vertices[verts[2]].subtract(vertices[verts[0]]).mul(.1);
-		diagY = vertices[verts[3]].subtract(vertices[verts[1]]).mul(.1);
-
-		// draws all the points between both diagonals
-		for (int i = 0; i <= 10; i += 1){
-			Vector line = vertices[verts[3]].add(diagY.mul(i)).subtract(vertices[verts[2]].add(diagX.mul(i)));
-			for (double j = 0; j <= line.mag() ; j += LENGTH){
-				Points.add(vertices[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
-			}
-		}
-
-		// draws all the points between the two diagonals in the other way
-		for (int i = 0; i <= 10; i += 1){
-			Vector line = vertices[verts[3]].add(diagY.mul(i)).subtract(vertices[verts[0]].add(diagX.mul(-i)));
-			for (double j = 0; j < line.mag() + LENGTH/4; j += LENGTH){
-				Points.add(vertices[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
-			}
-		}
 
 		// finds the normal and centre of the face
 		x = vertices[verts[3]].subtract(vertices[verts[0]]).add(vertices[verts[2]].subtract(vertices[verts[1]]));
@@ -81,6 +58,35 @@ public class Face implements Cloneable {
 				(vertices[verts[0]].y + vertices[verts[1]].y + vertices[verts[2]].y + vertices[verts[3]].y)/4,
 				(vertices[verts[0]].z + vertices[verts[1]].z + vertices[verts[2]].z + vertices[verts[3]].z)/4
 		);
+
+		vertPointers = vertices;
+	}
+
+	// Draw all points within a face given vertices
+	// Currently only draws Quadrilaterals
+	public ArrayList<Point3D> drawFace() {
+		ArrayList<Point3D> Points = new ArrayList<Point3D>();
+
+		// Draws the two diagonals
+		Vector diagX, diagY;
+		diagX = vertPointers[verts[2]].subtract(vertPointers[verts[0]]).mul(.1);
+		diagY = vertPointers[verts[3]].subtract(vertPointers[verts[1]]).mul(.1);
+
+		// draws all the points between both diagonals
+		for (int i = 0; i <= 10; i += 1){
+			Vector line = vertPointers[verts[3]].add(diagY.mul(i)).subtract(vertPointers[verts[2]].add(diagX.mul(i)));
+			for (double j = 0; j <= line.mag() ; j += LENGTH){
+				Points.add(vertPointers[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
+			}
+		}
+
+		// draws all the points between the two diagonals in the other way
+		for (int i = 0; i <= 10; i += 1){
+			Vector line = vertPointers[verts[3]].add(diagY.mul(i)).subtract(vertPointers[verts[0]].add(diagX.mul(-i)));
+			for (double j = 0; j < line.mag() + LENGTH/4; j += LENGTH){
+				Points.add(vertPointers[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
+			}
+		}
 
 		return Points;
 	}
@@ -103,7 +109,7 @@ public class Face implements Cloneable {
 		}
 		if (obj instanceof Face) {
 			Face p = (Face) obj;
-			return Arrays.equals(verts, p.getVerts());
+			return p.norm.equals(this.norm) && p.centre.equals(this.centre);
 		}
 		return false;
 	}
