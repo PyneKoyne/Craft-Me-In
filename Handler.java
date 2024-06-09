@@ -33,11 +33,16 @@ public class Handler {
     public void addObject(gameObject object){
         this.object.add(object);
         // adds the mesh of the game object into the gpu memory
+        regenerateObject(object);
+    }
+
+    public void regenerateObject(gameObject object){
         Mesh tempMesh = object.getMesh();
         if (tempMesh != null) {
             gpu[0].allocateMemory(tempMesh.points, tempMesh.rawMesh, 15, object.getHash());
         }
     }
+
     //Removes a gameObject from the list
     public void removeObject(gameObject object){
         this.object.remove(object);

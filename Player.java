@@ -38,13 +38,7 @@ public class Player extends gameObject{
         if (movement[1]) addForce(left.mul(-0.05));
         if (movement[2]) addForce(norm.mul(-0.05));
         if (movement[3]) addForce(left.mul(0.05));
-
-        for (int i = 0; i < handler.object.size(); i++){
-            gameObject tempObject = handler.object.get(i);
-            if (tempObject.getMesh() != null){
-                checkCollision(tempObject);
-            }
-        }
+        checkCollision();
 
         this.coords = this.coords.add(this.vel);
         this.vel = this.vel.mul(0.5);
@@ -75,12 +69,17 @@ public class Player extends gameObject{
 
     }
 
-    private boolean checkCollision(gameObject object){
-        for (Face face: object.getMesh().faces){
-            Vector normForce = face.intersects(this.coords, vel, object.coords);
-            if (normForce != null){
-                addForce(normForce);
-                return checkCollision(object);
+    private boolean checkCollision(){
+        for (int i = 0; i < handler.object.size(); i++){
+            gameObject object = handler.object.get(i);
+            if (object.getMesh() != null){
+                for (Face face: object.getMesh().faces){
+                    Vector normForce = face.intersects(this.coords, vel, object.coords);
+                    if (normForce != null){
+                        addForce(normForce);
+                        return checkCollision();
+                    }
+                }
             }
         }
         return true;

@@ -16,7 +16,7 @@ public class Face implements Cloneable {
     private Point3D[] vertPointers;
     public Vector norm;
     public Point3D centre;
-    private static final double LENGTH = 0.05;// constant Length
+    private static final double LENGTH = 0.02;// constant Length
 
 
     // Constructor
@@ -69,11 +69,11 @@ public class Face implements Cloneable {
 
         // Draws the two diagonals
         Vector diagX, diagY;
-        diagX = vertPointers[verts[2]].subtract(vertPointers[verts[0]]).mul(.1);
-        diagY = vertPointers[verts[3]].subtract(vertPointers[verts[1]]).mul(.1);
+        diagX = vertPointers[verts[2]].subtract(vertPointers[verts[0]]).mul(.05);
+        diagY = vertPointers[verts[3]].subtract(vertPointers[verts[1]]).mul(.05);
 
         // draws all the points between both diagonals
-        for (int i = 0; i <= 10; i += 1) {
+        for (int i = 0; i <= 20; i += 1) {
             Vector line = vertPointers[verts[3]].add(diagY.mul(i)).subtract(vertPointers[verts[2]].add(diagX.mul(i)));
             for (double j = 0; j <= line.mag(); j += LENGTH) {
                 Points.add(vertPointers[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
@@ -81,7 +81,7 @@ public class Face implements Cloneable {
         }
 
         // draws all the points between the two diagonals in the other way
-        for (int i = 0; i <= 10; i += 1) {
+        for (int i = 0; i <= 20; i += 1) {
             Vector line = vertPointers[verts[3]].add(diagY.mul(i)).subtract(vertPointers[verts[0]].add(diagX.mul(-i)));
             for (double j = 0; j < line.mag() + LENGTH / 4; j += LENGTH) {
                 Points.add(vertPointers[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
@@ -96,14 +96,8 @@ public class Face implements Cloneable {
         if (ratio <= 0 || ratio >= 1 || Double.isNaN(ratio)) {
             return null;
         }
+
         Vector intersection = loc.add(centre).subtract(tail.add(ray.mul(ratio)));
-//        double area = intersection.subtract(vertPointers[0]).crossProd(intersection.subtract(vertPointers[1])).mag() +
-//                intersection.subtract(vertPointers[1]).crossProd(intersection.subtract(vertPointers[2])).mag() +
-//                intersection.subtract(vertPointers[2]).crossProd(intersection.subtract(vertPointers[3])).mag() +
-//                intersection.subtract(vertPointers[3]).crossProd(intersection.subtract(vertPointers[0])).mag();
-//
-//        double trueArea = vertPointers[1].subtract(vertPointers[0]).crossProd(vertPointers[1].subtract(vertPointers[3])).mag() +
-//                vertPointers[2].subtract(vertPointers[1]).crossProd(vertPointers[2].subtract(vertPointers[3])).mag();
         if (Math.abs(intersection.x) <= 0.5 && Math.abs(intersection.y) <= 0.5 && Math.abs(intersection.z) <= 0.5) {
             if (norm.dotProd(ray) < 0) {
                 return (norm.mul(-norm.dotProd(ray) / (norm.mag())));

@@ -14,7 +14,7 @@ public class Vector implements Cloneable {
 	// Common Vectors
 	public static Vector i = new Vector(1, 0, 0);
 	public static Vector j = new Vector(0, -1, 0);
-	public static Vector k = new Vector(0, 0, 2);
+	public static Vector k = new Vector(0, 0, 1);
 	public static Vector zero = new Vector(0, 0, 0);
 
 	// Constructs a Vector

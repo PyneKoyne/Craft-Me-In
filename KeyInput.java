@@ -79,7 +79,7 @@ public class KeyInput extends KeyAdapter {
             player.movement[3] = true;
         }
         if(key == KeyEvent.VK_SPACE){
-            player.addForce(Vector.k);
+            player.addForce(Vector.k.mul(1.5));
         }
         return player;
     }
