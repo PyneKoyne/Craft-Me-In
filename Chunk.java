@@ -7,9 +7,7 @@
 package main;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 
 // Chunk Class
 public class Chunk extends gameObject {
@@ -17,11 +15,13 @@ public class Chunk extends gameObject {
     // Variables
     private final Handler handler;
     private final Player reference;
+    private final double FACTOR = 2;
     private Color color;
     private boolean active;
-    public static final int SIZE = 18; // size of perlin noise
+    public static final int SIZE = 8; // size of perlin noise
     public static int render_distance = 3;
-    public final HashMap<Point3D, gameObject> blocks = new HashMap<>();
+//    public final HashMap<Point3D, gameObject> blocks = new HashMap<>();
+    public final Set<Point3D> blocks = new HashSet<Point3D>();
 
     // creates a new chunk and generates it's mesh
     public Chunk(Point3D p, ID id, Handler handler, Color color, int id2, Player reference) {
@@ -38,82 +38,76 @@ public class Chunk extends gameObject {
         ArrayList<int[]> faceVerts = new ArrayList<>(); // store all the vertices that need to be displayed
         PerlinNoise perlinNoise = new PerlinNoise(SIZE * 4, SIZE); // terrain map
         double[][] heatmap = perlinNoise.generateNoise(); // generate basic heatmap
-
-        // create x, y, z points for each point in heatmap
         for (int i = 0; i < SIZE; i++){
-            heatmap[i + SIZE*id2][0] = -1;
-            heatmap[i + SIZE*id2][SIZE - 1] = -1;
-            heatmap[0][i] = -1;
-            heatmap[SIZE - 1][i] = -1;
-        }
-        for (int i = 1; i < SIZE - 1; i++) {
-            for (int j = 1; j < SIZE - 1; j++) {
-                // heatmap[i][j] = (int) (Math.random() * 5);
-                verts.add(new Point3D(i, j, Math.round(heatmap[i + SIZE * id2][j] * 3.5)));
-                verts.add(new Point3D(i + 1, j, Math.round(heatmap[i + SIZE * id2][j] * 3.5)));
-                verts.add(new Point3D(i + 1, j + 1, Math.round(heatmap[i + SIZE * id2][j] * 3.5)));
-                verts.add(new Point3D(i, j + 1, Math.round(heatmap[i + SIZE * id2][j] * 3.5)));
-                faceVerts.add(new int[]{count, count + 1, count + 2, count + 3});
-                count += 4;
-                int k = count - 4;
-                double curr = Math.round(heatmap[i + SIZE * id2][j] * 3.5);
-                boolean start = false;
-                while (curr > Math.round(heatmap[i + SIZE * id2 + 1][j] * 3.5)){
-                    verts.add(new Point3D(i, j, curr - 1));
-                    verts.add(new Point3D(i + 1, j, curr - 1));
-                    if (!start) {
-                        faceVerts.add(new int[]{count - 3, count + 1, count, count - 4});
-                        start = true;
-                    }else{
-                        faceVerts.add(new int[]{count - 2, count - 1, count + 1, count});
-                    }
-                    count += 2;
-                    curr--;
-                }
-                start = false;
-                curr = Math.round(heatmap[i + SIZE * id2][j] * 3.5);
-                while (curr > Math.round(heatmap[i + SIZE * id2 - 1][j] * 3.5)){
-                    verts.add(new Point3D(i, j + 1, curr - 1));
-                    verts.add(new Point3D(i + 1, j + 1, curr - 1));
-                    if (!start){
-                        faceVerts.add(new int[]{k + 2, k + 3, count, count + 1});
-                        start = true;
-                    }else{
-                        faceVerts.add(new int[]{count - 2, count - 1, count + 1, count});
-                    }
-                    count += 2;
-                    curr--;
-                }
-                start = false;
-                curr = Math.round(heatmap[i + SIZE * id2][j] * 3.5);
-                while (curr > Math.round(heatmap[i + SIZE * id2 - 1][j + 1] * 3.5)){
-                    verts.add(new Point3D(i + 1, j, curr - 1));
-                    verts.add(new Point3D(i + 1, j + 1, curr - 1));
-                    if (!start){
-                        faceVerts.add(new int[]{k + 1, k + 2, count + 1, count});
-                        start = true;
-                    }else{
-                        faceVerts.add(new int[]{count - 2, count - 1, count + 1, count});
-                    }
-                    count += 2;
-                    curr--;
-                }
-                start = false;
-                curr = Math.round(heatmap[i + SIZE * id2][j] * 3.5);
-                while (curr > Math.round(heatmap[i + SIZE * id2 - 1][j - 1] * 3.5)){
-                    verts.add(new Point3D(i, j, curr - 1));
-                    verts.add(new Point3D(i, j + 1, curr - 1));
-                    if (!start){
-                        faceVerts.add(new int[]{k, k + 3, count + 1, count});
-                        start = true;
-                    }else{
-                        faceVerts.add(new int[]{count - 2, count - 1, count + 1, count});
-                    }
-                    count += 2;
-                    curr--;
+            for (int j = 0; j < SIZE; j++) {
+                double height = Math.round(heatmap[i + SIZE * id2][j] * FACTOR);
+                System.out.println(height);
+                while (height > -2){
+                    blocks.add(new Point3D(i, j, height));
+                    height--;
                 }
             }
         }
+        System.out.println(blocks);
+        System.out.println(blocks.size());
+        for (Point3D point: blocks){
+            // check if there is a face above
+            if (!blocks.contains(new Point3D(point.x, point.y, point.z + 1))){
+                verts.add(new Point3D(point.x, point.y, point.z));
+                verts.add(new Point3D(point.x + 1, point.y, point.z));
+                verts.add(new Point3D(point.x + 1, point.y + 1, point.z));
+                verts.add(new Point3D(point.x, point.y + 1, point.z));
+                faceVerts.add(new int[]{count, count + 1, count + 2, count + 3});
+                count += 4;
+            }
+            // check if there is a face to the right
+            if (!blocks.contains(new Point3D(point.x + 1, point.y, point.z))){
+                verts.add(new Point3D(point.x + 1, point.y, point.z));
+                verts.add(new Point3D(point.x + 1, point.y + 1, point.z));
+                verts.add(new Point3D(point.x + 1, point.y + 1, point.z - 1));
+                verts.add(new Point3D(point.x + 1, point.y, point.z - 1));
+                faceVerts.add(new int[]{count, count + 1, count + 2, count + 3});
+                count += 4;
+            }
+            // check if there is a face to the left
+            if (!blocks.contains(new Point3D(point.x - 1, point.y, point.z))){
+                verts.add(new Point3D(point.x, point.y, point.z));
+                verts.add(new Point3D(point.x, point.y + 1, point.z));
+                verts.add(new Point3D(point.x, point.y + 1, point.z - 1));
+                verts.add(new Point3D(point.x, point.y, point.z - 1));
+                faceVerts.add(new int[]{count, count + 1, count + 2, count + 3,});
+                count += 4;
+            }
+            // check if there is a face behind
+            if (!blocks.contains(new Point3D(point.x, point.y - 1, point.z))){
+                verts.add(new Point3D(point.x, point.y, point.z));
+                verts.add(new Point3D(point.x + 1, point.y , point.z));
+                verts.add(new Point3D(point.x + 1, point.y, point.z - 1));
+                verts.add(new Point3D(point.x, point.y, point.z - 1));
+                faceVerts.add(new int[]{count, count + 1, count + 2, count + 3,});
+                count += 4;
+            }
+            // check if there is a face in front
+            if (!blocks.contains(new Point3D(point.x, point.y + 1, point.z))){
+                verts.add(new Point3D(point.x, point.y + 1, point.z));
+                verts.add(new Point3D(point.x + 1, point.y + 1, point.z));
+                verts.add(new Point3D(point.x + 1, point.y + 1, point.z - 1));
+                verts.add(new Point3D(point.x, point.y + 1, point.z - 1));
+                faceVerts.add(new int[]{count, count + 1, count + 2, count + 3,});
+                count += 4;
+            }
+            // check if there is a face beneath
+            if (!blocks.contains(new Point3D(point.x, point.y, point.z - 1))){
+                verts.add(new Point3D(point.x, point.y, point.z - 1));
+                verts.add(new Point3D(point.x + 1, point.y, point.z - 1));
+                verts.add(new Point3D(point.x + 1, point.y + 1, point.z - 1));
+                verts.add(new Point3D(point.x, point.y + 1, point.z - 1));
+                faceVerts.add(new int[]{count, count + 1, count + 2, count + 3});
+                count += 4;
+            }
+
+        }
+        System.out.println(blocks.size());
         this.mesh = new Mesh(verts, faceVerts); // create mesh
         this.color = new Color(78, 153, 82);
         mesh.createMesh();

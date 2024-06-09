@@ -94,10 +94,14 @@ public class Point3D implements Cloneable {
     // Hash code for a hash map
     @Override
     public int hashCode() {
-        long l = java.lang.Double.doubleToLongBits(getZ());
-        l *= 31 ^ java.lang.Double.doubleToLongBits(getY());
-        l *= 31 ^ java.lang.Double.doubleToLongBits(getX());
-        return (int) ((l >> 31) ^ l);
+//        long l = java.lang.Double.doubleToLongBits(getZ());
+//        l *= 31 ^ java.lang.Double.doubleToLongBits(getY());
+//        l *= 31 ^ java.lang.Double.doubleToLongBits(getX());
+//        return (int) ((l >> 31) ^ l);
+        long x = java.lang.Double.doubleToLongBits(getX());
+        long y = java.lang.Double.doubleToLongBits(getY());
+        long z = java.lang.Double.doubleToLongBits(getZ());
+        return (int) (x + (y << 16) + (z << 32));
     }
 
 
