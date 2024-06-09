@@ -14,7 +14,7 @@ public class Player extends gameObject{
     // variables
     private final Handler handler;
     private final Camera camera; // has a camera object as a child
-    private final Vector CAMERA_OFFSET = new Vector(0, 0, 1);
+    private final Vector CAMERA_OFFSET = new Vector(0, 0, 2);
     private final Window window;
     public boolean[] movement = {false, false, false, false};
     public boolean locked = true;
@@ -34,33 +34,21 @@ public class Player extends gameObject{
 
     // changes its coordinates every tick based on its velocity
     public void tick() {
-        if (movement[0]) addForce(norm.mul(0.1));
-        if (movement[1]) addForce(left.mul(-0.1));
-        if (movement[2]) addForce(norm.mul(-0.1));
-        if (movement[3]) addForce(left.mul(0.1));
+        if (movement[0]) addForce(norm.mul(0.05));
+        if (movement[1]) addForce(left.mul(-0.05));
+        if (movement[2]) addForce(norm.mul(-0.05));
+        if (movement[3]) addForce(left.mul(0.05));
 
         for (int i = 0; i < handler.object.size(); i++){
             gameObject tempObject = handler.object.get(i);
             if (tempObject.getMesh() != null){
-                for (Face face: tempObject.getMesh().faces){
-                    Vector distance = tempObject.coords.add(face.centre).subtract(this.coords);
-                    if (Math.sqrt(Math.pow(distance.mag(), 2) - Math.pow(face.norm.dotProd(distance), 2)) < 1) {
-                        if (face.norm.dotProd(vel) < 0 && face.norm.dotProd(distance) > 0 && face.norm.dotProd(distance) + (face.norm.dotProd(vel)) < 0) {
-                            this.vel = this.vel.mul(0.6);
-                            addForce(face.norm.mul(-face.norm.dotProd(vel) / (face.norm.mag())));
-                        }
-                        if (face.norm.dotProd(vel) > 0 && face.norm.dotProd(distance) < 0 && face.norm.mul(-1).dotProd(distance) + (face.norm.mul(-1).dotProd(vel)) < 0) {
-                            this.vel = this.vel.mul(0.6);
-                            addForce(face.norm.mul(face.norm.mul(-1).dotProd(vel) / (face.norm.mag())));
-                        }
-                    }
-                }
+                checkCollision(tempObject);
             }
         }
 
         this.coords = this.coords.add(this.vel);
-        this.vel = this.vel.mul(0.5 );
-        this.addForce(new Vector(0, 0, -0.02));
+        this.vel = this.vel.mul(0.5);
+        this.addForce(new Vector(0, 0, -0.05));
 
         // Moves the mouse to the centre of the screen if not shift locked
         // rotates and moves the camera to follow the player
@@ -85,6 +73,17 @@ public class Player extends gameObject{
     // helper code to run on every render
     public void render(Graphics g, ArrayGPU[] gpu) {
 
+    }
+
+    private boolean checkCollision(gameObject object){
+        for (Face face: object.getMesh().faces){
+            Vector normForce = face.intersects(this.coords, vel, object.coords);
+            if (normForce != null){
+                addForce(normForce);
+                return checkCollision(object);
+            }
+        }
+        return true;
     }
 
     // switches if the mouse is locked in the center or not

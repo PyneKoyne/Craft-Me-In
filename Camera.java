@@ -125,7 +125,6 @@ public class Camera extends gameObject {
                 }
             }
         }
-//        g.dispose();
 
         gParent.drawImage(bufferedImg, 0, 0, null);
         gParent.setColor(Color.black);

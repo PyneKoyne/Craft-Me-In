@@ -29,7 +29,6 @@ public class Window extends Canvas{
         frame.setMaximumSize(new Dimension(width, height));
         frame.setMinimumSize(new Dimension(width, height));
         
-        
         frame.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
         frame.setLocationRelativeTo(null);
         frame.requestFocus();

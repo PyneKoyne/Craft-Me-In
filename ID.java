@@ -12,6 +12,7 @@ public enum ID {
     Player,
     Cube,
     Plane,
-    Chunk
+    Chunk,
+    Dirt
 
 }

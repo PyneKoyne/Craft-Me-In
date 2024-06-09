@@ -8,7 +8,6 @@ package main;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 
 // Chunk Class
@@ -16,28 +15,27 @@ public class Chunk extends gameObject {
 
     // Variables
     private final Handler handler;
-    private final Player reference;
+    private final Player playerRef;
     private Color color;
     private boolean active;
-    public static final int SIZE = 18; // size of perlin noise
-    public static int render_distance = 3;
+    public static final int SIZE = 4; // size of perlin noise
+    public static int render_distance = 1;
     public final HashMap<Point3D, gameObject> blocks = new HashMap<>();
+    public final HashMap<Point3D, Chunk> chunkRef;
 
     // creates a new chunk and generates it's mesh
-    public Chunk(Point3D p, ID id, Handler handler, Color color, int id2, Player reference) {
-
+    public Chunk(Point3D p, ID id, Handler handler, Color color, int id2, Player playerRef, HashMap<Point3D, Chunk> chunkRef) {
         super(p, new Vector(0, 0, 0), id);
 
-        this.reference = reference;
+        this.playerRef = playerRef;
+        this.chunkRef = chunkRef;
         this.active = true;
-
-        // int[][] heatmap = new int[32][32];
         int count = 0; // count of # of vertices
-
         ArrayList<Point3D> verts = new ArrayList<Point3D>(); // store all the vertices
         ArrayList<int[]> faceVerts = new ArrayList<>(); // store all the vertices that need to be displayed
         PerlinNoise perlinNoise = new PerlinNoise(SIZE * 4, SIZE); // terrain map
         double[][] heatmap = perlinNoise.generateNoise(); // generate basic heatmap
+        Point3D location;
 
         // create x, y, z points for each point in heatmap
         for (int i = 0; i < SIZE; i++){
@@ -46,13 +44,18 @@ public class Chunk extends gameObject {
             heatmap[0][i] = -1;
             heatmap[SIZE - 1][i] = -1;
         }
+
         for (int i = 1; i < SIZE - 1; i++) {
             for (int j = 1; j < SIZE - 1; j++) {
-                // heatmap[i][j] = (int) (Math.random() * 5);
-                verts.add(new Point3D(i, j, Math.round(heatmap[i + SIZE * id2][j] * 3.5)));
-                verts.add(new Point3D(i + 1, j, Math.round(heatmap[i + SIZE * id2][j] * 3.5)));
-                verts.add(new Point3D(i + 1, j + 1, Math.round(heatmap[i + SIZE * id2][j] * 3.5)));
-                verts.add(new Point3D(i, j + 1, Math.round(heatmap[i + SIZE * id2][j] * 3.5)));
+                for (int z = (int) Math.round(heatmap[i + SIZE * id2][j]); z > 0; z--) {
+                    location = new Point3D(i, j, Math.round(heatmap[i + SIZE * id2][j] * 1.5));
+                    blocks.put(location, new Dirt(location, ID.Dirt, Color.green));
+                }
+
+                verts.add(new Point3D(i, j, Math.round(heatmap[i + SIZE * id2][j] * 1.5)));
+                verts.add(new Point3D(i + 1, j, Math.round(heatmap[i + SIZE * id2][j] * 1.5)));
+                verts.add(new Point3D(i + 1, j + 1, Math.round(heatmap[i + SIZE * id2][j] * 1.5)));
+                verts.add(new Point3D(i, j + 1, Math.round(heatmap[i + SIZE * id2][j] * 1.5)));
                 faceVerts.add(new int[]{count, count + 1, count + 2, count + 3});
                 count += 4;
                 int k = count - 4;
@@ -127,8 +130,8 @@ public class Chunk extends gameObject {
 
     // changes its coordinates every tick based on its velocity
     public void tick() {
-        if (reference != null){
-            if (Math.abs(Vector.i.dotProd(this.coords.subtract(reference.coords))) + Math.abs(Vector.j.dotProd(this.coords.subtract(reference.coords))) > render_distance * SIZE + 10){
+        if (playerRef != null){
+            if (Math.abs(Vector.i.dotProd(this.coords.subtract(playerRef.coords))) + Math.abs(Vector.j.dotProd(this.coords.subtract(playerRef.coords))) > render_distance * SIZE + 10){
                 setInactive();
             }
         }

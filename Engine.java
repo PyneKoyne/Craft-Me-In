@@ -20,8 +20,8 @@ public class Engine extends Canvas implements Runnable{
     private boolean running = false;
     private final Handler handler;
     private final Window window;
-    private HashMap<Point, Chunk> chunkHashMap;
-    private Player player;
+    private final HashMap<Point3D, Chunk> chunkHashMap;
+    private final Player player;
 
     //To start and stop the loop
     public synchronized void start(){
@@ -75,7 +75,7 @@ public class Engine extends Canvas implements Runnable{
 
         // Places cubes which are actually planes
 //        handler.addObject(new Cube(new Point3D(10, 10, -8), 10, ID.Cube, handler, Color.black));
-//        handler.addObject(new Plane(new Point3D(-20, -20, -20), 100, ID.Plane, handler, Color.black));
+//        handler.addObject(new Plane(new Point3D(-20, -20, -20), 1, ID.Plane, handler, Color.black));
     }
 
     //Game Loop
@@ -129,15 +129,16 @@ public class Engine extends Canvas implements Runnable{
         if (player != null) {
             for (int i = 0; i < Chunk.render_distance; i++){
                 for (double theta = 0; theta < 2 * Math.PI; theta += Math.atan((double)1/i)){
-                    Point tempKey = new Point(
+                    Point3D tempKey = new Point3D(
                             (int) (Math.round((player.coords.x + (i * Chunk.SIZE) * Math.cos(theta))/Chunk.SIZE) * Chunk.SIZE),
-                            (int) (Math.round((player.coords.y + (i * Chunk.SIZE) * Math.sin(theta))/Chunk.SIZE) * Chunk.SIZE)
+                            (int) (Math.round((player.coords.y + (i * Chunk.SIZE) * Math.sin(theta))/Chunk.SIZE) * Chunk.SIZE),
+                            0
                     );
                     if (chunkHashMap.containsKey(tempKey)) {
                         chunkHashMap.get(tempKey).setActive();
                     }
                     else {
-                        chunkHashMap.put(tempKey, new Chunk(new Point3D(tempKey.x, tempKey.y, 0), ID.Chunk, handler, Color.black, 0, player));
+                        chunkHashMap.put(tempKey, new Chunk(tempKey, ID.Chunk, handler, Color.black, 0, player, chunkHashMap));
                     }
                 }
             }

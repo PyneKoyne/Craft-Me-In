@@ -25,9 +25,13 @@ public abstract class gameObject {
 
     // Average game object constructor
     public gameObject(Point3D coords, Vector rot, ID id) {
-        setRot(rot);
-        this.coords = coords;
-        this.vel = new Vector(0, 0, 0);
+        if (rot != null) {
+            setRot(rot);
+        }
+        if (coords != null) {
+            this.coords = coords;
+            this.vel = new Vector(0, 0, 0);
+        }
         this.id = id;
     }
 
