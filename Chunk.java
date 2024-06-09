@@ -31,7 +31,6 @@ public class Chunk extends gameObject {
         this.reference = reference;
         this.active = true;
 
-        // int[][] heatmap = new int[32][32];
         int count = 0; // count of # of vertices
 
         ArrayList<Point3D> verts = new ArrayList<Point3D>(); // store all the vertices
@@ -48,8 +47,6 @@ public class Chunk extends gameObject {
                 }
             }
         }
-        System.out.println(blocks);
-        System.out.println(blocks.size());
         for (Point3D point: blocks){
             // check if there is a face above
             if (!blocks.contains(new Point3D(point.x, point.y, point.z + 1))){
@@ -107,7 +104,6 @@ public class Chunk extends gameObject {
             }
 
         }
-        System.out.println(blocks.size());
         this.mesh = new Mesh(verts, faceVerts); // create mesh
         this.color = new Color(78, 153, 82);
         mesh.createMesh();
