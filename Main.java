@@ -5,76 +5,92 @@
 
 package main;
 
-// Imports
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-// Main class which creates the Main Menu screen
-public class Main extends JFrame implements ActionListener{
-    // Sets default width and height of the window
+public class Main extends JFrame implements KeyListener {
+
+    // Sets default width and height
     private final static int X = 1366;
     private final static int Y = 768;
 
     // main function
-    public static void main(String[] args){
+    public static void main(String[] args) {
         new Main().setVisible(true);
-
     }
 
-    // private constructor which launches the main menu
-    private Main(){
+    // Display main menu
+    private Main() {
         //Properties
         super("Craft Me In");
-        setSize(X, Y); //1024x768, 1600/900
+        setSize(X, Y);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
+        addKeyListener(this);
 
-        JLabel label = new JLabel("Press Q, E to decrease and increase the number of Cosine Functions applied respectively\n");
-        JLabel label1 = new JLabel("Press Z, C to decrease and increase the number of Tangent Functions applied respectively\n");
-        JLabel label2 = new JLabel("Press X to create a new plane where you are looking\n");
-        JLabel label3 = new JLabel("Scroll the mouse wheel to zoom in and out, move the mouse to look around\n");
-        JLabel label4 = new JLabel("Press W A S D to move around\n");
-        JLabel label5 = new JLabel("Press Shift to unlock or lock the cursor");
+        // main menu panel
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBackground(Color.BLACK);
+        panel.setBorder(BorderFactory.createEmptyBorder(100, 50, 100, 50));
 
+        // Title
+        JLabel titleLabel = new JLabel("Craft Me In", JLabel.CENTER);
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
+        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        //Start Button
-        JButton button = new JButton("Start");
-        button.addActionListener(this);
-        button.setBounds(X /2 - 110, Y /2 - 15, 220, 30);
+        // Instructions
+        JLabel instructionsLabel1 = new JLabel("Press W A S D to move around", JLabel.CENTER);
+        JLabel instructionsLabel2 = new JLabel("Left Click to place blocks", JLabel.CENTER);
+        JLabel instructionsLabel3 = new JLabel("Right Click to delete blocks", JLabel.CENTER);
+        JLabel instructionsLabel4 = new JLabel("Press Enter to Start", JLabel.CENTER);
 
-        //Panel
-        JPanel pnlButton = new JPanel();
-        pnlButton.setBounds(X /5, Y /5, 3* X /5, 3* Y /5);
-        LayoutManager FlowLayout = new FlowLayout(java.awt.FlowLayout.CENTER, 550, 25);
-        setLayout(FlowLayout);
+        instructionsLabel1.setFont(new Font("Arial", Font.PLAIN, 24));
+        instructionsLabel2.setFont(new Font("Arial", Font.PLAIN, 24));
+        instructionsLabel3.setFont(new Font("Arial", Font.PLAIN, 24));
+        instructionsLabel4.setFont(new Font("Arial", Font.PLAIN, 24));
 
-        //adding button
-        pnlButton.add(button);
+        instructionsLabel1.setForeground(Color.WHITE);
+        instructionsLabel2.setForeground(Color.WHITE);
+        instructionsLabel3.setForeground(Color.WHITE);
+        instructionsLabel4.setForeground(Color.WHITE);
 
-        add(label);
-        add(label1);
-        add(label4);
-        add(label2);
-        add(label3);
-        add(label5);
-        add(pnlButton);
+        instructionsLabel1.setAlignmentX(Component.CENTER_ALIGNMENT);
+        instructionsLabel2.setAlignmentX(Component.CENTER_ALIGNMENT);
+        instructionsLabel3.setAlignmentX(Component.CENTER_ALIGNMENT);
+        instructionsLabel4.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        panel.add(titleLabel);
+        panel.add(Box.createRigidArea(new Dimension(0, 50))); // Add space
+        panel.add(instructionsLabel1);
+        panel.add(instructionsLabel2);
+        panel.add(instructionsLabel3);
+        panel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space
+        panel.add(instructionsLabel4);
+
+        add(panel);
     }
 
-    // Checks if the user clicks the button to start the game
+    // Start the game when Enter key is pressed
     @Override
-    public void actionPerformed(ActionEvent e) {
-
-        // Closes the window if the start button is pressed
-        String name = e.getActionCommand();
-
-        if (name.equals("Start")){
-            // Starts the Engine
-            Engine.main();{
-            }
+    public void keyPressed(KeyEvent e) {
+        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+            Engine.main();
             this.dispose();
         }
+    }
+
+    @Override
+    public void keyReleased(KeyEvent e) {
+    }
+
+    @Override
+    public void keyTyped(KeyEvent e) {
     }
 }
