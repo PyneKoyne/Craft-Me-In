@@ -18,15 +18,15 @@ public class Chunk extends gameObject {
     private final double FACTOR = 1.5;
     private Color color;
     private boolean active;
-    public static final int SIZE = 2; // size of perlin noise
+    public static final int SIZE = 10; // size of perlin noise
     public static final int HEIGHT_MAX = 4;
-    public static int render_distance = 4;
+    public static int render_distance = 3;
     public int updateChunk = -1;
     public final HashMap<Point3D, gameObject> blocks = new HashMap<>();
     public final HashMap<Point3D, Chunk> chunkRef;
 
     // creates a new chunk and generates it's mesh
-    public Chunk(Point3D p, ID id, Handler handler, Color color, int id2, Player playerRef, HashMap<Point3D, Chunk> chunkRef) {
+    public Chunk(Point3D p, ID id, Handler handler, int id2, Player playerRef, HashMap<Point3D, Chunk> chunkRef) {
         super(p, new Vector(0, 0, 0), id);
 
         this.playerRef = playerRef;
@@ -344,6 +344,7 @@ public class Chunk extends gameObject {
             }
         }
         if (updateChunk > 0) {
+            System.out.println(updateChunk);
             updateChunk --;
         }
         else if (updateChunk == 0){

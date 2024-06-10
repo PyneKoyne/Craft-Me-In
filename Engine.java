@@ -7,6 +7,8 @@ package main;
 
 // Imports
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
 import java.util.HashMap;
 
@@ -49,7 +51,19 @@ public class Engine extends Canvas implements Runnable{
 
         // Adds KeyInputs
         this.addKeyListener(new KeyInput(handler));
-        
+
+        // Adds mouse inputs for placing and removing blocks
+        this.addMouseListener(new MouseAdapter() {
+            public void mousePressed(MouseEvent e) {
+                if (e.getButton() == 1) { // left click
+                    player.placeBlock();
+                }
+                if (e.getButton() == 3) { // right click
+                    player.removeBlock();
+                }
+            }
+        });
+
         // Mouse Wheel Listener
         this.addMouseWheelListener(e -> {
         	int notches = e.getWheelRotation();
@@ -138,7 +152,7 @@ public class Engine extends Canvas implements Runnable{
                         chunkHashMap.get(tempKey).setActive();
                     }
                     else {
-                        chunkHashMap.put(tempKey, new Chunk(tempKey, ID.Chunk, handler, Color.black, 0, player, chunkHashMap));
+                        chunkHashMap.put(tempKey, new Chunk(tempKey, ID.Chunk, handler, 0, player, chunkHashMap));
                     }
                 }
             }

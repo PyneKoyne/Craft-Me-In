@@ -32,11 +32,10 @@ public class Handler {
     //Adds a gameObject to the list
     public void addObject(gameObject object){
         this.object.add(object);
-        // adds the mesh of the game object into the gpu memory
-        regenerateObject(object);
     }
 
     public void regenerateObject(gameObject object){
+        // adds the mesh of the game object into the gpu memory
         Mesh tempMesh = object.getMesh();
         if (tempMesh != null) {
             gpu[0].allocateMemory(tempMesh.points, tempMesh.rawMesh, 15, object.getHash());

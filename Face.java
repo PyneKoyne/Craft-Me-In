@@ -92,8 +92,9 @@ public class Face implements Cloneable {
     }
 
     public Vector intersects(Point3D tail, Vector ray, Point3D loc) {
-        double ratio = norm.dotProd(tail.subtract(loc.add(this.centre))) / norm.dotProd(ray);
-        if (ratio <= 0 || ratio >= 1 || Double.isNaN(ratio)) {
+        double distance = norm.dotProd(tail.subtract(loc.add(this.centre)));
+        double ratio =  distance / norm.dotProd(ray);
+        if (ratio <= 0 || ratio >= 1 || Double.isNaN(ratio) || ray.mag() * 2 < distance) {
             return null;
         }
 

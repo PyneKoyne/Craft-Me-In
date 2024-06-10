@@ -14,7 +14,8 @@ public class Player extends gameObject{
     // variables
     private final Handler handler;
     private final Camera camera; // has a camera object as a child
-    private final Vector CAMERA_OFFSET = new Vector(0, 0, 2);
+    private static final Vector CAMERA_OFFSET = new Vector(0, 0, 2);
+    private static final double REACH = 10;
     private final Window window;
     public boolean[] movement = {false, false, false, false};
     public boolean locked = true;
@@ -68,6 +69,54 @@ public class Player extends gameObject{
     public void render(Graphics g, ArrayGPU[] gpu) {
 
     }
+
+    // tries to place a block
+    public void placeBlock(){
+        Point3D loc;
+        Chunk chunk;
+        gameObject object;
+        Vector normForce;
+        for (int i = 0; i < handler.object.size(); i++){
+            object = handler.object.get(i);
+            if (object.getMesh() != null){
+                for (Face face: object.getMesh().faces){
+                    normForce = face.intersects(this.camera.coords, this.camera.norm.mul(REACH), object.coords);
+                    if (normForce != null && object.id == ID.Chunk){
+                        chunk = (Chunk) object;
+                        loc = face.centre.add(normForce.fastNormalize(0.8));
+                        loc = new Point3D(Math.floor(loc.x), Math.floor(loc.y), Math.ceil(loc.z));
+                        chunk.blocks.put(loc, new Dirt(loc, ID.Dirt, Color.green));
+                        chunk.updateChunk = 1;
+                    }
+                }
+            }
+        }
+    }
+
+    // checks if there's a block to be removed
+    public void removeBlock(){
+        Point3D loc;
+        Chunk chunk;
+        gameObject object;
+        Vector normForce;
+        for (int i = 0; i < handler.object.size(); i++){
+            object = handler.object.get(i);
+            if (object.getMesh() != null){
+                for (Face face: object.getMesh().faces){
+                    normForce = face.intersects(this.camera.coords, this.camera.norm.mul(REACH), object.coords);
+                    if (normForce != null && object.id == ID.Chunk){
+                        chunk = (Chunk) object;
+                        loc = face.centre.add(normForce.fastNormalize(-0.8));
+                        loc = new Point3D(Math.floor(loc.x), Math.floor(loc.y), Math.ceil(loc.z));
+                        chunk.blocks.remove(loc);
+                        chunk.updateChunk = 1;
+
+                    }
+                }
+            }
+        }
+    }
+
 
     private boolean checkCollision(){
         for (int i = 0; i < handler.object.size(); i++){
