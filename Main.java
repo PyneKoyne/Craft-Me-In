@@ -7,8 +7,6 @@ package main;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
@@ -39,16 +37,15 @@ public class Main extends JFrame implements KeyListener {
         panel.setBackground(Color.BLACK);
         panel.setBorder(BorderFactory.createEmptyBorder(100, 50, 100, 50));
 
-        // Title
-        JLabel titleLabel = new JLabel("Craft Me In", JLabel.CENTER);
-        titleLabel.setFont(new Font("Arial", Font.BOLD, 48));
-        titleLabel.setForeground(Color.WHITE);
+        // Load and set the title image
+        ImageIcon titleImage = new ImageIcon("Craft-Me-In-6-10-2024.png");
+        JLabel titleLabel = new JLabel(titleImage, JLabel.CENTER);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Instructions
-        JLabel instructionsLabel1 = new JLabel("Press W A S D to move around", JLabel.CENTER);
-        JLabel instructionsLabel2 = new JLabel("Left Click to place blocks", JLabel.CENTER);
-        JLabel instructionsLabel3 = new JLabel("Right Click to delete blocks", JLabel.CENTER);
+        JLabel instructionsLabel1 = new JLabel("Press W A S D to move around, Space Bar to Jump", JLabel.CENTER);
+        JLabel instructionsLabel2 = new JLabel("Left Click to place blocks, Right click to delete blocks, Scroll to Zoom in/out", JLabel.CENTER);
+        JLabel instructionsLabel3 = new JLabel("This is an endless sandbox.", JLabel.CENTER);
         JLabel instructionsLabel4 = new JLabel("Press Enter to Start", JLabel.CENTER);
 
         instructionsLabel1.setFont(new Font("Arial", Font.PLAIN, 24));
@@ -94,3 +91,4 @@ public class Main extends JFrame implements KeyListener {
     public void keyTyped(KeyEvent e) {
     }
 }
+
