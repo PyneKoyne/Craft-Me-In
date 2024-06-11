@@ -112,15 +112,16 @@ public class Camera extends gameObject {
             gameObject tempObject = handler.object.get(i);
 
             // If the object is a cube, it renders it
-            if (tempObject.getMesh() != null) {
+            if (tempObject.getMesh() != null && tempObject.getColor() != null) {
                 float[] focal = tempObject.coords.subtract(this.getFocalPoint()).toFloat();
                 float[] vectors = gpu[0].runProgram(tempObject.getMesh().points, focal, tempObject.getMesh().points/3, tempObject.getHash());
+                Color[] colors = tempObject.getColor();
 
                 for (int j = 0; j < tempObject.getMesh().points / 3; j++) {
                     int[] renderPoint = new int[]{(int) vectors[j * 3 + 1], (int) vectors[j * 3 + 2]};
                     if (renderPoint[0] > 0 && renderPoint[1] > 0) {
-                        fillRect(pixelData, tempObject, renderPoint);
-                        fillRect(pixelData, tempObject, renderPoint);
+                        fillRect(pixelData, renderPoint, colors[j]);
+                        fillRect(pixelData, renderPoint, colors[j]);
                     }
                 }
             }
@@ -137,8 +138,8 @@ public class Camera extends gameObject {
     }
 
     // fills a one by two rectangle on the image
-    private void fillRect(int[] pixelData, gameObject tempObject, int[] loc) {
-        pixelData[loc[0] + loc[1] * screenX * 2] = tempObject.getColor().getRGB();
-        pixelData[loc[0] + 1 + (loc[1] + 1) * screenX * 2] = tempObject.getColor().getRGB();
+    private void fillRect(int[] pixelData, int[] loc, Color color) {
+        pixelData[loc[0] + loc[1] * screenX * 2] = color.getRGB();
+        pixelData[loc[0] + 1 + (loc[1] + 1) * screenX * 2] = color.getRGB();
     }
 }

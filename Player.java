@@ -84,7 +84,7 @@ public class Player extends gameObject{
                         chunk = (Chunk) object;
                         loc = face.centre.add(normForce.fastNormalize(0.8));
                         loc = new Point3D(Math.floor(loc.x), Math.floor(loc.y), Math.ceil(loc.z));
-                        chunk.blocks.put(loc, new Dirt(loc, ID.Dirt));
+                        chunk.blocks.put(loc, new Stone(loc, ID.Stone));
                         chunk.updateChunk = 1;
                     }
                 }
@@ -156,7 +156,7 @@ public class Player extends gameObject{
 
 
     // returns null for the colour
-    public Color getColor(){
+    public Color[] getColor(){
         return null;
     }
 }

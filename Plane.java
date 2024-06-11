@@ -17,6 +17,7 @@ public class Plane extends gameObject{
     public Plane(Point3D p, float scale, ID id, Handler handler, Color color){
         super(p, new Vector(1, 0, 0), id);
         this.handler = handler;
+        ArrayList<Color> colors = new ArrayList<>();
 
         // adds the vertices and faces of the object to render
         ArrayList<Point3D> verts = new ArrayList<>();
@@ -27,9 +28,10 @@ public class Plane extends gameObject{
 
         ArrayList<int[]> faceVerts = new ArrayList<>();
         faceVerts.add(new int[]{0, 1, 3, 2});
+        colors.add(color);
 
         // creates the mesh to draw
-        this.mesh = new Mesh(verts, faceVerts);
+        this.mesh = new Mesh(verts, faceVerts, colors);
         this.color = color;
         mesh.setMesh();
 
@@ -46,8 +48,8 @@ public class Plane extends gameObject{
     }
 
     // returns the color of the shape
-    public Color getColor(){
-        return color;
+    public Color[] getColor(){
+        return new Color[]{color};
     }
 
 }

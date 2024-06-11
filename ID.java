@@ -13,6 +13,7 @@ public enum ID {
     Cube,
     Plane,
     Chunk,
-    Dirt
+    Dirt,
+    Stone
 
 }

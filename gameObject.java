@@ -197,7 +197,7 @@ public abstract class gameObject {
         return rot;
     }
 
-    protected Color getColor() {
+    protected Color[] getColor() {
         return null;
     }
 }

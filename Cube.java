@@ -17,6 +17,7 @@ public class Cube extends gameObject {
     // Cube constructor which extends game Object
     public Cube(Point3D p, float scale, ID id, Handler handler, Color color) {
         super(p, new Vector(0, 0, 0), id);
+        ArrayList<Color> colors = new ArrayList<>();
 
         // adds the vertices and faces to the mesh
         ArrayList<Point3D> verts = new ArrayList<>();
@@ -38,9 +39,16 @@ public class Cube extends gameObject {
         faceVerts.add(new int[]{4, 5, 7, 6});
         faceVerts.add(new int[]{5, 7, 3, 1});
 
-        // constructs the mesh
-        this.mesh = new Mesh(verts, faceVerts);
         this.color = color;
+        colors.add(color);
+        colors.add(color);
+        colors.add(color);
+        colors.add(color);
+        colors.add(color);
+        colors.add(color);
+
+        // constructs the mesh
+        this.mesh = new Mesh(verts, faceVerts, colors);
         mesh.setMesh();
 
         this.handler = handler;
@@ -57,8 +65,8 @@ public class Cube extends gameObject {
     }
 
     // returns the color of the shape
-    public Color getColor() {
-        return color;
+    public Color[] getColor() {
+        return new Color[]{color};
     }
 
 }

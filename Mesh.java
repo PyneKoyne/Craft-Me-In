@@ -5,6 +5,7 @@
 
 package main;
 
+import java.awt.*;
 import java.util.ArrayList;
 
 // Mesh object class which is used to display game objects
@@ -12,23 +13,26 @@ public class Mesh {
 	// Variables
 	public ArrayList<Point3D> verts;
 	public ArrayList<int[]> faceVerts;
-	ArrayList<Point3D> mesh;
+	public ArrayList<Point3D> mesh;
+	public ArrayList<Color> colors;
 	public int points, count;
 	public ArrayList<Face> faces = new ArrayList<>();
 	public float[] rawMesh;
 
 	// Defines the mesh based on the given parameters
-	public Mesh(ArrayList<Point3D> vertices, ArrayList<int[]> faceStructure) {
-		mesh = new ArrayList<>();
+	public Mesh(ArrayList<Point3D> vertices, ArrayList<int[]> faceStructure, ArrayList<Color> colors) {
+		this.mesh = new ArrayList<>();
+		this.colors = colors;
 		setMesh(vertices, faceStructure);
 	}
 
 	// empty constructor
 	public Mesh(){
-		verts = new ArrayList<>();
-		faceVerts = new ArrayList<>();
-		mesh = new ArrayList<>();
-		count = 0;
+		this.verts = new ArrayList<>();
+		this.faceVerts = new ArrayList<>();
+		this.mesh = new ArrayList<>();
+		this.colors = new ArrayList<>();
+		this.count = 0;
 	}
 
 	// sets the faces from the face verts
@@ -58,7 +62,10 @@ public class Mesh {
 	// Creates the total mesh by drawing each face
 	public ArrayList<Point3D> createMesh() {
 		// converts the flexible vertices ArrayList into a normal array
+		mesh = new ArrayList<>();
 		Point3D[] meshVertices = new Point3D[verts.size()];
+		ArrayList<Color> faceColours = (ArrayList<Color>) this.colors.clone();
+		this.colors = new ArrayList<>();
 		for (int i = 0; i < verts.size(); i++){
 			meshVertices[i] = verts.get(i);
 		}
@@ -67,12 +74,17 @@ public class Mesh {
 		for (Face face: faces){
 			face.setFace(meshVertices);
 		}
-		for (Face face : faces) { // checks if any faces are overlapping
+		for (int i = 0; i < faces.size(); i ++) { // checks if any faces are overlapping
 			int cnt = 0;
 			for (Face face2: faces){
-				if (face.equals(face2)) cnt++;
+				if (faces.get(i).equals(face2)) cnt++;
 			}
-			if (cnt < 2) mesh.addAll(face.drawFace()); // adds the points from the face to the mesh
+			if (cnt < 2) {
+				for (Point3D meshPoint: faces.get(i).drawFace()) {
+					mesh.add(meshPoint); // adds the points from the face to the mesh
+					colors.add(faceColours.get(i));
+				}
+			}
 		}
 		return mesh;
 	}

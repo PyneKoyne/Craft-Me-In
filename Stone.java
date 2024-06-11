@@ -1,26 +1,26 @@
 // Author: Kenny Z & Anish Nagariya
 // Date: June 11th
 // Program Name: Craft Me In
-// Description: Creates a gameObject which acts as a dirt block
+// Description: Creates a gameObject which acts as a stone block
 
 package main;
 
 import java.awt.*;
 
 // Creates a Cube on screen
-public class Dirt extends gameObject {
+public class Stone extends gameObject {
     // Variables
     private Color color;
 
     // Dirt constructor which extends game Object
-    public Dirt(Point3D coords, ID id) {
+    public Stone(Point3D coords, ID id) {
         super(coords, null, id);
-        this.color = new Color(78, 153, 82); // color for grass
+        this.color = new Color(30, 100, 100); // color for stone
     }
 
     // changes its coordinates every tick based on its velocity
     public void tick() {
-        
+
     }
 
     public void render(Graphics g, ArrayGPU[] gpu) {
