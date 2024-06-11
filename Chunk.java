@@ -1,8 +1,7 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 3rd
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: This is the Chunk Class which covers the terrain of the player field
-
 
 package main;
 
@@ -15,29 +14,34 @@ public class Chunk extends gameObject {
     // Variables
     private final Handler handler;
     private final Player playerRef;
-    private final double FACTOR = 1.5;
+    private static final double FACTOR = 1.5;
     private Color color;
     private boolean active;
     public static final int SIZE = 10; // size of perlin noise
     public static final int HEIGHT_MAX = 4; // max height of a block
     public static int render_distance = 3; // how many chunks to render
     public int updateChunk = -1;
+    public boolean updateFront = false, updateLeft = false, updateRight = false, updateBack = false;
     public final HashMap<Point3D, gameObject> blocks = new HashMap<>();
-    public final HashMap<Point3D, Chunk> chunkRef;
+    public final HashMap<Point3D, Chunk> chunkRef; // the chunk hashmap
+    public Mesh[] meshes;
+    public ArrayList<Face> innerFaces;
 
     // creates a new chunk and generates it's mesh
     public Chunk(Point3D p, ID id, Handler handler, int id2, Player playerRef, HashMap<Point3D, Chunk> chunkRef) {
-        super(p, new Vector(0, 0, 0), id);
+        super(p, new Vector(0, 0, 0), id); // game object constructor
 
         this.playerRef = playerRef;
         this.chunkRef = chunkRef;
         this.active = true;
         this.handler = handler;
         this.handler.addObject(this);
+        this.meshes = new Mesh[5];
 
+        // generates the perlin noise of the chunk
         PerlinNoise perlinNoise = new PerlinNoise(SIZE * 4, SIZE); // terrain map
         double[][] heatmap = perlinNoise.generateNoise(); // generate basic heatmap
-        Point3D loc, neighbourChunk;
+        Point3D loc;
 
         // add blocks according to heatmap
         for (int i = 0; i < SIZE; i++) {
@@ -45,47 +49,51 @@ public class Chunk extends gameObject {
                 int height = (int) (Math.round(heatmap[i + SIZE * id2][j] * FACTOR) + HEIGHT_MAX - FACTOR);
                 while (height >= 0) { // give each coordinate height based on perline noise
                     loc = new Point3D(i, j, height);
-                    blocks.put(loc, new Dirt(loc, ID.Dirt, Color.green));
+                    blocks.put(loc, new Dirt(loc, ID.Dirt));
                     height--;
                 }
             }
         }
         this.color = new Color(78, 153, 82); // color for grass
-        generateMesh();
+        generateMesh(); // generates the mess
+    }
 
-        neighbourChunk = coords.add(Vector.j.mul(-Chunk.SIZE)); // check if there is a chunk on left
+    // updates all chunks around the current chunk
+    private void updateNeightbours(){
+        Point3D neighbourChunk;
+        neighbourChunk = coords.add(Vector.j.mul(-Chunk.SIZE)); // check if there is a chunk in front
         if (chunkRef.containsKey(neighbourChunk)) {
-            chunkRef.get(neighbourChunk).updateChunk = 10;
+            chunkRef.get(neighbourChunk).updateBack = true;
         }
 
-        neighbourChunk = coords.add(Vector.j.mul(Chunk.SIZE)); // check if chunk on right
+        neighbourChunk = coords.add(Vector.j.mul(Chunk.SIZE)); // check if chunk behind
         if (chunkRef.containsKey(neighbourChunk)) {
-            chunkRef.get(neighbourChunk).updateChunk = 10;
+            chunkRef.get(neighbourChunk).updateFront = true;
         }
 
-        neighbourChunk = coords.add(Vector.i.mul(Chunk.SIZE)); // check chunk below
+        neighbourChunk = coords.add(Vector.i.mul(Chunk.SIZE)); // check chunk to the right
         if (chunkRef.containsKey(neighbourChunk)) {
-            chunkRef.get(neighbourChunk).updateChunk = 10;
+            chunkRef.get(neighbourChunk).updateLeft = true;
         }
 
-        neighbourChunk = coords.add(Vector.i.mul(-Chunk.SIZE)); // check chunk above
+        neighbourChunk = coords.add(Vector.i.mul(-Chunk.SIZE)); // check chunk to the left
         if (chunkRef.containsKey(neighbourChunk)) {
-            chunkRef.get(neighbourChunk).updateChunk = 10;
+            chunkRef.get(neighbourChunk).updateRight = true;
         }
     }
 
-    private void generateMesh() {
-        int z;
-        int y;
-        int x;
+    // generates the mesh for the corner blocks
+    private void generateCorners(){
+        int x, y, z; // the x y and z for the blocks in the
         int count = 0; // count of # of vertices
-        Point3D key;
+        Point3D key; // the current point being looked at
         ArrayList<Point3D> verts = new ArrayList<>(); // store all the vertices
         ArrayList<int[]> faceVerts = new ArrayList<>(); // store all the vertices that need to be displayed
 
-        // create point for each face in chunks
         for (z = HEIGHT_MAX; z > 0; z--) {
-            x = 0; y = 0;
+            // check the left-bottom corner
+            x = 0;
+            y = 0;
             key = new Point3D(x, y, z);
             // check left, right, top, bottom, front, back for chunk faces
             if (blocks.containsKey(key)) {
@@ -97,10 +105,11 @@ public class Chunk extends gameObject {
                 count = checkChunkBehind(chunkRef, x, z, verts, faceVerts, count);
             }
 
-            // for lower chunk
+            // check the right bottom corner
             x = Chunk.SIZE - 1;
             key = new Point3D(x, y, z);
             if (blocks.containsKey(key)) {
+                // check left, right, top, bottom, front, back for chunk faces
                 count = checkFaceUp(key, verts, x, y, z, faceVerts, count);
                 count = checkFaceLeft(key, verts, x, y, z, faceVerts, count);
                 count = checkFaceFront(key, verts, x, y, z, faceVerts, count);
@@ -109,10 +118,11 @@ public class Chunk extends gameObject {
                 count = checkChunkBehind(chunkRef, x, z, verts, faceVerts, count);
             }
 
-            // for chunk to left
+            // check the top right corner
             y = Chunk.SIZE - 1;
             key = new Point3D(x, y, z);
             if (blocks.containsKey(key)) {
+                // check left, right, top, bottom, front, back for chunk faces
                 count = checkFaceUp(key, verts, x, y, z, faceVerts, count);
                 count = checkFaceLeft(key, verts, x, y, z, faceVerts, count);
                 count = checkFaceBehind(key, verts, x, y, z, faceVerts, count);
@@ -121,9 +131,11 @@ public class Chunk extends gameObject {
                 count = checkChunkFront(chunkRef, x, z, verts, faceVerts, count);
             }
 
+            // check the top left corner
             x = 0;
             key = new Point3D(x, y, z);
             if (blocks.containsKey(key)) {
+                // check left, right, top, bottom, front, back for chunk faces
                 count = checkFaceUp(key, verts, x, y, z, faceVerts, count);
                 count = checkFaceRight(key, verts, x, y, z, faceVerts, count);
                 count = checkFaceBehind(key, verts, x, y, z, faceVerts, count);
@@ -131,71 +143,152 @@ public class Chunk extends gameObject {
                 count = checkChunkLeft(chunkRef, y, z, verts, faceVerts, count);
                 count = checkChunkFront(chunkRef, x, z, verts, faceVerts, count);
             }
+        }
+        this.meshes[4] = new Mesh(verts, faceVerts); // create mesh
+    }
 
+    // generates the mesh for the outermost left side of the chunk
+    private void generateLeft(){
+        int x, y, z; // the x y and z for the blocks in the
+        Point3D key; // the current point being looked at
+        this.meshes[0] = new Mesh();
+
+        for (z = HEIGHT_MAX; z > 0; z--) {
             for (y = 1; y < Chunk.SIZE - 1; y++) {
                 x = 0;
                 key = new Point3D(x, y, z);
                 if (blocks.containsKey(key)) {
-                    count = checkFaceUp(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceRight(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceBehind(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceFront(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceDown(key, verts, x, y, z, faceVerts, count);
-                    count = checkChunkLeft(chunkRef, y, z, verts, faceVerts, count);
-                }
-                x = Chunk.SIZE - 1;
-                key = new Point3D(x, y, z);
-                if (blocks.containsKey(key)) {
-                    count = checkFaceUp(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceLeft(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceBehind(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceFront(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceDown(key, verts, x, y, z, faceVerts, count);
-                    count = checkChunkRight(chunkRef, y, z, verts, faceVerts, count);
+                    // check left, right, top, bottom, front, back for chunk faces
+                    meshes[0].count = checkFaceUp(key, meshes[0].verts, x, y, z, meshes[0].faceVerts, meshes[0].count);
+                    meshes[0].count = checkFaceRight(key, meshes[0].verts, x, y, z, meshes[0].faceVerts, meshes[0].count);
+                    meshes[0].count = checkFaceBehind(key, meshes[0].verts, x, y, z, meshes[0].faceVerts, meshes[0].count);
+                    meshes[0].count = checkFaceFront(key, meshes[0].verts, x, y, z, meshes[0].faceVerts, meshes[0].count);
+                    meshes[0].count = checkFaceDown(key, meshes[0].verts, x, y, z, meshes[0].faceVerts, meshes[0].count);
+                    meshes[0].count = checkChunkLeft(chunkRef, y, z, meshes[0].verts, meshes[0].faceVerts, meshes[0].count);
                 }
             }
+        }
+        this.meshes[0].setFaces();
+    }
 
+    // generates the mesh for the outermost right side of the chunk
+    private void generateRight() {
+        int x = Chunk.SIZE - 1, y, z; // the x y and z for the blocks in the
+        Point3D key; // the current point being looked at
+        this.meshes[2] = new Mesh();
+
+        for (z = HEIGHT_MAX; z > 0; z--) {
+            for (y = 1; y < Chunk.SIZE - 1; y++) {
+                key = new Point3D(x, y, z);
+                if (blocks.containsKey(key)) {
+                    // check left, right, top, bottom, front, back for chunk faces
+                    meshes[2].count = checkFaceUp(key, meshes[2].verts, x, y, z, meshes[2].faceVerts, meshes[2].count);
+                    meshes[2].count = checkFaceLeft(key, meshes[2].verts, x, y, z, meshes[2].faceVerts, meshes[2].count);
+                    meshes[2].count = checkFaceBehind(key, meshes[2].verts, x, y, z, meshes[2].faceVerts, meshes[2].count);
+                    meshes[2].count = checkFaceFront(key, meshes[2].verts, x, y, z, meshes[2].faceVerts, meshes[2].count);
+                    meshes[2].count = checkFaceDown(key, meshes[2].verts, x, y, z, meshes[2].faceVerts, meshes[2].count);
+                    meshes[2].count = checkChunkRight(chunkRef, y, z, meshes[2].verts, meshes[2].faceVerts, meshes[2].count);
+                }
+            }
+        }
+        this.meshes[2].setFaces();
+    }
+
+    // generates the mesh for the outermost back side of the chunk
+    private void generateBack() {
+        int x, y = 0, z; // the x y and z for the blocks in the
+        Point3D key; // the current point being looked at
+        this.meshes[1] = new Mesh();
+
+        for (z = HEIGHT_MAX; z > 0; z--) {
+            // Loops through every x value
             for (x = 1; x < Chunk.SIZE - 1; x++) {
-                y = 0;
                 key = new Point3D(x, y, z);
                 if (blocks.containsKey(key)) {
-                    count = checkFaceUp(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceRight(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceLeft(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceFront(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceDown(key, verts, x, y, z, faceVerts, count);
-                    count = checkChunkBehind(chunkRef, x, z, verts, faceVerts, count);
+                    // check left, right, top, bottom, front, back for chunk faces
+                    meshes[1].count = checkFaceUp(key, meshes[1].verts, x, y, z, meshes[1].faceVerts, meshes[1].count);
+                    meshes[1].count = checkFaceRight(key, meshes[1].verts, x, y, z, meshes[1].faceVerts, meshes[1].count);
+                    meshes[1].count = checkFaceLeft(key, meshes[1].verts, x, y, z, meshes[1].faceVerts, meshes[1].count);
+                    meshes[1].count = checkFaceFront(key, meshes[1].verts, x, y, z, meshes[1].faceVerts, meshes[1].count);
+                    meshes[1].count = checkFaceDown(key, meshes[1].verts, x, y, z, meshes[1].faceVerts, meshes[1].count);
+                    meshes[1].count = checkChunkBehind(chunkRef, x, z, meshes[1].verts, meshes[1].faceVerts, meshes[1].count);
                 }
-                y = Chunk.SIZE - 1;
+            }
+        }
+        this.meshes[1].setFaces();
+    }
+
+    // generates the mesh for the outermost front side of the chunk
+    private void generateFront() {
+        int x, y = Chunk.SIZE - 1, z; // the x y and z for the blocks in the
+        Point3D key; // the current point being looked at
+        this.meshes[3] = new Mesh();
+
+        for (z = HEIGHT_MAX; z > 0; z--) {
+            // Loops through every x value
+            for (x = 1; x < Chunk.SIZE - 1; x++) {
                 key = new Point3D(x, y, z);
                 if (blocks.containsKey(key)) {
-                    count = checkFaceUp(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceRight(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceLeft(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceBehind(key, verts, x, y, z, faceVerts, count);
-                    count = checkFaceDown(key, verts, x, y, z, faceVerts, count);
-                    count = checkChunkFront(chunkRef, x, z, verts, faceVerts, count);
+                    // check left, right, top, bottom, front, back for chunk faces
+                    meshes[3].count = checkFaceUp(key, meshes[3].verts, x, y, z, meshes[3].faceVerts, meshes[3].count);
+                    meshes[3].count = checkFaceRight(key, meshes[3].verts, x, y, z, meshes[3].faceVerts, meshes[3].count);
+                    meshes[3].count = checkFaceLeft(key, meshes[3].verts, x, y, z, meshes[3].faceVerts, meshes[3].count);
+                    meshes[3].count = checkFaceBehind(key, meshes[3].verts, x, y, z, meshes[3].faceVerts, meshes[3].count);
+                    meshes[3].count = checkFaceDown(key, meshes[3].verts, x, y, z, meshes[3].faceVerts, meshes[3].count);
+                    meshes[3].count = checkChunkFront(chunkRef, x, z, meshes[3].verts, meshes[3].faceVerts, meshes[3].count);
                 }
+            }
+        }
+        this.meshes[3].setFaces();
+    }
+
+    // method to regenerate the mesh of the chunk
+    private void generateMesh() {
+        int x, y, z; // the x y and z for the blocks in the
+        this.mesh = new Mesh();
+        Point3D key; // the current point being looked at
+        ArrayList<Point3D> tempMesh;
+
+        generateCorners(); // generates the mesh for the corner blocks
+        generateLeft();
+        generateRight();
+        generateFront();
+        generateBack();
+        // create point for each face in chunks
+        for (z = HEIGHT_MAX; z > 0; z--) {
+            // Loops through every x value
+            for (x = 1; x < Chunk.SIZE - 1; x++) {
+                // adds in all inner blocks into the mesh
                 for (y = 1; y < Chunk.SIZE - 1; y++) {
                     key = new Point3D(x, y, z);
                     if (blocks.containsKey(key)) {
-                        count = checkFaceUp(key, verts, x, y, z, faceVerts, count);
-                        count = checkFaceRight(key, verts, x, y, z, faceVerts, count);
-                        count = checkFaceLeft(key, verts, x, y, z, faceVerts, count);
-                        count = checkFaceBehind(key, verts, x, y, z, faceVerts, count);
-                        count = checkFaceFront(key, verts, x, y, z, faceVerts, count);
-                        count = checkFaceDown(key, verts, x, y, z, faceVerts, count);
-
+                        // check left, right, top, bottom, front, back for chunk faces
+                        mesh.count = checkFaceUp(key, mesh.verts, x, y, z, mesh.faceVerts, mesh.count);
+                        mesh.count = checkFaceRight(key, mesh.verts, x, y, z, mesh.faceVerts, mesh.count);
+                        mesh.count = checkFaceLeft(key, mesh.verts, x, y, z, mesh.faceVerts, mesh.count);
+                        mesh.count = checkFaceBehind(key, mesh.verts, x, y, z, mesh.faceVerts, mesh.count);
+                        mesh.count = checkFaceFront(key, mesh.verts, x, y, z, mesh.faceVerts, mesh.count);
+                        mesh.count = checkFaceDown(key, mesh.verts, x, y, z, mesh.faceVerts, mesh.count);
                     }
                 }
             }
         }
-        this.mesh = new Mesh(verts, faceVerts); // create mesh
-        this.mesh.createMesh();
+        // adds the meshes into a full array list of points
+        tempMesh = new ArrayList<>(this.meshes[4].createMesh());
+        this.mesh.setFaces();
+        tempMesh.addAll(this.mesh.createMesh());
+        this.innerFaces = (ArrayList<Face>) this.mesh.faces.clone();
+        this.mesh.faces.addAll(this.meshes[4].faces);
+        for (int i = 0; i < 4; i ++) {
+            tempMesh.addAll(this.meshes[i].createMesh());
+            this.mesh.faces.addAll(this.meshes[i].faces);
+        }
+
+        this.mesh.setRawMesh(Point3D.toFloat(tempMesh.toArray(new Point3D[0]))); // sets the raw mesh with the temp array
         this.handler.regenerateObject(this);
     }
 
-    // check if there is a chunk infront
+    // check if there is a chunk in front
     private int checkChunkFront(HashMap<Point3D, Chunk> chunkRef, int x, int z, ArrayList<Point3D> verts, ArrayList<int[]> faceVerts, int count) {
         Point3D neighbourChunk;
         neighbourChunk = coords.add(Vector.j.mul(-Chunk.SIZE));
@@ -289,6 +382,7 @@ public class Chunk extends gameObject {
         return count;
     }
 
+    // checks if there's a face behind the chunk
     private int checkFaceBehind(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]> faceVerts, int count) {
         // check if there is a face behind
         if (!blocks.containsKey(key.add(Vector.j))) {
@@ -344,18 +438,78 @@ public class Chunk extends gameObject {
 
     // changes its coordinates every tick based on its velocity
     public void tick() {
-        if (playerRef != null) {
+        if (playerRef != null) { // if the player is too far away from the chunk, it despawns
             if (Math.abs(Vector.i.dotProd(this.coords.subtract(playerRef.coords))) + Math.abs(Vector.j.dotProd(this.coords.subtract(playerRef.coords))) > render_distance * SIZE + 10) {
                 setInactive();
             }
         }
-        if (updateChunk > 0) {
-            System.out.println(updateChunk);
+        if (updateChunk > 0) { // if the chunk is supposed to be updated in n ticks, it subtracts n by one
             updateChunk --;
         }
-        else if (updateChunk == 0){
-            generateMesh();
+        else if (updateChunk == 0){ // if the chunk is supposed to be updated it updates
+            generateMesh(); // updates the chunk
+            updateNeightbours();
             updateChunk = -1;
+        }
+
+        // if the chunk needs to update any of its out-most layers of blocks
+        if (updateBack || updateFront || updateLeft || updateRight) {
+            generateCorners();
+            ArrayList<Point3D> tempMesh = new ArrayList<>(this.meshes[4].createMesh());
+            if (updateBack) { // updates the back of the chunk
+                generateBack();
+                // adds the meshes into a full array list of points
+                tempMesh.addAll(this.mesh.mesh);
+                tempMesh.addAll(this.meshes[1].createMesh());
+                tempMesh.addAll(this.meshes[0].mesh);
+                tempMesh.addAll(this.meshes[2].mesh);
+                tempMesh.addAll(this.meshes[3].mesh);
+
+                updateBack = false;
+            }
+
+            if (updateFront) { // updates the front of the chunk
+                generateFront();
+                // adds the meshes into a full array list of points
+                tempMesh.addAll(this.mesh.mesh);
+                tempMesh.addAll(this.meshes[3].createMesh());
+                tempMesh.addAll(this.meshes[0].mesh);
+                tempMesh.addAll(this.meshes[1].mesh);
+                tempMesh.addAll(this.meshes[2].mesh);
+
+                updateFront = false;
+            }
+
+            if (updateLeft) { // updates the left side of the chunk
+                generateLeft();
+                // adds the meshes into a full array list of points
+                tempMesh.addAll(this.mesh.mesh);
+                tempMesh.addAll(this.meshes[0].createMesh());
+                tempMesh.addAll(this.meshes[1].mesh);
+                tempMesh.addAll(this.meshes[2].mesh);
+                tempMesh.addAll(this.meshes[3].mesh);
+
+                updateLeft = false;
+            }
+
+            if (updateRight) { // updates the right side of the chunk
+                generateRight();
+                // adds the meshes into a full array list of points
+                tempMesh.addAll(this.mesh.mesh);
+                tempMesh.addAll(this.meshes[2].createMesh());
+                tempMesh.addAll(this.meshes[1].mesh);
+                tempMesh.addAll(this.meshes[3].mesh);
+                tempMesh.addAll(this.meshes[0].mesh);
+
+                updateRight = false;
+            }
+            this.mesh.faces = (ArrayList<Face>) innerFaces.clone();
+            this.mesh.faces.addAll(this.meshes[4].faces);
+            for (int i = 0; i < 4; i ++) {
+                this.mesh.faces.addAll(this.meshes[i].faces);
+            }
+            this.mesh.setRawMesh(Point3D.toFloat(tempMesh.toArray(new Point3D[0]))); // sets the raw mesh with the temp array
+            this.handler.regenerateObject(this);
         }
     }
 

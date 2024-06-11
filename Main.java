@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 3rd
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: This is the runner class, creating a window beforehand to put information
 
@@ -81,6 +81,7 @@ public class Main extends JFrame implements KeyListener {
         }
     }
 
+    // Unused Overrides
     @Override
     public void keyReleased(KeyEvent e) {
     }

@@ -1,6 +1,6 @@
 // Author: Unknown
-// Date: June 14th
-// Program Name: Engine
+// Date: June 11th
+// Program Name: Craft Me In
 // Description: This is the perlin noise generation code found online. Creates slopes and terrains.
 
 package main;

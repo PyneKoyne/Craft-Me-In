@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 14th
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: This class handles the JFrame of which the program is displayed on
 
@@ -23,7 +23,8 @@ public class Window extends Canvas{
     public Window(int width, int height, String title, Engine engine){
         // creates a new window
     	frame = new JFrame(title);
-        
+
+        // default parameters
         frame.setPreferredSize(new Dimension(width, height)); //1024x768, 1600/900\
 
         frame.setMaximumSize(new Dimension(width, height));
@@ -42,7 +43,8 @@ public class Window extends Canvas{
                 loc = c.getLocationOnScreen();
             }
         });
-        
+
+        // adds the engine on to the frame
         frame.add(engine);
         frame.setVisible(true);
 

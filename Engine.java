@@ -1,5 +1,5 @@
-// Author: Kenny Z
-// Date: June 14th
+// Author: Kenny Z & Anish Nagariya
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: This is the main class of the engine, running the game loop and calling all game object methods, as well as listeners
 
@@ -25,12 +25,13 @@ public class Engine extends Canvas implements Runnable{
     private final HashMap<Point3D, Chunk> chunkHashMap;
     private final Player player;
 
-    //To start and stop the loop
+    //To start the thread and consequently the game
     public synchronized void start(){
         thread = new Thread(this);
         thread.start();
         running = true;
     }
+    // To stop the game and the window
     public synchronized void stop(){
         try{
             running = false;
@@ -47,7 +48,7 @@ public class Engine extends Canvas implements Runnable{
         handler.gpu[0] = new ArrayGPU(); // sets the GPU integration of the handler
         handler.gpu[0].startProgram(ArrayGPU.projectionSource); // starts the
 
-        this.chunkHashMap = new HashMap<>();
+        this.chunkHashMap = new HashMap<>(); // the chunk hashmap
 
         // Adds KeyInputs
         this.addKeyListener(new KeyInput(handler));
@@ -84,7 +85,7 @@ public class Engine extends Canvas implements Runnable{
         this.window = new Window(WIDTH, HEIGHT, "Craft Me In", this);
 
         //Places the Camera
-        player = new Player(new Point3D(0, 0, 10), 0.2F, ID.Player, handler, Color.black, window);
+        player = new Player(new Point3D(0, 0, 10), 0.2F, ID.Player, handler, window);
         handler.addObject(player);
 
         // Places cubes which are actually planes
@@ -139,9 +140,11 @@ public class Engine extends Canvas implements Runnable{
 		// Finds the width and height of the screen every tick
     	WIDTH = window.getWidth();
         HEIGHT = window.getHeight();
+        handler.tick();
 
-        if (player != null) {
+        if (player != null) { // if a player exists
             for (int i = 0; i < Chunk.render_distance; i++){
+                // checks if a zone around the player, and generates chunks
                 for (double theta = 0; theta < 2 * Math.PI; theta += Math.atan((double)1/i)){
                     Point3D tempKey = new Point3D(
                             (int) (Math.round((player.coords.x + (i * Chunk.SIZE) * Math.cos(theta))/Chunk.SIZE) * Chunk.SIZE),
@@ -157,7 +160,6 @@ public class Engine extends Canvas implements Runnable{
                 }
             }
         }
-        handler.tick();
     }
 
     // Method which runs every single frame to draw all game objects

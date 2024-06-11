@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 3rd
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: This class handles all keyboard inputs
 
@@ -61,6 +61,7 @@ public class KeyInput extends KeyAdapter {
         }
     }
 
+    // Player specific key inputs, and also returns the player object for further use
     private static Player getPlayer(Player player, int key) {
         // If the shift key is pressed, it switches between the camera being locked or not
         if (key == KeyEvent.VK_SHIFT) {
@@ -91,7 +92,6 @@ public class KeyInput extends KeyAdapter {
             gameObject tempObject = handler.object.get(i);
             if (tempObject.getid() == ID.Player) {
                 Player player = (Player) tempObject;
-
                 //Key Release Events
                 if (key == KeyEvent.VK_W) {
                     player.movement[0] = false;

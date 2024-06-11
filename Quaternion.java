@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 3rd
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: This class creates the Quaternion Data Structure for 3D rotations
 

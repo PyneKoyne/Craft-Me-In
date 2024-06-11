@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 14th
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: Creates a 3d plane on screen
 
@@ -31,7 +31,7 @@ public class Plane extends gameObject{
         // creates the mesh to draw
         this.mesh = new Mesh(verts, faceVerts);
         this.color = color;
-        mesh.createMesh();
+        mesh.setMesh();
 
     }
 

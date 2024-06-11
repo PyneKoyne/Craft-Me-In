@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 3rd
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: This class creates the Point3D Data Structure, which keep tracks of all points within the 3d space
 
@@ -7,6 +7,7 @@ package main;
 
 // Point3D class
 public class Point3D implements Cloneable {
+    // variables
     public double x;
     public double y;
     public double z;
@@ -94,10 +95,6 @@ public class Point3D implements Cloneable {
     // Hash code for a hash map
     @Override
     public int hashCode() {
-//        long l = java.lang.Double.doubleToLongBits(getZ());
-//        l *= 31 ^ java.lang.Double.doubleToLongBits(getY());
-//        l *= 31 ^ java.lang.Double.doubleToLongBits(getX());
-//        return (int) ((l >> 31) ^ l);
         long x = java.lang.Double.doubleToLongBits(getX());
         long y = java.lang.Double.doubleToLongBits(getY());
         long z = java.lang.Double.doubleToLongBits(getZ());
@@ -143,13 +140,6 @@ public class Point3D implements Cloneable {
         for (int i = 0; i < cos; i++) angle = Math.cos(angle);
         for (int i = 0; i < tan; i++) angle = Math.tan(angle);
 
-//        double length = 99999999;
-//        // length of the vector to reach the screen plane
-//        // In case the angle is 0
-//        if (angle != 0) {
-//            length = focalLength / Math.cos(Math.PI - angle);
-//        }
-
         // Rotates the vector to the camera towards the screen
         vector2cam = cam.getRot().rotateVector(vector2cam, true);
         vector2cam.setX(0);
@@ -177,5 +167,4 @@ public class Point3D implements Cloneable {
     public float[] toFloat() {
         return new float[] {(float) getX(), (float) getY(), (float) getZ()};
     }
-
 }

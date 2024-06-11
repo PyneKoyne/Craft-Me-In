@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 3rd
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: This class creates a data structure which handles all game objects
 
@@ -13,16 +13,16 @@ public class Handler {
     // A list of all the gameObjects
     public LinkedList<gameObject> object = new LinkedList<gameObject>();
     public ArrayGPU[] gpu = new ArrayGPU[3];
-//    ExecutorService executorService = Executors.newFixedThreadPool(1);
 
     // Ticks and renders every game object
     public void tick(){
         for(int i = 0; i < object.size(); i ++) {
             gameObject tempObject = object.get(i);
             tempObject.tick();
-//            executorService.execute(tempObject::tick);
         }
     }
+
+    // causes every game object to render every frame
     public void render(Graphics g){
         for(int i = 0; i < object.size(); i ++) {
             gameObject tempObject = object.get(i);
@@ -34,6 +34,7 @@ public class Handler {
         this.object.add(object);
     }
 
+    // regenerates an objects gpu stored mesh in case it is updated but has not been removed
     public void regenerateObject(gameObject object){
         // adds the mesh of the game object into the gpu memory
         Mesh tempMesh = object.getMesh();

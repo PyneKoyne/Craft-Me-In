@@ -1,5 +1,5 @@
 // Author: Kenny Z
-// Date: June 3rd
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: This class creates the Face Data Structure, which a mesh is made out of
 
@@ -45,6 +45,7 @@ public class Face implements Cloneable {
 		}
 	}
 
+	// Sets the normal and center of the face for analysis
 	public void setFace(Point3D[] vertices) {
 		Vector x, y;
 
@@ -53,12 +54,15 @@ public class Face implements Cloneable {
 		y = vertices[verts[3]].subtract(vertices[verts[2]]).add(vertices[verts[0]].subtract(vertices[verts[1]]));
 
 		this.norm = x.crossProd(y).normalize();
+
+		// finds the centre of the shape
 		this.centre = new Point3D(
 				(vertices[verts[0]].x + vertices[verts[1]].x + vertices[verts[2]].x + vertices[verts[3]].x) / 4,
 				(vertices[verts[0]].y + vertices[verts[1]].y + vertices[verts[2]].y + vertices[verts[3]].y) / 4,
 				(vertices[verts[0]].z + vertices[verts[1]].z + vertices[verts[2]].z + vertices[verts[3]].z) / 4
 		);
 
+		// sets the given vertices as the global variable
 		vertPointers = vertices;
 	}
 
@@ -91,13 +95,16 @@ public class Face implements Cloneable {
 		return Points;
 	}
 
+	// a method which checks if a given ray passes through a face of a game object, and returns the normal force
 	public Vector intersects(Point3D tail, Vector ray, Point3D loc) {
 		double distance = norm.dotProd(tail.subtract(loc.add(this.centre)));
 		double ratio =  distance / norm.dotProd(ray);
+		// if the ratio is not between 0 and 1, or the ray is shorter than the distance by twice, then we stop
 		if (ratio <= 0 || ratio >= 1 || Double.isNaN(ratio) || ray.mag() * 2 < distance) {
 			return null;
 		}
 
+		// checks if the intersection point lands on the shape
 		Vector intersection = loc.add(centre).subtract(tail.add(ray.mul(ratio)));
 		if (Math.abs(intersection.x) <= 0.5 && Math.abs(intersection.y) <= 0.5 && Math.abs(intersection.z) <= 0.5) {
 			if (norm.dotProd(ray) < 0) {

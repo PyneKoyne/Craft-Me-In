@@ -41,7 +41,7 @@ public class Cube extends gameObject {
         // constructs the mesh
         this.mesh = new Mesh(verts, faceVerts);
         this.color = color;
-        mesh.createMesh();
+        mesh.setMesh();
 
         this.handler = handler;
     }

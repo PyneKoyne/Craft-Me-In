@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 3rd
+// Date: June 11th
 // Program Name: Craft Me In
 // Description: Creates a gameObject which acts as a dirt block
 
@@ -12,12 +12,10 @@ public class Dirt extends gameObject {
     // Variables
     private Color color;
 
-    // Cube constructor which extends game Object
-    public Dirt(Point3D coords, ID id, Color color) {
+    // Dirt constructor which extends game Object
+    public Dirt(Point3D coords, ID id) {
         super(coords, null, id);
-
-        // constructs the mesh
-        this.color = color;
+        this.color = new Color(78, 153, 82); // color for grass
     }
 
     // changes its coordinates every tick based on its velocity
