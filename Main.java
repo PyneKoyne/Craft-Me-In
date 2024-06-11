@@ -12,18 +12,16 @@ import java.awt.event.KeyListener;
 
 public class Main extends JFrame implements KeyListener {
 
-    // Sets default width and height
+    // width and height
     private final static int X = 1366;
     private final static int Y = 768;
 
-    // main function
     public static void main(String[] args) {
         new Main().setVisible(true);
     }
 
     // Display main menu
     private Main() {
-        //Properties
         super("Craft Me In");
         setSize(X, Y);
         setResizable(false);
@@ -37,7 +35,7 @@ public class Main extends JFrame implements KeyListener {
         panel.setBackground(Color.BLACK);
         panel.setBorder(BorderFactory.createEmptyBorder(100, 50, 100, 50));
 
-        // Load and set the title image
+        // Title
         ImageIcon titleImage = new ImageIcon("Craft-Me-In-6-10-2024.png");
         JLabel titleLabel = new JLabel(titleImage, JLabel.CENTER);
         titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
@@ -74,7 +72,7 @@ public class Main extends JFrame implements KeyListener {
         add(panel);
     }
 
-    // Start the game when Enter key is pressed
+    // Start game when enter key is pressed
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
