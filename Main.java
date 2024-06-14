@@ -9,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.io.IOException;
 
 public class Main extends JFrame implements KeyListener {
 
@@ -76,7 +77,11 @@ public class Main extends JFrame implements KeyListener {
     @Override
     public void keyPressed(KeyEvent e) {
         if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            Engine.main();
+            try {
+                Engine.main();
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
             this.dispose();
         }
     }

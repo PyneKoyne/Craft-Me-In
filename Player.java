@@ -14,7 +14,7 @@ public class Player extends gameObject{
     private final Handler handler;
     private final Camera camera; // has a camera object as a child
     private static final Vector CAMERA_OFFSET = new Vector(0, 0, 2);
-    private static final double REACH = 4; // the reach of the player to add and remove blocks
+    private static final double REACH = 5; // the reach of the player to add and remove blocks
     private final Window window;
     public boolean[] movement = {false, false, false, false}; // 4 movement vectors of the player
     public boolean locked = true; // if the camera is locked
@@ -41,6 +41,9 @@ public class Player extends gameObject{
 
         // updates velocity and coordinates
         this.coords = this.coords.add(this.vel);
+        if (this.coords.z < -10) {
+            this.coords.z = -10;
+        }
         this.vel = this.vel.mul(0.5);
         this.addForce(new Vector(0, 0, -0.05)); // gravity
 

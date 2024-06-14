@@ -10,6 +10,9 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferStrategy;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 // Class to start the main engine which starts the game
@@ -43,7 +46,8 @@ public class Engine extends Canvas implements Runnable{
     }
 
     //Main Class
-    public Engine(){
+    public Engine() throws IOException {
+        Files.createDirectories(Paths.get(Chunk.CHUNK_PATH));
         handler = new Handler(); // Creates a handler class to manage all our game objects
         handler.gpu[0] = new ArrayGPU(); // sets the GPU integration of the handler
         handler.gpu[0].startProgram(ArrayGPU.projectionSource); // starts the
@@ -85,7 +89,7 @@ public class Engine extends Canvas implements Runnable{
         this.window = new Window(WIDTH, HEIGHT, "Craft Me In", this);
 
         //Places the Camera
-        player = new Player(new Point3D(0, 0, 10), 0.2F, ID.Player, handler, window);
+        player = new Player(new Point3D(0, 0, 20), 0.2F, ID.Player, handler, window);
         handler.addObject(player);
 
         // Places cubes which are actually planes
@@ -115,7 +119,11 @@ public class Engine extends Canvas implements Runnable{
             // Ticks all game objects
             while(delta >=1)
             {
-                tick();
+                try {
+                    tick();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
                 delta--;
             }
             if(running) {
@@ -136,7 +144,7 @@ public class Engine extends Canvas implements Runnable{
     }
 
     // Method which runs every 60th of a second
-    private void tick(){
+    private void tick() throws IOException {
 		// Finds the width and height of the screen every tick
     	WIDTH = window.getWidth();
         HEIGHT = window.getHeight();
@@ -183,7 +191,7 @@ public class Engine extends Canvas implements Runnable{
     }
 
     // creates new Engine
-    public static void main(){
+    public static void main() throws IOException {
         new Engine();
     }
 }

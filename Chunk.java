@@ -6,6 +6,9 @@
 package main;
 
 import java.awt.*;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 
 // Chunk Class
@@ -14,47 +17,90 @@ public class Chunk extends gameObject {
     // Variables
     private final Handler handler;
     private final Player playerRef;
-    private static final double FACTOR = 1.5;
+    private static final double FACTOR = 3;
     private ArrayList<Face> innerFaces;
     private Color[] colors;
     private boolean active;
     public static final int SIZE = 10; // size of perlin noise
-    public static final int HEIGHT_MAX = 4; // max height of a block
+    public static final int HEIGHT_MAX = 10; // max height of a block
+    public static final String CHUNK_PATH = "./craftmein/Chunks/";
     public static int render_distance = 3; // how many chunks to render
     public int updateChunk = -1;
     public boolean updateFront = false, updateLeft = false, updateRight = false, updateBack = false;
-    public final HashMap<Point3D, gameObject> blocks = new HashMap<>();
+    public HashMap<Point3D, gameObject> blocks;
     public final HashMap<Point3D, Chunk> chunkRef; // the chunk hashmap
     public Mesh[] meshes;
 
     // creates a new chunk and generates it's mesh
-    public Chunk(Point3D p, ID id, Handler handler, int id2, Player playerRef, HashMap<Point3D, Chunk> chunkRef) {
+    public Chunk(Point3D p, ID id, Handler handler, int id2, Player playerRef, HashMap<Point3D, Chunk> chunkRef) throws IOException {
         super(p, new Vector(0, 0, 0), id); // game object constructor
-
+        File f;
+        Point3D key;
         this.playerRef = playerRef;
         this.chunkRef = chunkRef;
         this.active = true;
         this.handler = handler;
         this.handler.addObject(this);
         this.meshes = new Mesh[5];
+        this.mesh = new Mesh();
+        for (int i = 0; i < 5; i++) {
+            this.meshes[i] = new Mesh();
+        }
+        f = new File(CHUNK_PATH + p.toString() + ".txt");
+        this.blocks = new HashMap<>();
 
-        // generates the perlin noise of the chunk
-        PerlinNoise perlinNoise = new PerlinNoise(SIZE * 4, SIZE); // terrain map
-        double[][] heatmap = perlinNoise.generateNoise(); // generate basic heatmap
-        Point3D loc;
+        if (!f.exists()) {
+            // generates the perlin noise of the chunk
+            PerlinNoise perlinNoise = new PerlinNoise(SIZE * 4, SIZE); // terrain map
+            double[][] heatmap = perlinNoise.generateNoise(); // generate basic heatmap
+            Point3D loc;
 
-        // add blocks according to heatmap
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                int height = (int) (Math.round(heatmap[i + SIZE * id2][j] * FACTOR) + HEIGHT_MAX - FACTOR);
-                while (height >= 0) { // give each coordinate height based on perline noise
-                    loc = new Point3D(i, j, height);
-                    blocks.put(loc, new Dirt(loc, ID.Dirt));
-                    height--;
+            // add blocks according to heatmap
+            for (int i = 0; i < SIZE; i++) {
+                for (int j = 0; j < SIZE; j++) {
+                    int height = (int) (Math.round(heatmap[i + SIZE * id2][j] * FACTOR) + HEIGHT_MAX - FACTOR);
+                    while (height >= 0) { // give each coordinate height based on perlin noise
+                        loc = new Point3D(i, j, height);
+                        blocks.put(loc, new Dirt(loc, ID.Dirt));
+                        height--;
+                    }
                 }
             }
         }
+        else{
+            Scanner chunkReader = new Scanner(f);
+            while (chunkReader.hasNextLine()){
+                String[] line = chunkReader.nextLine().split("=");
+                String[] rawPoint = line[0].split(", ");
+                key = new Point3D(Double.parseDouble(rawPoint[0]), Double.parseDouble(rawPoint[1]), Double.parseDouble(rawPoint[2]));
+                ID blockId = ID.valueOf(line[1]);
+                if (blockId == ID.Dirt) {
+                    blocks.put(key, new Dirt(key, ID.Dirt));
+                }
+                else if (blockId == ID.Stone){
+                    blocks.put(key, new Stone(key, ID.Stone));
+                }
+            }
+        }
+
+        System.out.println(blocks);
+
         generateMesh(); // generates the mess
+        updateNeighbours();
+        saveChunk(f);
+    }
+
+    private void saveChunk(File f) {
+        try {
+            FileWriter chunkWriter = new FileWriter(f);
+            for (Point3D key : blocks.keySet()) {
+                chunkWriter.write(key.toString().substring(1, key.toString().length() - 1) + "=" + blocks.get(key).id.toString() + "\n");
+            }
+            chunkWriter.close();
+        } catch (IOException e) {
+            System.out.println("A Chunk Saving Error Occurred.");
+            e.printStackTrace();
+        }
     }
 
     // updates all chunks around the current chunk
@@ -62,22 +108,22 @@ public class Chunk extends gameObject {
         Point3D neighbourChunk;
         neighbourChunk = coords.add(Vector.j.mul(-Chunk.SIZE)); // check if there is a chunk in front
         if (chunkRef.containsKey(neighbourChunk)) {
-            chunkRef.get(neighbourChunk).updateFront = true;
+            chunkRef.get(neighbourChunk).updateBack = true;
         }
 
         neighbourChunk = coords.add(Vector.j.mul(Chunk.SIZE)); // check if chunk behind
         if (chunkRef.containsKey(neighbourChunk)) {
-            chunkRef.get(neighbourChunk).updateBack = true;
+            chunkRef.get(neighbourChunk).updateFront = true;
         }
 
         neighbourChunk = coords.add(Vector.i.mul(Chunk.SIZE)); // check chunk to the right
         if (chunkRef.containsKey(neighbourChunk)) {
-            chunkRef.get(neighbourChunk).updateRight = true;
+            chunkRef.get(neighbourChunk).updateLeft = true;
         }
 
         neighbourChunk = coords.add(Vector.i.mul(-Chunk.SIZE)); // check chunk to the left
         if (chunkRef.containsKey(neighbourChunk)) {
-            chunkRef.get(neighbourChunk).updateLeft = true;
+            chunkRef.get(neighbourChunk).updateRight = true;
         }
     }
 
@@ -151,7 +197,8 @@ public class Chunk extends gameObject {
     private void generateLeft() {
         int x, y, z; // the x y and z for the blocks in the
         Point3D key; // the current point being looked at
-        this.meshes[0] = new Mesh();
+        this.meshes[0].colors = new ArrayList<>();
+        this.meshes[0].faces = new ArrayList<>();
 
         for (z = HEIGHT_MAX; z > 0; z--) {
             for (y = 1; y < Chunk.SIZE - 1; y++) {
@@ -175,7 +222,8 @@ public class Chunk extends gameObject {
     private void generateRight() {
         int x = Chunk.SIZE - 1, y, z; // the x y and z for the blocks in the
         Point3D key; // the current point being looked at
-        this.meshes[2] = new Mesh();
+        this.meshes[2].colors = new ArrayList<>();
+        this.meshes[2].faces = new ArrayList<>();
 
         for (z = HEIGHT_MAX; z > 0; z--) {
             for (y = 1; y < Chunk.SIZE - 1; y++) {
@@ -198,7 +246,8 @@ public class Chunk extends gameObject {
     private void generateBack() {
         int x, y = 0, z; // the x y and z for the blocks in the
         Point3D key; // the current point being looked at
-        this.meshes[1] = new Mesh();
+        this.meshes[1].colors = new ArrayList<>();
+        this.meshes[1].faces = new ArrayList<>();
 
         for (z = HEIGHT_MAX; z > 0; z--) {
             // Loops through every x value
@@ -222,7 +271,8 @@ public class Chunk extends gameObject {
     private void generateFront() {
         int x, y = Chunk.SIZE - 1, z; // the x y and z for the blocks in the
         Point3D key; // the current point being looked at
-        this.meshes[3] = new Mesh();
+        this.meshes[3].colors = new ArrayList<>();
+        this.meshes[3].faces = new ArrayList<>();
 
         for (z = HEIGHT_MAX; z > 0; z--) {
             // Loops through every x value
@@ -245,7 +295,8 @@ public class Chunk extends gameObject {
     // method to regenerate the mesh of the chunk
     private void generateMesh() {
         int x, y, z; // the x y and z for the blocks in the
-        this.mesh = new Mesh();
+        this.mesh.colors = new ArrayList<>();
+        this.mesh.faces = new ArrayList<>();
         Point3D key; // the current point being looked at
         ArrayList<Point3D> tempMesh;
 
@@ -274,7 +325,7 @@ public class Chunk extends gameObject {
             }
         }
         // adds the meshes into a full array list of points
-        tempMesh = new ArrayList<>(this.meshes[4].createMesh());
+        tempMesh = new ArrayList<>(this.meshes[4].mesh);
         this.mesh.setFaces();
         tempMesh.addAll(this.mesh.createMesh());
         this.innerFaces = (ArrayList<Face>) this.mesh.faces.clone();
@@ -290,7 +341,8 @@ public class Chunk extends gameObject {
     }
 
     // check if there is a chunk in front
-    private int checkChunkFront(Point3D key, HashMap<Point3D, Chunk> chunkRef, int x, int z, ArrayList<Point3D> verts, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
+    private int checkChunkFront(Point3D key, HashMap<Point3D, Chunk> chunkRef, int x, int z, ArrayList<
+            Point3D> verts, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
         Point3D neighbourChunk;
         Point3D chunkKey;
 
@@ -312,7 +364,8 @@ public class Chunk extends gameObject {
     }
 
     // Checks if there's block in the chunk behind
-    private int checkChunkBehind(Point3D key, HashMap<Point3D, Chunk> chunkRef, int x, int z, ArrayList<Point3D> verts, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
+    private int checkChunkBehind(Point3D key, HashMap<Point3D, Chunk> chunkRef, int x, int z, ArrayList<
+            Point3D> verts, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
         Point3D neighbourChunk;
         Point3D chunkKey;
         neighbourChunk = coords.add(Vector.j.mul(Chunk.SIZE));
@@ -332,7 +385,8 @@ public class Chunk extends gameObject {
     }
 
     // checks if there's a block in the right chunk
-    private int checkChunkRight(Point3D key, HashMap<Point3D, Chunk> chunkRef, int y, int z, ArrayList<Point3D> verts, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
+    private int checkChunkRight(Point3D key, HashMap<Point3D, Chunk> chunkRef, int y, int z, ArrayList<
+            Point3D> verts, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
         Point3D neighbourChunk;
         Point3D chunkKey;
         neighbourChunk = coords.add(Vector.i.mul(Chunk.SIZE));
@@ -352,7 +406,8 @@ public class Chunk extends gameObject {
     }
 
     // checks the left chunk
-    private int checkChunkLeft(Point3D key, HashMap<Point3D, Chunk> chunkRef, int y, int z, ArrayList<Point3D> verts, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
+    private int checkChunkLeft(Point3D key, HashMap<Point3D, Chunk> chunkRef, int y, int z, ArrayList<
+            Point3D> verts, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
         Point3D neighbourChunk;
         Point3D chunkKey;
         neighbourChunk = coords.add(Vector.i.mul(-Chunk.SIZE));
@@ -372,7 +427,8 @@ public class Chunk extends gameObject {
     }
 
     // check if there is a face beneath
-    private int checkFaceDown(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
+    private int checkFaceDown(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]>
+            faceVerts, int count, ArrayList<Color> colors) {
         if (!blocks.containsKey(key.add(Vector.k.mul(-1)))) { // display face beneath
             verts.add(new Point3D(x, y, z - 1));
             verts.add(new Point3D(x + 1, y, z - 1));
@@ -386,7 +442,8 @@ public class Chunk extends gameObject {
     }
 
     // check if there is a face in front
-    private int checkFaceFront(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
+    private int checkFaceFront(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]>
+            faceVerts, int count, ArrayList<Color> colors) {
         if (!blocks.containsKey(key.add(Vector.j.mul(-1)))) { // display face in front
             verts.add(new Point3D(x, y + 1, z));
             verts.add(new Point3D(x + 1, y + 1, z));
@@ -400,7 +457,8 @@ public class Chunk extends gameObject {
     }
 
     // checks if there's a face behind the chunk
-    private int checkFaceBehind(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
+    private int checkFaceBehind(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]>
+            faceVerts, int count, ArrayList<Color> colors) {
         // check if there is a face behind
         if (!blocks.containsKey(key.add(Vector.j))) {
             verts.add(key);
@@ -415,7 +473,8 @@ public class Chunk extends gameObject {
     }
 
     // check if there is a face to the left
-    private int checkFaceLeft(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
+    private int checkFaceLeft(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]>
+            faceVerts, int count, ArrayList<Color> colors) {
         if (!blocks.containsKey(key.add(Vector.i.mul(-1)))) { // display face to left
             verts.add(key);
             verts.add(new Point3D(x, y + 1, z));
@@ -429,7 +488,8 @@ public class Chunk extends gameObject {
     }
 
     // check if face to right
-    private int checkFaceRight(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
+    private int checkFaceRight(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]>
+            faceVerts, int count, ArrayList<Color> colors) {
         if (!blocks.containsKey(key.add(Vector.i))) { // display face to right
             verts.add(new Point3D(x + 1, y, z));
             verts.add(new Point3D(x + 1, y + 1, z));
@@ -443,7 +503,8 @@ public class Chunk extends gameObject {
     }
 
     // check if face is above
-    private int checkFaceUp(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]> faceVerts, int count, ArrayList<Color> colors) {
+    private int checkFaceUp(Point3D key, ArrayList<Point3D> verts, int x, int y, int z, ArrayList<int[]> faceVerts,
+                            int count, ArrayList<Color> colors) {
         if (!blocks.containsKey(key.add(Vector.k))) { // display face above
             verts.add(key);
             verts.add(new Point3D(x + 1, y, z));
@@ -455,7 +516,6 @@ public class Chunk extends gameObject {
         }
         return count;
     }
-
 
     // changes its coordinates every tick based on its velocity
     public void tick() {
@@ -475,50 +535,43 @@ public class Chunk extends gameObject {
         // if the chunk needs to update any of its out-most layers of blocks
         if (updateBack || updateFront || updateLeft || updateRight) {
             generateCorners();
-            ArrayList<Point3D> tempMesh = new ArrayList<>(this.meshes[4].createMesh());
+            ArrayList<Point3D> tempMesh = new ArrayList<>(this.meshes[4].mesh);
             tempMesh.addAll(this.mesh.mesh);
+
+            if (updateLeft) { // updates the left side of the chunk
+                generateLeft();
+                // adds the meshes into a full array list of points
+                tempMesh.addAll(this.meshes[0].createMesh());
+                updateLeft = false;
+            } else {
+                tempMesh.addAll(this.meshes[0].mesh);
+            }
 
             if (updateBack) { // updates the back of the chunk
                 generateBack();
                 // adds the meshes into a full array list of points
-                tempMesh.addAll(this.meshes[0].mesh);
                 tempMesh.addAll(this.meshes[1].createMesh());
-                tempMesh.addAll(this.meshes[2].mesh);
-                tempMesh.addAll(this.meshes[3].mesh);
-
                 updateBack = false;
+            } else {
+                tempMesh.addAll(this.meshes[1].mesh);
             }
 
-            else if (updateFront) { // updates the front of the chunk
+            if (updateFront) { // updates the front of the chunk
                 generateFront();
                 // adds the meshes into a full array list of points
-                tempMesh.addAll(this.meshes[0].mesh);
-                tempMesh.addAll(this.meshes[1].mesh);
-                tempMesh.addAll(this.meshes[2].mesh);
                 tempMesh.addAll(this.meshes[3].createMesh());
-
                 updateFront = false;
-            }
-
-            else if (updateLeft) { // updates the left side of the chunk
-                generateLeft();
-                // adds the meshes into a full array list of points
-                tempMesh.addAll(this.meshes[0].createMesh());
-                tempMesh.addAll(this.meshes[1].mesh);
-                tempMesh.addAll(this.meshes[2].mesh);
+            } else {
                 tempMesh.addAll(this.meshes[3].mesh);
-
-                updateLeft = false;
             }
 
-            else if (updateRight) { // updates the right side of the chunk
+            if (updateRight) { // updates the right side of the chunk
                 generateRight();
                 // adds the meshes into a full array list of points
-                tempMesh.addAll(this.meshes[0].mesh);
-                tempMesh.addAll(this.meshes[1].mesh);
                 tempMesh.addAll(this.meshes[2].createMesh());
-                tempMesh.addAll(this.meshes[3].mesh);
                 updateRight = false;
+            } else {
+                tempMesh.addAll(this.meshes[2].mesh);
             }
             this.mesh.faces = (ArrayList<Face>) innerFaces.clone();
             this.mesh.faces.addAll(this.meshes[4].faces);
@@ -557,29 +610,43 @@ public class Chunk extends gameObject {
 
     // returns the color of the shape
     public Color[] getColor() {
-        if(colors != null) {
-
+        if (colors != null) {
             return colors;
-        }
-        else return null;
+        } else return null;
     }
 
     // sets the colours of the mesh
-    public void setColors () {
-        ArrayList<Color> colors = new ArrayList<>();
-        colors.addAll(meshes[4].colors);
-        colors.addAll(mesh.colors);
-        colors.addAll(meshes[0].colors);
-        colors.addAll(meshes[1].colors);
-        colors.addAll(meshes[2].colors);
-        colors.addAll(meshes[3].colors);
+    public void setColors() {
+        this.colors = new Color[meshes[0].colors.size() +
+                meshes[1].colors.size() +
+                meshes[2].colors.size() +
+                meshes[3].colors.size() +
+                meshes[4].colors.size() +
+                mesh.colors.size()];
 
-//        System.out.println(mesh.rawMesh.length - colors.size() * 3);
-//        System.out.println(meshes[4].colors.size() * 3);
-
-        this.colors = new Color[colors.size()];
-        for (int i = 0; i < colors.size(); i++){
-            this.colors[i] = colors.get(i);
+        int offset = 0;
+        for (int i = 0; i < meshes[4].colors.size(); i++) {
+            this.colors[i + offset] = meshes[4].colors.get(i);
+        }
+        offset += meshes[4].colors.size();
+        for (int i = 0; i < mesh.colors.size(); i++) {
+            this.colors[i + offset] = mesh.colors.get(i);
+        }
+        offset += mesh.colors.size();
+        for (int i = 0; i < meshes[0].colors.size(); i++) {
+            this.colors[i + offset] = meshes[0].colors.get(i);
+        }
+        offset += meshes[0].colors.size();
+        for (int i = 0; i < meshes[1].colors.size(); i++) {
+            this.colors[i + offset] = meshes[1].colors.get(i);
+        }
+        offset += meshes[1].colors.size();
+        for (int i = 0; i < meshes[2].colors.size(); i++) {
+            this.colors[i + offset] = meshes[2].colors.get(i);
+        }
+        offset += meshes[2].colors.size();
+        for (int i = 0; i < meshes[3].colors.size(); i++) {
+            this.colors[i + offset] = meshes[3].colors.get(i);
         }
     }
 }

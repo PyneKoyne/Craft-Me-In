@@ -30,7 +30,7 @@ public abstract class gameObject {
         }
         if (coords != null) {
             this.coords = coords;
-            this.vel = new Vector(0, 0, 0);
+            this.vel = Vector.zero;
         }
         this.id = id;
     }

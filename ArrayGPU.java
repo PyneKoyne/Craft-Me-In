@@ -104,23 +104,34 @@ public class ArrayGPU {
         // Create the kernel
         this.kernel = CL.clCreateKernel(this.program, "sampleKernel", null);
         clReleaseProgram(program);
+        this.camMem = CL.clCreateBuffer(this.context,
+                CL.CL_MEM_READ_ONLY,
+                (long) Sizeof.cl_float * 15, null, null);
     }
 
     // allocates memory objects to save time if they are used between seperate runs
-    public void allocateMemory(int n, float[] srcArrayA, int b, int hash){
+    public void allocateMemory(int n, float[] srcArrayA, int hash){
         // Allocate the memory objects for the input and output data
         Pointer srcA = Pointer.to(srcArrayA);
         cl_mem[] mem = new cl_mem[3];
         mem[0] = CL.clCreateBuffer(this.context,
                 CL.CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
                 (long) Sizeof.cl_float * n, srcA, null);
-        this.camMem = CL.clCreateBuffer(this.context,
-                CL.CL_MEM_READ_ONLY,
-                (long) Sizeof.cl_float * b, null, null);
         mem[2] = CL.clCreateBuffer(this.context,
                 CL.CL_MEM_READ_WRITE,
                 (long) Sizeof.cl_float * n, null, null);
         memObjects.put(hash, mem);
+    }
+
+    // removes memory objects when deloaded
+    public void unallocateMemory(int hash){
+        // Allocate the memory objects for the input and output data
+        if (memObjects.containsKey(hash)) {
+            cl_mem[] mem = memObjects.get(hash);
+            CL.clReleaseMemObject(mem[0]);
+            CL.clReleaseMemObject(mem[2]);
+            memObjects.remove(hash);
+        }
     }
 
     // sets the memory data of the camera details

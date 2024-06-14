@@ -18,7 +18,6 @@ public class Face implements Cloneable {
 	public Point3D centre;
 	private static final double LENGTH = 0.02;// constant Length
 
-
 	// Constructor
 	public Face(int[] verts) {
 		this.verts = verts;

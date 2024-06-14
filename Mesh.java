@@ -16,12 +16,13 @@ public class Mesh {
 	public ArrayList<Point3D> mesh;
 	public ArrayList<Color> colors;
 	public int points, count;
-	public ArrayList<Face> faces = new ArrayList<>();
+	public ArrayList<Face> faces;
 	public float[] rawMesh;
 
 	// Defines the mesh based on the given parameters
 	public Mesh(ArrayList<Point3D> vertices, ArrayList<int[]> faceStructure, ArrayList<Color> colors) {
 		this.mesh = new ArrayList<>();
+		this.faces = new ArrayList<>();
 		this.colors = colors;
 		setMesh(vertices, faceStructure);
 	}
@@ -32,6 +33,7 @@ public class Mesh {
 		this.faceVerts = new ArrayList<>();
 		this.mesh = new ArrayList<>();
 		this.colors = new ArrayList<>();
+		this.faces = new ArrayList<>();
 		this.count = 0;
 	}
 
@@ -86,6 +88,9 @@ public class Mesh {
 				}
 			}
 		}
+		this.verts = new ArrayList<>();
+		this.faceVerts = new ArrayList<>();
+		this.count = 0;
 		return mesh;
 	}
 

@@ -18,6 +18,7 @@ public class Camera extends gameObject {
     public double focalLength;
     public Window window;
     public double focalVel;
+    public float[] cameraMemory;
     public int cos = 0, tan = 0;
     public int screenX = 0, screenY = 0;
     public Point3D focalPoint = Point3D.zero;
@@ -31,6 +32,20 @@ public class Camera extends gameObject {
         this.handler = handler;
         this.window = window;
         bufferedImg = CONFIG.createCompatibleImage(window.getWidth(), window.getHeight()); // sets the image
+        cameraMemory = new float[]{
+                (float) this.norm.x,
+                (float) this.norm.y,
+                (float) this.norm.z,
+                (float) norm.mag(),
+                (float) ((-1) * this.rot.x),
+                (float) ((-1) * this.rot.y),
+                (float) ((-1) * this.rot.z),
+                (float) this.rot.w,
+                (float) (this.rot.w * this.rot.w - (this.rot.x * this.rot.x + this.rot.y * this.rot.y + this.rot.z * this.rot.z)),
+                (float) this.focalLength,
+                (float) screenX,
+                (float) screenY
+        };
     }
 
     // Retrieves the focal length of the camera
@@ -76,6 +91,20 @@ public class Camera extends gameObject {
         }
 
         this.focalVel /= 4;
+        cameraMemory = new float[]{
+                (float) this.norm.x,
+                (float) this.norm.y,
+                (float) this.norm.z,
+                (float) norm.mag(),
+                (float) ((-1) * this.rot.x),
+                (float) ((-1) * this.rot.y),
+                (float) ((-1) * this.rot.z),
+                (float) this.rot.w,
+                (float) (this.rot.w * this.rot.w - (this.rot.x * this.rot.x + this.rot.y * this.rot.y + this.rot.z * this.rot.z)),
+                (float) this.focalLength,
+                (float) screenX,
+                (float) screenY
+        };
     }
 
     // Renders the screen
@@ -90,22 +119,9 @@ public class Camera extends gameObject {
 
         // resets the image
         int[] pixelData = ((DataBufferInt) bufferedImg.getRaster().getDataBuffer()).getData();
-        Arrays.fill(pixelData, 0xd3d3d3);
+        Arrays.fill(pixelData, 0x000000);
 
-        gpu[0].setCamMem(new float[]{
-                (float) this.norm.x,
-                (float) this.norm.y,
-                (float) this.norm.z,
-                (float) norm.mag(),
-                (float) ((-1) * this.rot.x),
-                (float) ((-1) * this.rot.y),
-                (float) ((-1) * this.rot.z),
-                (float) this.rot.w,
-                (float) (this.rot.w * this.rot.w - (this.rot.x * this.rot.x + this.rot.y * this.rot.y + this.rot.z * this.rot.z)),
-                (float) this.focalLength,
-                (float) screenX,
-                (float) screenY
-        }); // sets variables required for computing the screen location of the point in the GPU
+        gpu[0].setCamMem(cameraMemory); // sets variables required for computing the screen location of the point in the GPU
 
         // Loops through all objects
         for (int i = 0; i < handler.object.size(); i++) {
@@ -118,10 +134,9 @@ public class Camera extends gameObject {
                 Color[] colors = tempObject.getColor();
 
                 for (int j = 0; j < tempObject.getMesh().points / 3; j++) {
-                    int[] renderPoint = new int[]{(int) vectors[j * 3 + 1], (int) vectors[j * 3 + 2]};
-                    if (renderPoint[0] > 0 && renderPoint[1] > 0) {
-                        fillRect(pixelData, renderPoint, colors[j]);
-                        fillRect(pixelData, renderPoint, colors[j]);
+                    if (vectors[j * 3 + 1] > 0 && vectors[j * 3 + 2] > 0) {
+                        fillRect(pixelData, (int) vectors[j * 3 + 1], (int) vectors[j * 3 + 2], colors[j]);
+                        fillRect(pixelData, (int) vectors[j * 3 + 1], (int) vectors[j * 3 + 2], colors[j]);
                     }
                 }
             }
@@ -133,13 +148,11 @@ public class Camera extends gameObject {
         // Prints the focal-length on screen and number of cosines and tangents applied
         gParent.drawString("Focal Length: " + focalLength, 600, 600);
         gParent.drawString("Coordinates: " + coords, 600, 625);
-        gParent.drawString("# of Cos Applied: " + cos, 600, 650);
-        gParent.drawString("# of Tan Applied: " + tan, 600, 675);
     }
 
     // fills a one by two rectangle on the image
-    private void fillRect(int[] pixelData, int[] loc, Color color) {
-        pixelData[loc[0] + loc[1] * screenX * 2] = color.getRGB();
-        pixelData[loc[0] + 1 + (loc[1] + 1) * screenX * 2] = color.getRGB();
+    private void fillRect(int[] pixelData, int x, int y, Color color) {
+        pixelData[x + y * screenX * 2] = color.getRGB();
+        pixelData[x + 1 + (y + 1) * screenX * 2] = color.getRGB();
     }
 }
