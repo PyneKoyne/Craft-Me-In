@@ -10,7 +10,7 @@ import java.awt.*;
 // Creates a Cube on screen
 public class Dirt extends gameObject {
     // Variables
-    private static final Color COLOR = new Color(78, 153, 82);
+    private static final Color[][] COLOR = new Color[][]{{new Color(78, 153, 82)}, {new Color(150, 75, 0)}};
 
     // Dirt constructor which extends game Object
     public Dirt(Point3D coords, ID id) {
@@ -26,7 +26,10 @@ public class Dirt extends gameObject {
     }
 
     // returns the color of the shape
-    public Color[] getColor() {
-        return new Color[]{Dirt.COLOR};
+    public Color[] getColor(int orientation) {
+        if (orientation == 1){
+            return Dirt.COLOR[0];
+        }
+        return Dirt.COLOR[1];
     }
 }

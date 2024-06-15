@@ -22,24 +22,18 @@ public class ArrayGPU {
             "    float x = (a[gid * 3 + 0] - b[12]);" +
             "    float y = (a[gid * 3 + 1] - b[13]);" +
             "    float z = (a[gid * 3 + 2] - b[14]);" +
-            "    c[gid * 3 + 0] = acos((x * b[0] + y * b[1] + z * b[2]) / (sqrt(x * x + y * y + z * z) * b[3]));" +
-            "    if (c[gid * 3 + 0] < 1.57079632679) {" +
+            "    float angle = acos((x * b[0] + y * b[1] + z * b[2]) / (sqrt(x * x + y * y + z * z) * b[3]));" +
+            "    if (angle < 1.57079632679) {" +
             "       float con = 2.0 * (b[4] * x + b[5] * y + b[6] * z);" +
             "       float new_y = b[5] * con + y * b[8] + (b[6] * x - b[4] * z) * b[7] * 2.0;" +
             "       float new_z = b[6] * con + z * b[8] + (b[4] * y - b[5] * x) * b[7] * 2.0;" +
-            "       float hyp = (c[gid * 3] * b[9] * 8192)/sqrt(new_y * new_y + new_z * new_z);" +
-            "       c[gid * 3 + 1] = new_y * hyp + b[10];" +
-            "       if (c[gid * 3 + 1] > (b[10] * 2 - 2)) {" +
-            "           c[gid * 3 + 1] = 0;" +
-            "       }" +
-            "       c[gid * 3 + 2] = new_z * hyp + b[11];" +
-            "       if (c[gid * 3 + 2] > (b[11] * 2 - 2)) {" +
-            "           c[gid * 3 + 2] = 0;" +
-            "       }" +
+            "       float hyp = (angle * b[9] * 8192)/sqrt(new_y * new_y + new_z * new_z);" +
+            "       c[gid * 2] = new_y * hyp + b[10];" +
+            "       c[gid * 2 + 1] = new_z * hyp + b[11];" +
             "    }" +
             "    else {" +
-            "       c[gid * 3 + 1] = 0;" +
-            "       c[gid * 3 + 2] = 0;" +
+            "       c[gid * 2] = 0;" +
+            "       c[gid * 2 + 1] = 0;" +
             "    }" +
             "}";
 

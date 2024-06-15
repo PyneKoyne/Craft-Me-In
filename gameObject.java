@@ -197,7 +197,10 @@ public abstract class gameObject {
         return rot;
     }
 
-    protected Color[] getColor() {
+    protected Color[] getColor(int orientation) {
+        return null;
+    }
+    protected int[] getMeshColor() {
         return null;
     }
 }

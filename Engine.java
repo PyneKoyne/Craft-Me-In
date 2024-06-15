@@ -92,9 +92,7 @@ public class Engine extends Canvas implements Runnable{
         player = new Player(new Point3D(0, 0, 20), 0.2F, ID.Player, handler, window);
         handler.addObject(player);
 
-        // Places cubes which are actually planes
-//        handler.addObject(new Cube(new Point3D(10, 10, -8), 10, ID.Cube, handler, Color.black));
-//        handler.addObject(new Plane(new Point3D(-20, -20, -20), 1, ID.Plane, handler, Color.black));
+        handler.addObject(new Cube(new Point3D(10, 10, 10), 10, ID.Cube, handler, Color.yellow));
     }
 
     //Game Loop
@@ -107,6 +105,7 @@ public class Engine extends Canvas implements Runnable{
         double delta = 0;
         long timer = System.currentTimeMillis();
         int frames = 0;
+        int seconds = 0;
 
         // Game Loop
         while(running){
@@ -134,6 +133,11 @@ public class Engine extends Canvas implements Runnable{
             // Prints every second
             if(System.currentTimeMillis() - timer > 1000) {
                 timer += 1000;
+                seconds += 1;
+                if (seconds > 20){
+                    (new Thread(System::gc)).start();
+                    seconds = 0;
+                }
 
                 //Prints the FPS into the console
                 System.out.println("FPS: " + frames);

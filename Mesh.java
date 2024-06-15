@@ -14,7 +14,8 @@ public class Mesh {
 	public ArrayList<Point3D> verts;
 	public ArrayList<int[]> faceVerts;
 	public ArrayList<Point3D> mesh;
-	public ArrayList<Color> colors;
+	public ArrayList<Color> rawColors;
+	public ArrayList<Integer> colors;
 	public int points, count;
 	public ArrayList<Face> faces;
 	public float[] rawMesh;
@@ -23,7 +24,8 @@ public class Mesh {
 	public Mesh(ArrayList<Point3D> vertices, ArrayList<int[]> faceStructure, ArrayList<Color> colors) {
 		this.mesh = new ArrayList<>();
 		this.faces = new ArrayList<>();
-		this.colors = colors;
+		this.rawColors = colors;
+		this.colors = new ArrayList<>();
 		setMesh(vertices, faceStructure);
 	}
 
@@ -32,6 +34,7 @@ public class Mesh {
 		this.verts = new ArrayList<>();
 		this.faceVerts = new ArrayList<>();
 		this.mesh = new ArrayList<>();
+		this.rawColors = new ArrayList<>();
 		this.colors = new ArrayList<>();
 		this.faces = new ArrayList<>();
 		this.count = 0;
@@ -66,8 +69,6 @@ public class Mesh {
 		// converts the flexible vertices ArrayList into a normal array
 		mesh = new ArrayList<>();
 		Point3D[] meshVertices = new Point3D[verts.size()];
-		ArrayList<Color> faceColours = (ArrayList<Color>) this.colors.clone();
-		this.colors = new ArrayList<>();
 		for (int i = 0; i < verts.size(); i++){
 			meshVertices[i] = verts.get(i);
 		}
@@ -82,9 +83,8 @@ public class Mesh {
 				if (faces.get(i).equals(face2)) cnt++;
 			}
 			if (cnt < 2) {
-				for (Point3D meshPoint: faces.get(i).drawFace()) {
+				for (Point3D meshPoint: faces.get(i).drawFace(colors, rawColors.get(i))) {
 					mesh.add(meshPoint); // adds the points from the face to the mesh
-					colors.add(faceColours.get(i));
 				}
 			}
 		}

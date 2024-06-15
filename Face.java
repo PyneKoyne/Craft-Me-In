@@ -5,6 +5,7 @@
 
 package main;
 
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -16,7 +17,7 @@ public class Face implements Cloneable {
 	private Point3D[] vertPointers;
 	public Vector norm;
 	public Point3D centre;
-	private static final double LENGTH = 0.02;// constant Length
+	private static final double LENGTH = 0.03;// constant Length
 
 	// Constructor
 	public Face(int[] verts) {
@@ -67,7 +68,7 @@ public class Face implements Cloneable {
 
 	// Draw all points within a face given vertices
 	// Currently only draws Quadrilaterals
-	public ArrayList<Point3D> drawFace() {
+	public ArrayList<Point3D> drawFace(ArrayList<Integer> colors, Color color) {
 		ArrayList<Point3D> Points = new ArrayList<>();
 
 		// Draws the two diagonals
@@ -80,6 +81,7 @@ public class Face implements Cloneable {
 			Vector line = vertPointers[verts[3]].add(diagY.mul(i)).subtract(vertPointers[verts[2]].add(diagX.mul(i)));
 			for (double j = 0; j <= line.mag(); j += LENGTH) {
 				Points.add(vertPointers[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
+				colors.add(color.getRGB());
 			}
 		}
 
@@ -88,6 +90,7 @@ public class Face implements Cloneable {
 			Vector line = vertPointers[verts[3]].add(diagY.mul(i)).subtract(vertPointers[verts[0]].add(diagX.mul(-i)));
 			for (double j = 0; j < line.mag() + LENGTH / 4; j += LENGTH) {
 				Points.add(vertPointers[verts[3]].add(diagY.mul(i)).add(line.fastNormalize(j)));
+				colors.add(color.getRGB());
 			}
 		}
 

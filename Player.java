@@ -41,9 +41,6 @@ public class Player extends gameObject{
 
         // updates velocity and coordinates
         this.coords = this.coords.add(this.vel);
-        if (this.coords.z < -10) {
-            this.coords.z = -10;
-        }
         this.vel = this.vel.mul(0.5);
         this.addForce(new Vector(0, 0, -0.05)); // gravity
 

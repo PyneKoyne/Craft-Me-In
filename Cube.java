@@ -49,7 +49,6 @@ public class Cube extends gameObject {
 
         // constructs the mesh
         this.mesh = new Mesh(verts, faceVerts, colors);
-        mesh.setMesh();
 
         this.handler = handler;
     }
@@ -65,8 +64,7 @@ public class Cube extends gameObject {
     }
 
     // returns the color of the shape
-    public Color[] getColor() {
-        return new Color[]{color};
+    public Color[] getColor(int orientation) {
+        return new Color[]{color, color, color, color, color, color};
     }
-
 }

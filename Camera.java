@@ -128,22 +128,21 @@ public class Camera extends gameObject {
             gameObject tempObject = handler.object.get(i);
 
             // If the object is a cube, it renders it
-            if (tempObject.getMesh() != null && tempObject.getColor() != null) {
+            if (tempObject.getMesh() != null && tempObject.getMeshColor() != null) {
                 float[] focal = tempObject.coords.subtract(this.getFocalPoint()).toFloat();
-                float[] vectors = gpu[0].runProgram(tempObject.getMesh().points, focal, tempObject.getMesh().points/3, tempObject.getHash());
-                Color[] colors = tempObject.getColor();
-
+                float[] vectors = gpu[0].runProgram(tempObject.getMesh().points * 2 / 3, focal, tempObject.getMesh().points/3, tempObject.getHash());
+                int[] colors = tempObject.getMeshColor();
                 for (int j = 0; j < tempObject.getMesh().points / 3; j++) {
-                    if (vectors[j * 3 + 1] > 0 && vectors[j * 3 + 2] > 0) {
-                        fillRect(pixelData, (int) vectors[j * 3 + 1], (int) vectors[j * 3 + 2], colors[j]);
-                        fillRect(pixelData, (int) vectors[j * 3 + 1], (int) vectors[j * 3 + 2], colors[j]);
+                    if (vectors[j * 2] > 0 && vectors[j * 2] < screenX * 2 - 2 && vectors[j * 2 + 1] > 0 && vectors[j * 2 + 1] < screenY * 2 - 2) {
+                        fillRect(pixelData, (int) vectors[j * 2], (int) vectors[j * 2 + 1], colors[j]);
+                        fillRect(pixelData, (int) vectors[j * 2] + 1, (int) vectors[j * 2 + 1], colors[j]);
                     }
                 }
             }
         }
 
         gParent.drawImage(bufferedImg, 0, 0, null);
-        gParent.setColor(Color.black);
+        gParent.setColor(Color.white);
 
         // Prints the focal-length on screen and number of cosines and tangents applied
         gParent.drawString("Focal Length: " + focalLength, 600, 600);
@@ -151,8 +150,8 @@ public class Camera extends gameObject {
     }
 
     // fills a one by two rectangle on the image
-    private void fillRect(int[] pixelData, int x, int y, Color color) {
-        pixelData[x + y * screenX * 2] = color.getRGB();
-        pixelData[x + 1 + (y + 1) * screenX * 2] = color.getRGB();
+    private void fillRect(int[] pixelData, int x, int y, int color) {
+        pixelData[x + y * screenX * 2] = color;
+        pixelData[x + (y + 1) * screenX * 2] = color;
     }
 }

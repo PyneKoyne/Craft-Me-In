@@ -41,7 +41,6 @@ public class Handler {
         if (tempMesh != null) {
             gpu[0].unallocateMemory(object.getHash());
             gpu[0].allocateMemory(tempMesh.points, tempMesh.rawMesh, object.getHash());
-            tempMesh.rawMesh = null;
         }
     }
 
