@@ -12,10 +12,12 @@ import java.awt.event.KeyEvent;
 // KeyInput class
 public class KeyInput extends KeyAdapter {
     private final Handler handler;
+    boolean survival;
 
     // constructor which sets the handler variable
-    public KeyInput(Handler handler){
+    public KeyInput(Handler handler, boolean survival){
         this.handler = handler;
+        this.survival = survival;
     }
 
     // When a key is pressed on the keyboard
@@ -80,7 +82,7 @@ public class KeyInput extends KeyAdapter {
             player.movement[3] = true;
         }
         if(key == KeyEvent.VK_SPACE){
-            player.addForce(Vector.k.mul(1.5));
+            player.movement[4] = true;
         }
         return player;
     }
@@ -104,6 +106,9 @@ public class KeyInput extends KeyAdapter {
                 }
                 if (key == KeyEvent.VK_A) {
                     player.movement[3] = false;
+                }
+                if (key == KeyEvent.VK_SPACE) {
+                    player.movement[4] = false;
                 }
             }
         }

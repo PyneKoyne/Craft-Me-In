@@ -12,18 +12,22 @@ import java.awt.*;
 public class Player extends gameObject{
     // variables
     private final Handler handler;
+    boolean canJump = false;
     private final Camera camera; // has a camera object as a child
     private static final Vector CAMERA_OFFSET = new Vector(0, 0, 2);
     private static final double REACH = 5; // the reach of the player to add and remove blocks
     private final Window window;
-    public boolean[] movement = {false, false, false, false}; // 4 movement vectors of the player
+    public boolean[] movement = {false, false, false, false, false}; // 4 movement vectors of the player
     public boolean locked = true; // if the camera is locked
+    public boolean survival;
+
 
     // player constructor which extends game object
-    public Player(Point3D p, float scale, ID id, Handler handler, Window window){
+    public Player(Point3D p, float scale, ID id, Handler handler, Window window, boolean survival){
         super(p, new Vector(Math.PI, 0, 0), id);
         this.handler = handler;
         this.window = window;
+        this.survival = survival;
         // creates a new camera
         this.camera = new Camera(p, 0.08, ID.Camera, handler, window);
         this.camera.pitch = Math.PI/2;
@@ -33,11 +37,18 @@ public class Player extends gameObject{
     // changes its coordinates every tick based on its velocity
     public void tick() {
         // moves the player
+        canJump = false;
         if (movement[0]) addForce(norm.mul(0.05));
         if (movement[1]) addForce(left.mul(-0.05));
         if (movement[2]) addForce(norm.mul(-0.05));
         if (movement[3]) addForce(left.mul(0.05));
-        checkCollision(); // checks for collisions
+        if (this.survival) {
+            checkCollision(); // checks for collisions
+            if (movement[4] && canJump) addForce(Vector.k.mul(1.50));
+        }else{
+            if (movement[4]) addForce(Vector.k.mul(0.25));
+            checkCollision();
+        }
 
         // updates velocity and coordinates
         this.coords = this.coords.add(this.vel);
@@ -128,6 +139,7 @@ public class Player extends gameObject{
                     Vector normForce = face.intersects(this.coords, vel, object.coords); // the normal force
                     if (normForce != null){ // if there is a normal force, the player collided
                         addForce(normForce);
+                        canJump = true;
                         return checkCollision();
                     }
                 }

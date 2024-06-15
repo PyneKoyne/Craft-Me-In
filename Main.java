@@ -1,17 +1,12 @@
-// Author: Kenny Z & Anish Nagariya
-// Date: June 11th
-// Program Name: Craft Me In
-// Description: This is the runner class, creating a window beforehand to put information
-
 package main;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.io.IOException;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-public class Main extends JFrame implements KeyListener {
+public class Main extends JFrame {
 
     // width and height
     private final static int X = 1366;
@@ -28,13 +23,8 @@ public class Main extends JFrame implements KeyListener {
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
-        addKeyListener(this);
 
-        // main menu panel
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
-        panel.setBackground(Color.BLACK);
-        panel.setBorder(BorderFactory.createEmptyBorder(100, 50, 100, 50));
+        JPanel panel = getPanel();
 
         // Title
         ImageIcon titleImage = new ImageIcon("Craft-Me-In-6-10-2024.png");
@@ -45,7 +35,7 @@ public class Main extends JFrame implements KeyListener {
         JLabel instructionsLabel1 = new JLabel("Press W A S D to move around, Space Bar to Jump", JLabel.CENTER);
         JLabel instructionsLabel2 = new JLabel("Left Click to place blocks, Right click to delete blocks, Scroll to Zoom in/out", JLabel.CENTER);
         JLabel instructionsLabel3 = new JLabel("This is an endless sandbox.", JLabel.CENTER);
-        JLabel instructionsLabel4 = new JLabel("Press Enter to Start", JLabel.CENTER);
+        JLabel instructionsLabel4 = new JLabel("Press Survival to play with realistic jumps. Press Creative for endless jumps.", JLabel.CENTER);
 
         instructionsLabel1.setFont(new Font("Arial", Font.PLAIN, 24));
         instructionsLabel2.setFont(new Font("Arial", Font.PLAIN, 24));
@@ -62,37 +52,89 @@ public class Main extends JFrame implements KeyListener {
         instructionsLabel3.setAlignmentX(Component.CENTER_ALIGNMENT);
         instructionsLabel4.setAlignmentX(Component.CENTER_ALIGNMENT);
 
+        // Buttons
+        JButton survivalButton = new JButton("Survival");
+        JButton creativeButton = new JButton("Creative");
+
+        customizeButton(survivalButton);
+        customizeButton(creativeButton);
+
+        survivalButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        creativeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+
+        survivalButton.setMaximumSize(new Dimension(200, 50));
+        creativeButton.setMaximumSize(new Dimension(200, 50));
+
+        survivalButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startSurvivalMode();
+            }
+        });
+
+        creativeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                startCreativeMode();
+            }
+        });
+
         panel.add(titleLabel);
-        panel.add(Box.createRigidArea(new Dimension(0, 50))); // Add space
+        panel.add(Box.createRigidArea(new Dimension(0, 10))); // Reduced space between title and instructions
         panel.add(instructionsLabel1);
         panel.add(instructionsLabel2);
         panel.add(instructionsLabel3);
-        panel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space
+        panel.add(Box.createRigidArea(new Dimension(0, 10))); // Reduced space between instructions
         panel.add(instructionsLabel4);
+        panel.add(Box.createRigidArea(new Dimension(0, 120))); // Added space between instructions and buttons
+        panel.add(survivalButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space
+        panel.add(creativeButton);
 
         add(panel);
     }
 
-    // Start game when enter key is pressed
-    @Override
-    public void keyPressed(KeyEvent e) {
-        if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-            try {
-                Engine.main();
-            } catch (IOException ex) {
-                throw new RuntimeException(ex);
+    private JPanel getPanel() {
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                ImageIcon background = new ImageIcon("background.png");
+                g.drawImage(background.getImage(), 0, 0, getWidth(), getHeight(), this);
             }
+        };
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(10, 50, 50, 50)); // Reduced top padding to move content up
+        return panel;
+    }
+
+    // Customize button appearance
+    private void customizeButton(JButton button) {
+        button.setFont(new Font("Arial", Font.BOLD, 20));
+        button.setForeground(Color.WHITE);
+        button.setBackground(new Color(50, 50, 50)); // Dark gray color for the buttons
+        button.setFocusPainted(false);
+        button.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+        button.setOpaque(true);
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+    }
+
+    // Methods to start game modes
+    private void startSurvivalMode() {
+        try {
+            Engine.main(true);
             this.dispose();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
         }
     }
 
-    // Unused Overrides
-    @Override
-    public void keyReleased(KeyEvent e) {
-    }
-
-    @Override
-    public void keyTyped(KeyEvent e) {
+    private void startCreativeMode() {
+        try {
+            Engine.main(false);
+            this.dispose();
+        } catch (IOException ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }
-
