@@ -46,7 +46,7 @@ public class Engine extends Canvas implements Runnable{
     }
 
     //Main Class
-    public Engine() throws IOException {
+    public Engine(boolean survival) throws IOException {
         Files.createDirectories(Paths.get(Chunk.CHUNK_PATH));
         handler = new Handler(); // Creates a handler class to manage all our game objects
         handler.gpu[0] = new ArrayGPU(); // sets the GPU integration of the handler
@@ -55,7 +55,7 @@ public class Engine extends Canvas implements Runnable{
         this.chunkHashMap = new HashMap<>(); // the chunk hashmap
 
         // Adds KeyInputs
-        this.addKeyListener(new KeyInput(handler));
+        this.addKeyListener(new KeyInput(handler, survival));
 
         // Adds mouse inputs for placing and removing blocks
         this.addMouseListener(new MouseAdapter() {
@@ -89,7 +89,7 @@ public class Engine extends Canvas implements Runnable{
         this.window = new Window(WIDTH, HEIGHT, "Craft Me In", this);
 
         //Places the Camera
-        player = new Player(new Point3D(0, 0, 20), 0.2F, ID.Player, handler, window);
+        player = new Player(new Point3D(0, 0, 20), 0.2F, ID.Player, handler, window, survival);
         handler.addObject(player);
 
         handler.addObject(new Cube(new Point3D(10, 10, 10), 10, ID.Cube, handler, Color.yellow));
@@ -195,7 +195,7 @@ public class Engine extends Canvas implements Runnable{
     }
 
     // creates new Engine
-    public static void main() throws IOException {
-        new Engine();
+    public static void main(boolean survival) throws IOException {
+        new Engine(survival);
     }
 }
