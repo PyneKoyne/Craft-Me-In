@@ -5,6 +5,9 @@ import java.awt.*;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import javax.sound.sampled.*;
+import java.io.File;
+import java.io.IOException;
 
 public class Main extends JFrame {
 
@@ -19,6 +22,7 @@ public class Main extends JFrame {
     // Display main menu
     private Main() {
         super("Craft Me In");
+        playAudio();
         setSize(X, Y);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -135,6 +139,20 @@ public class Main extends JFrame {
             this.dispose();
         } catch (IOException ex) {
             throw new RuntimeException(ex);
+        }
+    }
+
+    void playAudio(){
+        try {
+            File audioFile = new File("Minecraft.wav");
+            AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioStream);
+            clip.loop(Clip.LOOP_CONTINUOUSLY);
+            clip.start();
+        }catch (Error | LineUnavailableException | IOException e){
+        } catch (UnsupportedAudioFileException e) {
+            throw new RuntimeException(e);
         }
     }
 }
