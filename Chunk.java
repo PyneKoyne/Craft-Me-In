@@ -18,12 +18,12 @@ public class Chunk extends gameObject {
     // Variables
     private final Handler handler;
     private final Player playerRef;
-    private static final double FACTOR = 3;
+    private static final double FACTOR = 1;
     private ArrayList<Face> innerFaces;
     private int[] colors;
     private boolean active;
     public static final int SIZE = 10; // size of perlin noise
-    public static final int HEIGHT_MAX = 10; // max height of a block
+    public static final int HEIGHT_MAX = 30; // max height of a block
     public static final String CHUNK_PATH = "./craftmein/Chunks/";
     public final File f;
     public static int render_distance = 3; // how many chunks to render
@@ -55,7 +55,7 @@ public class Chunk extends gameObject {
     private void readChunk(File f) {
         Point3D key, loc;
         PerlinNoise perlinNoise;
-        double[][] heatmap;
+        int[][] heatmap;
         Scanner chunkReader;
         String[] line, rawPoint;
         ID blockId;
@@ -67,7 +67,7 @@ public class Chunk extends gameObject {
             // add blocks according to heatmap
             for (int i = 0; i < SIZE; i++) {
                 for (int j = 0; j < SIZE; j++) {
-                    int height = (int) (Math.round(heatmap[i + SIZE][j] * FACTOR) + HEIGHT_MAX - FACTOR);
+                    int height = (int) (Math.round(heatmap[i + SIZE][j] * FACTOR));
                     while (height >= 0) { // give each coordinate height based on perlin noise
                         loc = new Point3D(i, j, height);
                         blocks.put(loc, new Dirt(loc, ID.Dirt));
