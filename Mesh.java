@@ -68,6 +68,7 @@ public class Mesh {
 	public ArrayList<Point3D> createMesh() {
 		// converts the flexible vertices ArrayList into a normal array
 		mesh = new ArrayList<>();
+		colors = new ArrayList<>();
 		Point3D[] meshVertices = new Point3D[verts.size()];
 		for (int i = 0; i < verts.size(); i++){
 			meshVertices[i] = verts.get(i);
@@ -83,9 +84,8 @@ public class Mesh {
 				if (faces.get(i).equals(face2)) cnt++;
 			}
 			if (cnt < 2) {
-				for (Point3D meshPoint: faces.get(i).drawFace(colors, rawColors.get(i))) {
-					mesh.add(meshPoint); // adds the points from the face to the mesh
-				}
+                // adds the points from the face to the mesh
+                mesh.addAll(faces.get(i).drawFace(colors, rawColors.get(i)));
 			}
 		}
 		this.verts = new ArrayList<>();
