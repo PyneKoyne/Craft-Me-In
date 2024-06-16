@@ -89,7 +89,7 @@ public class Engine extends Canvas implements Runnable{
         this.window = new Window(WIDTH, HEIGHT, "Craft Me In", this);
 
         //Places the Camera
-        player = new Player(new Point3D(0, 0, 20), 0.2F, ID.Player, handler, window, survival);
+        player = new Player(new Point3D(0, 0, 100), 0.2F, ID.Player, handler, window, survival);
         handler.addObject(player);
 
         handler.addObject(new Cube(new Point3D(10, 10, 300), 10, ID.Cube, handler, Color.yellow));
