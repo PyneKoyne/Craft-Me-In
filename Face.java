@@ -13,20 +13,15 @@ import java.util.Arrays;
 public class Face implements Cloneable {
 
 	// Vertices
-	private int[] verts;
+	private short[] verts;
 	private Point3D[] vertPointers;
 	public Vector norm;
 	public Point3D centre;
 	private static final double LENGTH = 0.03;// constant Length
 
 	// Constructor
-	public Face(int[] verts) {
+	public Face(short[] verts) {
 		this.verts = verts;
-	}
-
-	// Get Vert methods
-	public int[] getVerts() {
-		return verts;
 	}
 
 	// To String method for debugging

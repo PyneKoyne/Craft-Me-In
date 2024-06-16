@@ -13,6 +13,7 @@ public class Cube extends gameObject {
     // Variables
     private final Handler handler;
     private final Color color;
+    private int[] colors;
 
     // Cube constructor which extends game Object
     public Cube(Point3D p, float scale, ID id, Handler handler, Color color) {
@@ -31,13 +32,13 @@ public class Cube extends gameObject {
         verts.add(new Point3D(0, scale, scale));
         verts.add(new Point3D(scale, scale, scale));
 
-        ArrayList<int[]> faceVerts = new ArrayList<>();
-        faceVerts.add(new int[]{0, 1, 3, 2});
-        faceVerts.add(new int[]{0, 4, 6, 2});
-        faceVerts.add(new int[]{0, 1, 5, 4});
-        faceVerts.add(new int[]{2, 6, 7, 3});
-        faceVerts.add(new int[]{4, 5, 7, 6});
-        faceVerts.add(new int[]{5, 7, 3, 1});
+        ArrayList<short[]> faceVerts = new ArrayList<>();
+        faceVerts.add(new short[]{0, 1, 3, 2});
+        faceVerts.add(new short[]{0, 4, 6, 2});
+        faceVerts.add(new short[]{0, 1, 5, 4});
+        faceVerts.add(new short[]{2, 6, 7, 3});
+        faceVerts.add(new short[]{4, 5, 7, 6});
+        faceVerts.add(new short[]{5, 7, 3, 1});
 
         this.color = color;
         colors.add(color);
@@ -49,8 +50,12 @@ public class Cube extends gameObject {
 
         // constructs the mesh
         this.mesh = new Mesh(verts, faceVerts, colors);
-
+        this.colors = new int[this.mesh.colors.size()];
+        for (int i = 0; i < this.mesh.colors.size(); i++){
+            this.colors[i] = this.mesh.colors.get(i);
+        }
         this.handler = handler;
+        handler.regenerateObject(this);
     }
 
     // changes its coordinates every tick based on its velocity
@@ -66,5 +71,8 @@ public class Cube extends gameObject {
     // returns the color of the shape
     public Color[] getColor(int orientation) {
         return new Color[]{color, color, color, color, color, color};
+    }
+    public int[] getMeshColor() {
+        return this.colors;
     }
 }

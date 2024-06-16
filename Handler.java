@@ -32,6 +32,7 @@ public class Handler {
     //Adds a gameObject to the list
     public void addObject(gameObject object){
         this.object.add(object);
+        changeScene();
     }
 
     // regenerates an objects gpu stored mesh in case it is updated but has not been removed
@@ -42,11 +43,24 @@ public class Handler {
             gpu[0].unallocateMemory(object.getHash());
             gpu[0].allocateMemory(tempMesh.points, tempMesh.rawMesh, object.getHash());
         }
+        changeScene();
     }
 
     //Removes a gameObject from the list
     public void removeObject(gameObject object){
         this.object.remove(object);
         gpu[0].unallocateMemory(object.getHash());
+        changeScene();
+    }
+
+    // Tells any camera objects that the scene has changed
+    private void changeScene(){
+        for(int i = 0; i < object.size(); i ++) {
+            gameObject tempObject = object.get(i);
+            if (tempObject.getid() == ID.Camera){
+                Camera c = (Camera) tempObject;
+                c.sceneChanged = true;
+            }
+        }
     }
 }

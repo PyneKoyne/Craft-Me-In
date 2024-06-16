@@ -28,12 +28,10 @@ public class ArrayGPU {
             "       float new_y = b[5] * con + y * b[8] + (b[6] * x - b[4] * z) * b[7] * 2.0;" +
             "       float new_z = b[6] * con + z * b[8] + (b[4] * y - b[5] * x) * b[7] * 2.0;" +
             "       float hyp = (angle * b[9] * 8192)/sqrt(new_y * new_y + new_z * new_z);" +
-            "       c[gid * 2] = new_y * hyp + b[10];" +
-            "       c[gid * 2 + 1] = new_z * hyp + b[11];" +
+            "       c[gid] = round(new_y * hyp + b[10]) * 10000 + (new_z * hyp + b[11]);" +
             "    }" +
             "    else {" +
-            "       c[gid * 2] = 0;" +
-            "       c[gid * 2 + 1] = 0;" +
+            "       c[gid] = 0;" +
             "    }" +
             "}";
 

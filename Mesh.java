@@ -12,16 +12,17 @@ import java.util.ArrayList;
 public class Mesh {
 	// Variables
 	public ArrayList<Point3D> verts;
-	public ArrayList<int[]> faceVerts;
+	public ArrayList<short[]> faceVerts;
 	public ArrayList<Point3D> mesh;
 	public ArrayList<Color> rawColors;
 	public ArrayList<Integer> colors;
-	public int points, count;
+	public int points;
+	public short count;
 	public ArrayList<Face> faces;
 	public float[] rawMesh;
 
 	// Defines the mesh based on the given parameters
-	public Mesh(ArrayList<Point3D> vertices, ArrayList<int[]> faceStructure, ArrayList<Color> colors) {
+	public Mesh(ArrayList<Point3D> vertices, ArrayList<short[]> faceStructure, ArrayList<Color> colors) {
 		this.mesh = new ArrayList<>();
 		this.faces = new ArrayList<>();
 		this.rawColors = colors;
@@ -42,15 +43,15 @@ public class Mesh {
 
 	// sets the faces from the face verts
 	public void setFaces(){
-		for (int[] face : this.faceVerts) {
+		for (short[] face : this.faceVerts) {
 			faces.add(new Face(face));
 		}
 	}
 
 	// sets the main variables of the mesh and draws each point
-	public void setMesh(ArrayList<Point3D> vertices, ArrayList<int[]> faceStructure) {
+	public void setMesh(ArrayList<Point3D> vertices, ArrayList<short[]> faceStructure) {
 		this.verts = vertices;
-		for (int[] face : faceStructure) {
+		for (short[] face : faceStructure) {
 			faces.add(new Face(face));
 		}
 		setRawMesh(Point3D.toFloat(createMesh().toArray(new Point3D[0])));
@@ -58,7 +59,7 @@ public class Mesh {
 
 	// draws each point with the current state of the mesh
 	public void setMesh(){
-		for (int[] face : this.faceVerts) {
+		for (short[] face : this.faceVerts) {
 			faces.add(new Face(face));
 		}
 		setRawMesh(Point3D.toFloat(createMesh().toArray(new Point3D[0])));

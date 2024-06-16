@@ -26,8 +26,8 @@ public class Plane extends gameObject{
         verts.add(p.add(new Vector(0, scale, 0)));
         verts.add(p.add(new Vector(scale, scale, 0)));
 
-        ArrayList<int[]> faceVerts = new ArrayList<>();
-        faceVerts.add(new int[]{0, 1, 3, 2});
+        ArrayList<short[]> faceVerts = new ArrayList<>();
+        faceVerts.add(new short[]{0, 1, 3, 2});
         colors.add(color);
 
         // creates the mesh to draw

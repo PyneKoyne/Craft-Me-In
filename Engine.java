@@ -92,7 +92,7 @@ public class Engine extends Canvas implements Runnable{
         player = new Player(new Point3D(0, 0, 20), 0.2F, ID.Player, handler, window, survival);
         handler.addObject(player);
 
-        handler.addObject(new Cube(new Point3D(10, 10, 10), 10, ID.Cube, handler, Color.yellow));
+        handler.addObject(new Cube(new Point3D(10, 10, 300), 10, ID.Cube, handler, Color.yellow));
     }
 
     //Game Loop

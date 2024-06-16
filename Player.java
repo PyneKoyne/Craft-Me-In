@@ -29,7 +29,7 @@ public class Player extends gameObject{
         this.window = window;
         this.survival = survival;
         // creates a new camera
-        this.camera = new Camera(p, 0.08, ID.Camera, handler, window);
+        this.camera = new Camera(p, 0.09, ID.Camera, handler, window, survival);
         this.camera.pitch = Math.PI/2;
         handler.addObject(this.camera);
     }
@@ -51,6 +51,7 @@ public class Player extends gameObject{
         }
 
         // updates velocity and coordinates
+        if (this.vel.mag() < 0.01) this.vel = Vector.zero;
         this.coords = this.coords.add(this.vel);
         this.vel = this.vel.mul(0.5);
         this.addForce(new Vector(0, 0, -0.05)); // gravity
