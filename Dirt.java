@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 11th
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: Creates a gameObject which acts as a dirt block
 
@@ -17,11 +17,11 @@ public class Dirt extends gameObject {
         super(coords, null, id);
     }
 
-    // changes its coordinates every tick based on its velocity
+    // tick method from handler
     public void tick() {
-        
     }
 
+    // render method from handler
     public void render(Graphics g, ArrayGPU[] gpu) {
     }
 

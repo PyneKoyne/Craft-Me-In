@@ -28,20 +28,19 @@ public class PerlinNoise {
     public int[][] generateNoise() {
         for (int i = 0; i < width; i++) {
             for (int j = 0; j < height; j++) {
-                this.noise[i][j] = random.nextInt(30); // assign random value
+                this.noise[i][j] = random.nextInt(30);
             }
         }
 
-        // smooth about my taking average of neighbours, repeat for k times
         int[][] noise2 = new int[this.width][this.height];
-        for (int k = 0; k < 5; k++) {
+        for (int k = 0; k < 5; k++) { // number of smooth outs
             for (int i = 0; i < this.width; i++) {
                 for (int j = 0; j < this.height; j++) {
                     double sum = 0;
                     int count = 0;
                     for (int dx = -1; dx <= 1; dx++) {
                         for (int dy = -1; dy <= 1; dy++) {
-                            if (dx == 0 && dy == 0) continue;
+                            if (dx == 0 && dy == 0) continue; // Skip the current cell
                             int x = i + dx;
                             int y = j + dy;
                             if (x >= 0 && x < this.width && y >= 0 && y < this.height) {

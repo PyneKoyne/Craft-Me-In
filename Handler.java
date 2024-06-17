@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 11th
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: This class creates a data structure which handles all game objects
 
@@ -12,7 +12,7 @@ import java.util.LinkedList;
 public class Handler {
     // A list of all the gameObjects
     public LinkedList<gameObject> object = new LinkedList<gameObject>();
-    public ArrayGPU[] gpu = new ArrayGPU[3];
+    public ArrayGPU[] gpu = new ArrayGPU[3]; // gpu rendering accessible for the game objects
 
     // Ticks and renders every game object
     public void tick(){
@@ -57,7 +57,7 @@ public class Handler {
     private void changeScene(){
         for(int i = 0; i < object.size(); i ++) {
             gameObject tempObject = object.get(i);
-            if (tempObject.getid() == ID.Camera){
+            if (tempObject.getId() == ID.Camera){
                 Camera c = (Camera) tempObject;
                 c.sceneChanged = true;
             }

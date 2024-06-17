@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 3rd
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: Creates a gameObject which has all the properties of a cube
 
@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class Cube extends gameObject {
     // Variables
     private final Handler handler;
-    private final Color color;
+    private Color color;
     private int[] colors;
 
     // Cube constructor which extends game Object
@@ -61,17 +61,18 @@ public class Cube extends gameObject {
     // changes its coordinates every tick based on its velocity
     public void tick() {
         coords = coords.add(vel);
-//        this.addForce(new Vector(0, 0, -0.000981));
     }
 
+    // code that would run every render
     public void render(Graphics g, ArrayGPU[] gpu) {
-
     }
 
     // returns the color of the shape
     public Color[] getColor(int orientation) {
         return new Color[]{color, color, color, color, color, color};
     }
+
+    // returns the color mapped to every point in the mesh
     public int[] getMeshColor() {
         return this.colors;
     }

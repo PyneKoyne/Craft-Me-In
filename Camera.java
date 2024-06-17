@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 3rd
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: This is the camera class, creating a game object of which points can be displayed on screen according to its location and rotation
 
@@ -19,23 +19,22 @@ import java.util.concurrent.Future;
 
 // Class to manage the camera of the game
 public class Camera extends gameObject {
-    // Global Variables
+    // Variables
     private final Handler handler;
-    public double focalLength;
-    public Window window;
-    public double focalVel;
-    public float[] cameraMemory;
-    public int cos = 0, tan = 0;
-    public int screenX = 0, screenY = 0;
-    public Point3D focalPoint = Point3D.zero;
-    private BufferedImage bufferedImg; //     // image creation
+    private double focalLength;
+    private Window window;
+    private double focalVel;
+    private float[] cameraMemory;
+    private volatile float screenX, screenY;
+    private Point3D focalPoint = Point3D.zero;
+    private BufferedImage bufferedImg;     // image creation
     private volatile int[] pixelData;
     private volatile short[] pixelCount;
     private boolean survival;
     public boolean sceneChanged = true;
-    public double dayPrecentage = 0;
+    private double dayPercentage = 0;
     private final GraphicsConfiguration CONFIG = GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice().getDefaultConfiguration();
-    private ExecutorService executor = Executors.newFixedThreadPool(30);
+    private ExecutorService executor = Executors.newFixedThreadPool(10); // threads
 
     // Constructor of the class, extends gameObject
     public Camera(Point3D coords, double focal, ID id, Handler handler, Window window, boolean survival) {
@@ -45,6 +44,8 @@ public class Camera extends gameObject {
         this.window = window;
         this.survival = survival;
         bufferedImg = CONFIG.createCompatibleImage(window.getWidth(), window.getHeight()); // sets the image
+        this.screenX = this.window.getWidth() / 2.0f;
+        this.screenY = this.window.getHeight() / 2.0f;
         cameraMemory = new float[]{
                 (float) this.norm.x,
                 (float) this.norm.y,
@@ -56,10 +57,11 @@ public class Camera extends gameObject {
                 (float) this.rot.w,
                 (float) (this.rot.w * this.rot.w - (this.rot.x * this.rot.x + this.rot.y * this.rot.y + this.rot.z * this.rot.z)),
                 (float) this.focalLength,
-                (float) screenX,
-                (float) screenY
+                screenX,
+                screenY
         };
         pixelData = ((DataBufferInt) bufferedImg.getRaster().getDataBuffer()).getData();
+        pixelCount = new short[pixelData.length];
     }
 
     // Retrieves the focal length of the camera
@@ -77,27 +79,10 @@ public class Camera extends gameObject {
         return focalPoint;
     }
 
-    // Sets the number of cosines applied in the projection
-    public void setCos(int cos) {
-        if (cos < 0) {
-            cos = 0;
-        }
-        this.cos = cos;
-    }
-
-    // Sets the number of tangents applied in the projection
-    public void setTan(int tan) {
-        if (tan < 0) {
-            tan = 0;
-        }
-        this.tan = tan;
-    }
-
     // Runs every tick
     public void tick() {
         float[] tempMemory;
         Point3D tempFocal;
-
         tempMemory = new float[]{
                 (float) this.norm.x,
                 (float) this.norm.y,
@@ -109,8 +94,8 @@ public class Camera extends gameObject {
                 (float) this.rot.w,
                 (float) (this.rot.w * this.rot.w - (this.rot.x * this.rot.x + this.rot.y * this.rot.y + this.rot.z * this.rot.z)),
                 (float) this.focalLength,
-                (float) screenX,
-                (float) screenY
+                screenX,
+                screenY
         };
 
         sceneChanged = !Arrays.equals(tempMemory, cameraMemory);
@@ -130,9 +115,9 @@ public class Camera extends gameObject {
 
         this.focalVel /= 4;
         if (survival) {
-            dayPrecentage += 0.0003;
-            if (dayPrecentage > 1) {
-                dayPrecentage = -1;
+            dayPercentage += 0.0003;
+            if (dayPercentage > 1) {
+                dayPercentage = -1;
             }
             sceneChanged = true;
         }
@@ -140,22 +125,23 @@ public class Camera extends gameObject {
 
     // Renders the screen
     public void render(Graphics gParent, ArrayGPU[] gpu) {
-        this.screenX = this.window.getWidth() / 2;
-        this.screenY = this.window.getHeight() / 2;
         Vector tempFocal;
         float[] focal;
-
         // if the screen size has changed, creates a new canvas
         if (bufferedImg.getHeight() != window.getHeight() || bufferedImg.getWidth() != window.getWidth()) {
             bufferedImg = CONFIG.createCompatibleImage(window.getWidth(), window.getHeight());
             pixelData = ((DataBufferInt) bufferedImg.getRaster().getDataBuffer()).getData();
+            pixelCount = new short[pixelData.length];
+            this.screenX = bufferedImg.getWidth() / 2.0f; // updates the dimension variables of the screen
+            this.screenY = bufferedImg.getHeight() / 2.0f;
+            sceneChanged = false; // waits until next tick
         }
 
-        if (sceneChanged) {
+        if (sceneChanged) { // only renders if the scene has changed
             // resets the image
-            Arrays.fill(pixelData, blendColor(0, 0xfffff, Math.abs(dayPrecentage)));
+            Arrays.fill(pixelData, blendColor(0, 0xfffff, Math.abs(dayPercentage)));
+            Arrays.fill(pixelCount, (short) 0);
             ArrayList<Future<String>> renders = new ArrayList<>();
-            pixelCount = new short[pixelData.length];
 
             gpu[0].setCamMem(cameraMemory); // sets variables required for computing the screen location of the point in the GPU
 
@@ -166,18 +152,19 @@ public class Camera extends gameObject {
                 // If the object is a cube, it renders it
                 if (tempObject.getMesh() != null && tempObject.getMeshColor() != null) {
                     tempFocal = tempObject.coords.subtract(this.getFocalPoint());
-                    if (tempFocal.dotProd(norm) > 0.2 && tempFocal.mag() > Chunk.SIZE * 1.5){
+                    if (tempFocal.dotProd(norm) > 0.2 && tempFocal.mag() > Chunk.SIZE * 2){ // if the chunk is behind the user, it doesn't render
                         continue;
                     }
 
                     focal = tempFocal.toFloat();
-                    float[] vectors = gpu[0].runProgram(tempObject.getMesh().points / 3, focal, tempObject.getMesh().points / 3, tempObject.getHash());
+                    int[] vectors = gpu[0].runProgram(tempObject.getMesh().points / 3, focal, tempObject.getMesh().points / 3, tempObject.getHash()); // grabs the screen locations of all the points by sending a script to the GPU
+                    // renders the game object in a new thread
                     renders.add((Future<String>) executor.submit(new Thread(() -> {
                         int x, y;
                         int[] colors = tempObject.getMeshColor();
                         for (int j = 0; j < tempObject.getMesh().points / 3; j++) {
-                            x = Math.round(vectors[j] / 10000);
-                            y = Math.round(vectors[j] % 10000);
+                            x = (int) Math.round(vectors[j] / 10000.0);
+                            y = vectors[j] % 10000;
                             if (x > 0 && x < screenX * 2 - 2 && y > 0 && y < screenY * 2 - 2) {
                                 fillRect(pixelData, x, y, colors[j]);
                                 fillRect(pixelData, x, y + 1, colors[j]);
@@ -188,6 +175,7 @@ public class Camera extends gameObject {
                     })));
                 }
             }
+            // waits for all objects to be rendered
             for (Future<String> f : renders) {
                 try {
                     f.get();
@@ -197,21 +185,22 @@ public class Camera extends gameObject {
             }
         }
 
+        // draws the image onscreen
         gParent.drawImage(bufferedImg, 0, 0, null);
         gParent.setColor(Color.white);
 
         // Prints the focal-length on screen and number of cosines and tangents applied
-//        gParent.drawString("Focal Length: " + focalLength, 600, 600);
-//        gParent.drawString("Coordinates: " + coords, 600, 625);
+        gParent.drawString("Focal Length: " + focalLength, 600, 600);
     }
 
     // fills a one by two rectangle on the image
     private void fillRect(int[] pixelData, int x, int y, int color) {
-        float ratio = (float) ((pixelCount[x + y * screenX * 2] + 1.0) / (pixelCount[x + y * screenX * 2] + 2.0));
-        pixelCount[x + y * screenX * 2]++;
-        pixelData[x + y * screenX * 2] = blendColor(color, pixelData[x + y * screenX * 2], ratio);
+        float ratio = (float) ((pixelCount[x + y * this.window.getWidth()] + 1.0) / (pixelCount[x + y * this.window.getWidth()] + 2.0));
+        pixelCount[x + y * this.window.getWidth()] ++;
+        pixelData[x + y * this.window.getWidth()] = blendColor(color, pixelData[x + y * this.window.getWidth()], ratio); // blends the new colour with the old colour so the order at which pixels are drawn on screen is irrelevant
     }
 
+    // a method to blend two rgb colours together
     private int blendColor(int color1, int color2, double ratio){
         int a1 = (color1 >> 24 & 0xff);
         int r1 = ((color1 & 0xff0000) >> 16);

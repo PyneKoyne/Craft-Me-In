@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 11th
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: Creates a 3d plane on screen
 
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 // creates a new plane object
 public class Plane extends gameObject{
     private final Handler handler;
-    private final Color color;
+    private Color color;
 
     // constructor of the plane class which extends game object
     public Plane(Point3D p, float scale, ID id, Handler handler, Color color){

@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 11th
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: This class creates the mesh data structure, which manages the 3d graphics portion of game objects
 
@@ -11,15 +11,13 @@ import java.util.ArrayList;
 // Mesh object class which is used to display game objects
 public class Mesh {
 	// Variables
-	public ArrayList<Point3D> verts;
-	public ArrayList<short[]> faceVerts;
-	public ArrayList<Point3D> mesh;
-	public ArrayList<Color> rawColors;
-	public ArrayList<Integer> colors;
-	public int points;
-	public short count;
-	public ArrayList<Face> faces;
-	public float[] rawMesh;
+	public ArrayList<Point3D> verts, mesh; // the vertices and mesh
+	public ArrayList<short[]> faceVerts; // the vertex tuples
+	public ArrayList<Color> rawColors; // face colours
+	public ArrayList<Integer> colors; // int colours
+	public int points; // number of points within the raw mesh
+	public ArrayList<Face> faces; // the actual face objects
+	public float[] rawMesh; // the raw mesh to be displayed
 
 	// Defines the mesh based on the given parameters
 	public Mesh(ArrayList<Point3D> vertices, ArrayList<short[]> faceStructure, ArrayList<Color> colors) {
@@ -27,7 +25,7 @@ public class Mesh {
 		this.faces = new ArrayList<>();
 		this.rawColors = colors;
 		this.colors = new ArrayList<>();
-		setMesh(vertices, faceStructure);
+		setMesh(vertices, faceStructure); // generates the mesh from the given variables
 	}
 
 	// empty constructor
@@ -38,7 +36,6 @@ public class Mesh {
 		this.rawColors = new ArrayList<>();
 		this.colors = new ArrayList<>();
 		this.faces = new ArrayList<>();
-		this.count = 0;
 	}
 
 	// sets the faces from the face verts
@@ -54,7 +51,7 @@ public class Mesh {
 		for (short[] face : faceStructure) {
 			faces.add(new Face(face));
 		}
-		setRawMesh(Point3D.toFloat(createMesh().toArray(new Point3D[0])));
+		setRawMesh(Point3D.toFloat(createMesh().toArray(new Point3D[0]))); // sets the raw mesh
 	}
 
 	// draws each point with the current state of the mesh
@@ -62,7 +59,7 @@ public class Mesh {
 		for (short[] face : this.faceVerts) {
 			faces.add(new Face(face));
 		}
-		setRawMesh(Point3D.toFloat(createMesh().toArray(new Point3D[0])));
+		setRawMesh(Point3D.toFloat(createMesh().toArray(new Point3D[0]))); // sets the raw mesh
 	}
 
 	// Creates the total mesh by drawing each face
@@ -70,14 +67,10 @@ public class Mesh {
 		// converts the flexible vertices ArrayList into a normal array
 		mesh = new ArrayList<>();
 		colors = new ArrayList<>();
-		Point3D[] meshVertices = new Point3D[verts.size()];
-		for (int i = 0; i < verts.size(); i++){
-			meshVertices[i] = verts.get(i);
-		}
 
 		// goes through each face and sets their normal and centers
 		for (Face face: faces){
-			face.setFace(meshVertices);
+			face.setFace(verts);
 		}
 		for (int i = 0; i < faces.size(); i ++) { // checks if any faces are overlapping
 			int cnt = 0;
@@ -89,9 +82,7 @@ public class Mesh {
                 mesh.addAll(faces.get(i).drawFace(colors, rawColors.get(i)));
 			}
 		}
-		this.verts = new ArrayList<>();
-		this.faceVerts = new ArrayList<>();
-		this.count = 0;
+		this.faceVerts = new ArrayList<>(); // resets face verts to free memory
 		return mesh;
 	}
 

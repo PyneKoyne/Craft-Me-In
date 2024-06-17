@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 11th
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: This class creates the Vector Data Structure, which allows for vector algebra and point manipulation
 
@@ -31,7 +31,7 @@ public class Vector implements Cloneable {
 		this.z = v[2];
 	}
 
-	// Getters and Setters
+	// Getters and Setters for the x y and z coordinates
 	public double getX() {
 		return x;
 	}
@@ -56,10 +56,10 @@ public class Vector implements Cloneable {
 		this.z = z;
 	}
 
-	// Prints a Vector
+	// Prints a Vector as a string
 	@Override
 	public String toString() {
-		return getClass().getName() + "[x=" + x + ", y=" + y + ", z=" + z + "]"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+		return getClass().getName() + "[x=" + x + ", y=" + y + ", z=" + z + "]";
 	}
 
 	// finds the magnitude of the vector

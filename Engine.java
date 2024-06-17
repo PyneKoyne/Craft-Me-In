@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 11th
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: This is the main class of the engine, running the game loop and calling all game object methods, as well as listeners
 
@@ -17,13 +17,11 @@ import java.util.HashMap;
 
 // Class to start the main engine which starts the game
 public class Engine extends Canvas implements Runnable{
-    private static final long serialVersionUID = 1L;
-    public static int WIDTH = 1280, HEIGHT = 768; //Dimensions
-
     //Variables
+    public static int WIDTH = 1280, HEIGHT = 768; //Dimensions
     private Thread thread;
-    private boolean running = false;
-    private final Handler handler;
+    private boolean running = false; // boolean for the loop
+    private final Handler handler; // handler for the game objects
     private final Window window;
     private final HashMap<Point3D, Chunk> chunkHashMap;
     private final Player player;
@@ -32,14 +30,14 @@ public class Engine extends Canvas implements Runnable{
     public synchronized void start(){
         thread = new Thread(this);
         thread.start();
-        running = true;
+        running = true; // starts the game loop
     }
     // To stop the game and the window
     public synchronized void stop(){
         try{
-            running = false;
-            thread.join();
-            window.dispose();
+            running = false; // stops the game loop
+            thread.join(); // stops the thread
+            window.dispose(); // destroys the GUI
         }catch(Exception e){
             e.printStackTrace();
         }
@@ -55,7 +53,7 @@ public class Engine extends Canvas implements Runnable{
         this.chunkHashMap = new HashMap<>(); // the chunk hashmap
 
         // Adds KeyInputs
-        this.addKeyListener(new KeyInput(handler, survival));
+        this.addKeyListener(new KeyInput(handler));
 
         // Adds mouse inputs for placing and removing blocks
         this.addMouseListener(new MouseAdapter() {
@@ -89,7 +87,7 @@ public class Engine extends Canvas implements Runnable{
         this.window = new Window(WIDTH, HEIGHT, "Craft Me In", this);
 
         //Places the Camera
-        player = new Player(new Point3D(0, 0, 30), 0.2F, ID.Player, handler, window, survival);
+        player = new Player(new Point3D(0, 0, 30), ID.Player, handler, window, survival);
         handler.addObject(player);
 
         handler.addObject(new Cube(new Point3D(10, 10, 300), 10, ID.Cube, handler, Color.yellow));
@@ -144,6 +142,9 @@ public class Engine extends Canvas implements Runnable{
                 frames = 0;
             }
         } // end of game loop
+        for (Chunk c: chunkHashMap.values()){
+            c.setInactive();
+        } // saves all chunks
         handler.gpu[0].closeGPU(); // closes GPU integration
     }
 
@@ -155,7 +156,7 @@ public class Engine extends Canvas implements Runnable{
         handler.tick();
 
         if (player != null) { // if a player exists
-            for (int i = 0; i < Chunk.render_distance; i++){
+            for (int i = 0; i < Chunk.renderDistance; i++){
                 // checks if a zone around the player, and generates chunks
                 for (double theta = 0; theta < 2 * Math.PI; theta += Math.atan((double)1/i)){
                     Point3D tempKey = new Point3D(
@@ -167,7 +168,7 @@ public class Engine extends Canvas implements Runnable{
                         chunkHashMap.get(tempKey).setActive();
                     }
                     else {
-                        chunkHashMap.put(tempKey, new Chunk(tempKey, ID.Chunk, handler, 0, player, chunkHashMap));
+                        chunkHashMap.put(tempKey, new Chunk(tempKey, ID.Chunk, handler, player, chunkHashMap));
                     }
                 }
             }

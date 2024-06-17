@@ -1,12 +1,8 @@
-// Author: Anish Nagariya & Kenny Zheng
-// Date: June 11th
-// Program Name: Craft Me In
-// Description: This is the perlin noise generation code found online. Creates slopes and terrains.
-
 package main;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.IOException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.sound.sampled.*;
@@ -64,40 +60,27 @@ public class Main extends JFrame {
         JButton survivalButton = new JButton("Survival");
         JButton creativeButton = new JButton("Creative");
         JButton clearWorldButton = new JButton("Clear World");
+        JButton quitButton = new JButton("Quit Game");
 
         customizeButton(survivalButton);
         customizeButton(creativeButton);
         customizeButton(clearWorldButton);
+        customizeButton(quitButton);
 
         survivalButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         creativeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         clearWorldButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        quitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        survivalButton.setMaximumSize(new Dimension(200, 50));
-        creativeButton.setMaximumSize(new Dimension(200, 50));
-        clearWorldButton.setMaximumSize(new Dimension(200, 50));
+        survivalButton.setMaximumSize(new Dimension(300, 50));
+        creativeButton.setMaximumSize(new Dimension(300, 50));
+        quitButton.setMaximumSize(new Dimension(200, 50));
 
-        survivalButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startSurvivalMode();
-            }
-        });
+        survivalButton.addActionListener(e -> startSurvivalMode());
+        creativeButton.addActionListener(e -> startCreativeMode());
+        quitButton.addActionListener(e -> quitGame());
 
-        creativeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startCreativeMode();
-            }
-        });
-
-        clearWorldButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                clearWorld();
-            }
-        });
-
+        // creates the main menu
         panel.add(titleLabel);
         panel.add(Box.createRigidArea(new Dimension(0, 10))); // Reduced space between title and instructions
         panel.add(instructionsLabel1);
@@ -111,6 +94,8 @@ public class Main extends JFrame {
         panel.add(creativeButton);
         panel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space
         panel.add(clearWorldButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space
+        panel.add(quitButton);
 
         add(panel);
     }
@@ -141,7 +126,7 @@ public class Main extends JFrame {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    // Start survival mode
+    // Methods to start game modes
     private void startSurvivalMode() {
         try {
             Engine.main(true);
@@ -151,7 +136,6 @@ public class Main extends JFrame {
         }
     }
 
-    // start creative mode
     private void startCreativeMode() {
         try {
             Engine.main(false);
@@ -183,6 +167,13 @@ public class Main extends JFrame {
 
     // play minecraft background music forever
     void playAudio(){
+    // closes the whole game
+    private void quitGame() {
+        this.dispose();
+    }
+
+    // Method to create a thread which plays music the entire time
+    private void playAudio(){
         try {
             File audioFile = new File("Minecraft.wav");
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
@@ -190,7 +181,7 @@ public class Main extends JFrame {
             clip.open(audioStream);
             clip.loop(Clip.LOOP_CONTINUOUSLY);
             clip.start();
-        } catch (Error | LineUnavailableException | IOException e) {
+        } catch (Error | LineUnavailableException | IOException ignored){
         } catch (UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         }
