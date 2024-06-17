@@ -1,28 +1,33 @@
+// Author: Kenny Z & Anish Nagariya
+// Date: June 16th
+// Program Name: Craft Me In
+// Description: This class contains the main method which the whole program is run from, as well as the main menu
+
 package main;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import javax.sound.sampled.*;
 import java.io.File;
-import java.io.IOException;
 
+// Main menu class
 public class Main extends JFrame {
 
     // width and height
     private final static int X = 1366;
     private final static int Y = 768;
 
+    // main method which the entire program is stated from, creates a new Main object
     public static void main(String[] args) {
         new Main().setVisible(true);
     }
 
     // Display main menu
     private Main() {
+        // creates a new JFrame
         super("Craft Me In");
-        playAudio();
+        playAudio(); // plays Minecraft Music
         setSize(X, Y);
         setResizable(false);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -59,30 +64,25 @@ public class Main extends JFrame {
         // Buttons
         JButton survivalButton = new JButton("Survival");
         JButton creativeButton = new JButton("Creative");
+        JButton quitButton = new JButton("Quit Game");
 
         customizeButton(survivalButton);
         customizeButton(creativeButton);
+        customizeButton(quitButton);
 
         survivalButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         creativeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        quitButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        survivalButton.setMaximumSize(new Dimension(200, 50));
-        creativeButton.setMaximumSize(new Dimension(200, 50));
+        survivalButton.setMaximumSize(new Dimension(300, 50));
+        creativeButton.setMaximumSize(new Dimension(300, 50));
+        quitButton.setMaximumSize(new Dimension(200, 50));
 
-        survivalButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startSurvivalMode();
-            }
-        });
+        survivalButton.addActionListener(e -> startSurvivalMode());
+        creativeButton.addActionListener(e -> startCreativeMode());
+        quitButton.addActionListener(e -> quitGame());
 
-        creativeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                startCreativeMode();
-            }
-        });
-
+        // creates the main menu
         panel.add(titleLabel);
         panel.add(Box.createRigidArea(new Dimension(0, 10))); // Reduced space between title and instructions
         panel.add(instructionsLabel1);
@@ -94,10 +94,13 @@ public class Main extends JFrame {
         panel.add(survivalButton);
         panel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space
         panel.add(creativeButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space
+        panel.add(quitButton);
 
-        add(panel);
+        add(panel); // adds the main menu to the screen
     }
 
+    // creates a new JPanel
     private JPanel getPanel() {
         JPanel panel = new JPanel() {
             @Override
@@ -123,7 +126,7 @@ public class Main extends JFrame {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    // Methods to start game modes
+    // starts the engine in survival mode
     private void startSurvivalMode() {
         try {
             Engine.main(true);
@@ -133,6 +136,7 @@ public class Main extends JFrame {
         }
     }
 
+    // starts the engine in creative mode
     private void startCreativeMode() {
         try {
             Engine.main(false);
@@ -142,7 +146,13 @@ public class Main extends JFrame {
         }
     }
 
-    void playAudio(){
+    // closes the whole game
+    private void quitGame() {
+        this.dispose();
+    }
+
+    // Method to create a thread which plays music the entire time
+    private void playAudio(){
         try {
             File audioFile = new File("Minecraft.wav");
             AudioInputStream audioStream = AudioSystem.getAudioInputStream(audioFile);
@@ -150,7 +160,7 @@ public class Main extends JFrame {
             clip.open(audioStream);
             clip.loop(Clip.LOOP_CONTINUOUSLY);
             clip.start();
-        }catch (Error | LineUnavailableException | IOException e){
+        } catch (Error | LineUnavailableException | IOException ignored){
         } catch (UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         }

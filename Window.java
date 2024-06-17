@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 11th
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: This class handles the JFrame of which the program is displayed on
 
@@ -65,15 +65,17 @@ public class Window extends Canvas{
         System.exit(0);
     }
 
-    // Getters
+    // Gets the Width
     public int getWidth() {
     	return (int) dimension.getWidth();
     }
-    
+
+    // Gets the height
     public int getHeight() {
     	return (int) dimension.getHeight();
     }
-    
+
+    // gets the location of the window on the screen
     public Point screenLoc() {
     	return loc;
     }

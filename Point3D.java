@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 11th
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: This class creates the Point3D Data Structure, which keep tracks of all points within the 3d space
 
@@ -29,7 +29,7 @@ public class Point3D implements Cloneable {
         return x2 * x2 + y2 * y2 + z2 * z2;
     }
 
-    // Getters and Setters
+    // Getters and Setters for the x, y, and z coordinates
     public double getX() {
         return x;
     }
@@ -54,7 +54,7 @@ public class Point3D implements Cloneable {
         this.z = z;
     }
 
-    // To String Method
+    // To String Method to print a Point3D
     @Override
     public String toString() {
         return "(" + x + ", " + y + ", " + z + ")";
@@ -125,27 +125,6 @@ public class Point3D implements Cloneable {
     }
     // Adds a point to a point creating another point
     public Point3D add(Point3D p) { return new Point3D(getX() + p.x, getY() + p.y, getZ() + p.z); }
-
-    // Maps a point onto the camera OLD
-    public Vector screenOrthoCoordinates(Camera cam, Vector focalPoint, int cos, int tan) {
-        final double ROTATION_LIMIT = Math.PI/2.0;
-        Vector norm = cam.getNorm();
-        Vector vector2cam = focalPoint.subtract(this);
-        double angle = vector2cam.diffAngles(norm);
-        if (angle > ROTATION_LIMIT){
-            return null;
-        }
-
-        // Experiment with adding trigonometric functions to the projection
-        for (int i = 0; i < cos; i++) angle = Math.cos(angle);
-        for (int i = 0; i < tan; i++) angle = Math.tan(angle);
-
-        // Rotates the vector to the camera towards the screen
-        vector2cam = cam.getRot().rotateVector(vector2cam, true);
-        vector2cam.setX(0);
-
-        return vector2cam.fastNormalize(angle * cam.getFocalLength() * 5000);
-    }
 
     // Turns a list of Point3Ds into a 1-dimensional float array
     public static float[] toFloat(Point3D[] points){

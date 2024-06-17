@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 11th
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: Creates a gameObject which acts as a stone block
 
@@ -10,7 +10,7 @@ import java.awt.*;
 // Creates a Cube on screen
 public class Stone extends gameObject {
     // Variables
-    private static final Color[] COLOR = new Color[]{new Color(30, 100, 100)};
+    private static final Color[] COLOR = new Color[]{new Color(40, 40, 45)};
 
     // Dirt constructor which extends game Object
     public Stone(Point3D coords, ID id) {
@@ -22,6 +22,7 @@ public class Stone extends gameObject {
 
     }
 
+    // helper code every render
     public void render(Graphics g, ArrayGPU[] gpu) {
     }
 

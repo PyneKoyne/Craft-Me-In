@@ -1,5 +1,5 @@
 // Author: Kenny Z & Anish Nagariya
-// Date: June 3rd
+// Date: June 16th
 // Program Name: Craft Me In
 // Description: ArrayGPU creates an object which can interface with the GPU to perform an array of tasks simultaneously
 
@@ -16,7 +16,7 @@ public class ArrayGPU {
     public static String projectionSource = "__kernel void " +
             "sampleKernel(__global const float *a," +
             "             __global const float *b," +
-            "             __global float *c)" +
+            "             __global int *c)" +
             "{" +
             "    int gid = get_global_id(0);" +
             "    float x = (a[gid * 3 + 0] - b[12]);" +
@@ -28,10 +28,10 @@ public class ArrayGPU {
             "       float new_y = b[5] * con + y * b[8] + (b[6] * x - b[4] * z) * b[7] * 2.0;" +
             "       float new_z = b[6] * con + z * b[8] + (b[4] * y - b[5] * x) * b[7] * 2.0;" +
             "       float hyp = (angle * b[9] * 8192)/sqrt(new_y * new_y + new_z * new_z);" +
-            "       c[gid] = round(new_y * hyp + b[10]) * 10000 + (new_z * hyp + b[11]);" +
+            "       c[gid] = round(new_y * hyp + b[10]) * 10000 + (new_z * hyp + b[11]);" + // stores the final screen location in one float
             "    }" +
             "    else {" +
-            "       c[gid] = 0;" +
+            "       c[gid] = 0;" + // if the point is behind the camera, it's not drawn
             "    }" +
             "}";
 
@@ -39,7 +39,7 @@ public class ArrayGPU {
     private cl_context context;
     private cl_kernel kernel;
     private cl_command_queue commandQueue;
-    private HashMap<Integer, cl_mem[]> memObjects = new HashMap<>();
+    private HashMap<Integer, cl_mem[]> memObjects = new HashMap<>(); // hashmaps of the game objects to be drawn
     private cl_program program;
     private cl_mem camMem;
 
@@ -115,7 +115,7 @@ public class ArrayGPU {
         memObjects.put(hash, mem);
     }
 
-    // removes memory objects when deloaded
+    // removes memory objects when a gameobject is deloaded
     public void unallocateMemory(int hash){
         // Allocate the memory objects for the input and output data
         if (memObjects.containsKey(hash)) {
@@ -135,8 +135,8 @@ public class ArrayGPU {
     }
 
     // Executes the program based on the input received and the other stored memory objects
-    public float[] runProgram(int n, float[] focal, int ids, int hash) {
-        float[] dstArray = new float[n];
+    public int[] runProgram(int n, float[] focal, int ids, int hash) {
+        int[] dstArray = new int[n];
         Pointer srcB = Pointer.to(focal);
         Pointer dst = Pointer.to(dstArray);
 
@@ -164,7 +164,7 @@ public class ArrayGPU {
 
         // Read the output data
         CL.clEnqueueReadBuffer(this.commandQueue, mem[2], CL_TRUE, 0,
-                (long) n * Sizeof.cl_float, dst, 0, null, null);
+                (long) n * Sizeof.cl_int, dst, 0, null, null);
 
         return dstArray;
     }
