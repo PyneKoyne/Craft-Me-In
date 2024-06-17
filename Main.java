@@ -38,7 +38,7 @@ public class Main extends JFrame {
         // Instructions
         JLabel instructionsLabel1 = new JLabel("Press W A S D to move around, Space Bar to Jump", JLabel.CENTER);
         JLabel instructionsLabel2 = new JLabel("Left Click to place blocks, Right click to delete blocks, Scroll to Zoom in/out", JLabel.CENTER);
-        JLabel instructionsLabel3 = new JLabel("This is an endless sandbox.", JLabel.CENTER);
+        JLabel instructionsLabel3 = new JLabel("Shift to unlock the mouse. Escape to return to the Main Menu", JLabel.CENTER);
         JLabel instructionsLabel4 = new JLabel("Press Survival to play with realistic jumps. Press Creative for endless jumps.", JLabel.CENTER);
 
         instructionsLabel1.setFont(new Font("Arial", Font.PLAIN, 24));
@@ -74,10 +74,12 @@ public class Main extends JFrame {
 
         survivalButton.setMaximumSize(new Dimension(300, 50));
         creativeButton.setMaximumSize(new Dimension(300, 50));
+        clearWorldButton.setMaximumSize(new Dimension(200, 50));
         quitButton.setMaximumSize(new Dimension(200, 50));
 
         survivalButton.addActionListener(e -> startSurvivalMode());
         creativeButton.addActionListener(e -> startCreativeMode());
+        clearWorldButton.addActionListener(e -> clearWorld());
         quitButton.addActionListener(e -> quitGame());
 
         // creates the main menu
@@ -165,8 +167,6 @@ public class Main extends JFrame {
         }
     }
 
-    // play minecraft background music forever
-    void playAudio(){
     // closes the whole game
     private void quitGame() {
         this.dispose();

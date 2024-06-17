@@ -188,8 +188,7 @@ public class Engine extends Canvas implements Runnable{
         Graphics g = bs.getDrawGraphics();
         g.setColor(Color.lightGray);
         g.fillRect(0, 0, WIDTH, HEIGHT);
-		
-        //Renders the Game
+
         handler.render(g);
         g.dispose();
         bs.show();
