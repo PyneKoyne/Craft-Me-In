@@ -70,7 +70,11 @@ public class Chunk extends gameObject {
                     int height = (int) (Math.round(heatmap[i + SIZE][j]) - FACTOR);
                     while (height >= 0) { // give each coordinate height based on perlin noise
                         loc = new Point3D(i, j, height);
-                        blocks.put(loc, new Dirt(loc, ID.Dirt));
+                        if (height < 5){
+                            blocks.put(loc, new Stone(loc, ID.Stone));
+                        }else {
+                            blocks.put(loc, new Dirt(loc, ID.Dirt));
+                        }
                         height--;
                     }
                 }

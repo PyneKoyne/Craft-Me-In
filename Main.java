@@ -1,8 +1,12 @@
+// Author: Anish Nagariya & Kenny Zheng
+// Date: June 11th
+// Program Name: Craft Me In
+// Description: This is the perlin noise generation code found online. Creates slopes and terrains.
+
 package main;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.IOException;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.sound.sampled.*;
@@ -59,15 +63,19 @@ public class Main extends JFrame {
         // Buttons
         JButton survivalButton = new JButton("Survival");
         JButton creativeButton = new JButton("Creative");
+        JButton clearWorldButton = new JButton("Clear World");
 
         customizeButton(survivalButton);
         customizeButton(creativeButton);
+        customizeButton(clearWorldButton);
 
         survivalButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         creativeButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        clearWorldButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         survivalButton.setMaximumSize(new Dimension(200, 50));
         creativeButton.setMaximumSize(new Dimension(200, 50));
+        clearWorldButton.setMaximumSize(new Dimension(200, 50));
 
         survivalButton.addActionListener(new ActionListener() {
             @Override
@@ -83,6 +91,13 @@ public class Main extends JFrame {
             }
         });
 
+        clearWorldButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                clearWorld();
+            }
+        });
+
         panel.add(titleLabel);
         panel.add(Box.createRigidArea(new Dimension(0, 10))); // Reduced space between title and instructions
         panel.add(instructionsLabel1);
@@ -94,10 +109,13 @@ public class Main extends JFrame {
         panel.add(survivalButton);
         panel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space
         panel.add(creativeButton);
+        panel.add(Box.createRigidArea(new Dimension(0, 20))); // Add space
+        panel.add(clearWorldButton);
 
         add(panel);
     }
 
+    // for background image
     private JPanel getPanel() {
         JPanel panel = new JPanel() {
             @Override
@@ -123,7 +141,7 @@ public class Main extends JFrame {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    // Methods to start game modes
+    // Start survival mode
     private void startSurvivalMode() {
         try {
             Engine.main(true);
@@ -133,6 +151,7 @@ public class Main extends JFrame {
         }
     }
 
+    // start creative mode
     private void startCreativeMode() {
         try {
             Engine.main(false);
@@ -142,6 +161,27 @@ public class Main extends JFrame {
         }
     }
 
+    // delete stored chunks and start a new world
+    private void clearWorld() {
+        File folder = new File("craftmein/Chunks");
+        if (folder.exists() && folder.isDirectory()) {
+            File[] files = folder.listFiles();
+            if (files != null) {
+                for (File file : files) {
+                    if (file.isFile()) {
+                        file.delete();
+                    }
+                }
+                JOptionPane.showMessageDialog(this, "World cleared successfully.");
+            } else {
+                JOptionPane.showMessageDialog(this, "No files found to delete.");
+            }
+        } else {
+            JOptionPane.showMessageDialog(this, "Directory not found.");
+        }
+    }
+
+    // play minecraft background music forever
     void playAudio(){
         try {
             File audioFile = new File("Minecraft.wav");
@@ -150,7 +190,7 @@ public class Main extends JFrame {
             clip.open(audioStream);
             clip.loop(Clip.LOOP_CONTINUOUSLY);
             clip.start();
-        }catch (Error | LineUnavailableException | IOException e){
+        } catch (Error | LineUnavailableException | IOException e) {
         } catch (UnsupportedAudioFileException e) {
             throw new RuntimeException(e);
         }

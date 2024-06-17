@@ -66,7 +66,7 @@ public class KeyInput extends KeyAdapter {
     // Player specific key inputs, and also returns the player object for further use
     private static Player getPlayer(Player player, int key) {
         // If the shift key is pressed, it switches between the camera being locked or not
-        if (key == KeyEvent.VK_SHIFT) {
+        if (key == KeyEvent.VK_ESCAPE) {
             player.switchLock();
         }
         if(key == KeyEvent.VK_W ){

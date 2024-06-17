@@ -37,43 +37,47 @@ public class Player extends gameObject{
     // changes its coordinates every tick based on its velocity
     public void tick() {
         // moves the player
-        canJump = false;
-        if (movement[0]) addForce(norm.mul(0.05));
-        if (movement[1]) addForce(left.mul(-0.05));
-        if (movement[2]) addForce(norm.mul(-0.05));
-        if (movement[3]) addForce(left.mul(0.05));
-        if (this.survival) {
-            checkCollision(); // checks for collisions
-            if (movement[4] && canJump) addForce(Vector.k.mul(1.50));
-        }else{
-            if (movement[4]) addForce(Vector.k.mul(0.25));
-            checkCollision();
-        }
-
-        // updates velocity and coordinates
-        if (this.vel.mag() < 0.01) this.vel = Vector.zero;
-        this.coords = this.coords.add(this.vel);
-        this.vel = this.vel.mul(0.5);
-        this.addForce(new Vector(0, 0, -0.05)); // gravity
-
-        // Moves the mouse to the centre of the screen if not shift locked
-        // rotates and moves the camera to follow the player
-        if (locked) {
-            // Finds the difference in mouse coordinates
-            Point p = MouseInfo.getPointerInfo().getLocation();
-            int screenX = this.window.getWidth() / 2;
-            int screenY = this.window.getHeight() / 2;
-            setRot(getAngles().add(new Vector(0, (-screenY + p.getY() - window.screenLoc().y) / 2000, (screenX - p.getX() + window.screenLoc().x) / 2000)));
-
-            try {
-                Robot robot = new Robot();
-                robot.mouseMove(screenX + window.screenLoc().x, screenY + window.screenLoc().y);
-
-            } catch (AWTException e) {
-                e.printStackTrace();
+        if (!this.locked) {
+            ;
+        } else {
+            canJump = false;
+            if (movement[0]) addForce(norm.mul(0.05));
+            if (movement[1]) addForce(left.mul(-0.05));
+            if (movement[2]) addForce(norm.mul(-0.05));
+            if (movement[3]) addForce(left.mul(0.05));
+            if (this.survival) {
+                checkCollision(); // checks for collisions
+                if (movement[4] && canJump) addForce(Vector.k.mul(1.50));
+            } else {
+                if (movement[4]) addForce(Vector.k.mul(0.25));
+                checkCollision();
             }
+
+            // updates velocity and coordinates
+            if (this.vel.mag() < 0.01) this.vel = Vector.zero;
+            this.coords = this.coords.add(this.vel);
+            this.vel = this.vel.mul(0.5);
+            this.addForce(new Vector(0, 0, -0.05)); // gravity
+
+            // Moves the mouse to the centre of the screen if not shift locked
+            // rotates and moves the camera to follow the player
+            if (locked) {
+                // Finds the difference in mouse coordinates
+                Point p = MouseInfo.getPointerInfo().getLocation();
+                int screenX = this.window.getWidth() / 2;
+                int screenY = this.window.getHeight() / 2;
+                setRot(getAngles().add(new Vector(0, (-screenY + p.getY() - window.screenLoc().y) / 2000, (screenX - p.getX() + window.screenLoc().x) / 2000)));
+
+                try {
+                    Robot robot = new Robot();
+                    robot.mouseMove(screenX + window.screenLoc().x, screenY + window.screenLoc().y);
+
+                } catch (AWTException e) {
+                    e.printStackTrace();
+                }
+            }
+            camera.coords = this.coords.add(CAMERA_OFFSET); // moves the camera with the player
         }
-        camera.coords = this.coords.add(CAMERA_OFFSET); // moves the camera with the player
     }
 
     // helper code to run on every render
