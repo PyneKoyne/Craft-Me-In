@@ -22,7 +22,7 @@ To run, simply download the [zip](https://www.dropbox.com/scl/fi/shndepimm1sr35b
 - Complete Point3D, Quaternion, and Vector classes
 - Eye-like projection
 - Realistic rotation and movement of the camera
-- Custon Mesh generation
+- Custom Mesh generation
 
 
 https://github.com/PyneKoyne/Craft-Me-In/assets/39810461/25e9201c-606f-4c34-9777-2ca3cf0433ba
