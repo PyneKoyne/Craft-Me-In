@@ -1,10 +1,21 @@
 # Real-Engine
-this is a real engine not fake
+An implementation of a 3D rendering engine written in plain Java, and JOCL for GPU Accelerated rendering. This project was created for my Grade 11 Introduction to Computer Science Summative (Ontario).
 
-Run Main.java, and follow the instructions presented on the screen.
+---
 
-> This is a 3D engine created for my grade 11 ICS class using orthogonal projection. There's no "head" so you can see behind you :)
+## Dependencies
+- JDK version 17+
+- GUI elements
+- JOCL
 
+## Build
+Download the zipped project folder in releases, and use Maven to download the required dependencies.
 
+Ensure you have OpenCL installed on your computer.
+
+---
+
+### Example
 https://github.com/PyneKoyne/Real-Engine/assets/39810461/b443d111-f632-4ad3-8ccd-250e65dfa877
 
+*This was shown in class as part of my demo.*
