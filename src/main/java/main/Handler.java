@@ -13,6 +13,7 @@ public class Handler {
     // A list of all the gameObjects
     public LinkedList<gameObject> object = new LinkedList<gameObject>();
     public ArrayGPU[] gpu = new ArrayGPU[3]; // gpu rendering accessible for the game objects
+    public PerlinNoise perlinNoise; // perlin noise generator for terrain generation
 
     // Ticks and renders every game object
     public void tick(){

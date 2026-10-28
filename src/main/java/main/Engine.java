@@ -48,7 +48,9 @@ public class Engine extends Canvas implements Runnable{
         Files.createDirectories(Paths.get(Chunk.CHUNK_PATH));
         handler = new Handler(); // Creates a handler class to manage all our game objects
         handler.gpu[0] = new ArrayGPU(); // sets the GPU integration of the handler
-        handler.gpu[0].startProgram(ArrayGPU.projectionSource); // starts the
+        handler.gpu[0].startProgram(ArrayGPU.projectionSource); // starts the GPU integration
+        handler.perlinNoise = new PerlinNoise(Chunk.SIZE, Chunk.SIZE, (long) (Math.random() * 999999)); // terrain map
+
 
         this.chunkHashMap = new HashMap<>(); // the chunk hashmap
 

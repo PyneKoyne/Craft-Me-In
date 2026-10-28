@@ -25,7 +25,7 @@ public class Chunk extends gameObject {
     private int[] colors;
     private boolean active;
     public static final int SIZE = 8; // size of perlin noise
-    public static final int HEIGHT_MAX = 25; // max height of a block
+    public static final int HEIGHT_MAX = 22; // max height of a block
     public static final String CHUNK_PATH = "./craftmein/Chunks/";
     private File f;
     public static int renderDistance = 3; // how many chunks to render
@@ -67,12 +67,11 @@ public class Chunk extends gameObject {
 
         if (!f.exists()) { // checks if the chunk exists
             // generates the perlin noise of the chunk
-            perlinNoise = new PerlinNoise(SIZE * 4, SIZE); // terrain map
-            heatmap = perlinNoise.generateNoise(); // generate basic heatmap
+            heatmap = this.handler.perlinNoise.generateNoise((int) this.getX(), (int) this.getY()); // generate basic heatmap
             // add blocks according to heatmap
             for (int i = 0; i < SIZE; i++) {
                 for (int j = 0; j < SIZE; j++) {
-                    height = heatmap[i + SIZE][j]; // initial height of the block
+                    height = heatmap[i][j]; // initial height of the block
                     counter = 0;
                     while (height >= 0) { // give each coordinate height based on perlin noise
                         loc = new Point3D(i, j, height);
